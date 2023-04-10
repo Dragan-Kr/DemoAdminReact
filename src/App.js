@@ -72,7 +72,7 @@ import "./index.css";
 import "./list.css";
 import { Provider } from "react-alert";
 // import Layout from "pages/_layouts/Home";
-import {  Routes, Route, BrowserRouter } from "react-router-dom";
+import {  Routes, Route, BrowserRouter,Router,Switch } from "react-router-dom";
 // import routes from "routes";
 // import PageNotFound from "pages/PageNotFound";
 // import Home from "pages/Home";
@@ -89,6 +89,9 @@ import Header from "./components/Header/Header.js";
 
 import MainLayout from "./components/Layout/MainLayout";
 import HomePage from "./components/HomePage/HomePage";
+import UpdatePostComponent from "./components/UpdatePostComponent";
+import UpdatePost from "./components/UpdatePost";
+
 function App() {
     return (
         <BrowserRouter>
@@ -99,10 +102,16 @@ function App() {
             <Route path="/" element={HomePage}/>
             <Route path="/add-news" element={<CreatePostComponent2/>}/>
             <Route path="/news-list" element={<DataTable/>}/>
-            {/* <Route path="/add-news" element={<CreatePostComponent/>}/> */}
+            <Route path="/update-news/:id" element={<UpdatePostComponent/>}/>
+            {/* <Route path="/update-news2/:id" element={<UpdatePost/>}/> */}
         </Route>
         </Routes>
         </BrowserRouter>
+
+
+
+
+       
         
     );
 }

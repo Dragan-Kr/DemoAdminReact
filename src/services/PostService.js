@@ -12,11 +12,21 @@ class PostService{
         return axios.get(Post_API_Base_URL + '/'+postId);
     }
 
-    createPost(post){
-        return axios.post(Post_API_Base_URL,post);
+    createPost(url,post,formData){
+        return axios.post(Post_API_Base_URL,post,formData);
     }
 
+    deletePost(postId){
+        return axios.delete(Post_API_Base_URL + '/' + postId);
+    }
 
+    // deletePost(post){
+    //     return axios.delete(Post_API_Base_URL,post._id);
+    // }
+
+    updatePost(post,postId){
+        return axios.patch(Post_API_Base_URL + '/' + postId,post);
+    }
 
 }
 

@@ -12,16 +12,14 @@ import Cancel from '../images/cancel.svg';
 // import FormData from 'formdata';
 import FormData from 'form-data';
 import { format } from 'date-fns'
-import { Navigate  } from 'react-router-dom';
-import { withRouter } from 'react-router-dom';
+import Index from '../pages/Pages/index';
 
-
-class CreatePostComponent extends Component {
+class UpdatePostComponent extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            _id: '',
+            _id: '',       
             title: '',
             shortDescription: '',
             mainContent: '',
@@ -31,7 +29,6 @@ class CreatePostComponent extends Component {
             categories: [],
             selectedOptions: '',
             images: []
-            // formData: new FormData() 
         };
 
         this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -40,7 +37,7 @@ class CreatePostComponent extends Component {
         this.changeMainContentHandler = this.changeMainContentHandler.bind(this);
         this.changeIsPublishedHandler = this.changeIsPublishedHandler.bind(this);
         this.changePostDateHandler = this.changePostDateHandler.bind(this);
-        this.savePost = this.savePost.bind(this);
+        this.updatePost = this.updatePost.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
         this.handleWriterSelect = this.handleWriterSelect.bind(this);
         this.handleImageUpload = this.handleImageUpload.bind(this);
@@ -48,74 +45,57 @@ class CreatePostComponent extends Component {
         this.handleDrop = this.handleDrop.bind(this);
     }
 
-    savePost(e) {
-        e.preventDefault();
-       
 
-        if(this.state.title==='' && this.state.createdBy.length===0 && this.state.selectedOptions.length==0){
-            window.alert('Fill the Title, Written By and Categories filds');
-            return;
-        }
-        
-         else if(this.state.title===''){
-            window.alert('Fill the Title field');
-            return;
-        }
-        
-        else if(this.state.createdBy.length===0 ){
-            window.alert('Fill the Written By field');
-            return;
-        }
-        else if(this.state.selectedOptions.length ===0){
-            window.alert('Fill the Categories field');
-            return;
-        }
-        
-        const valueArray = this.state.selectedOptions.map(item => item.value);
-        
-        console.log("Ovo je valueArray" + JSON.stringify(valueArray));
+    componentWillMount(){
+        const url = window.location.href;
+        const id = url.substring(url.lastIndexOf('/') + 1).split("?")[0].split("#")[0];
+        this.setState({_id:id});
+        console.log("Ovo je id iz componentDidUpdate",id);
+        PostService.getPostById(id).then((res) =>{
+            let post = res.data;
+            console.log("Ovo je res.data iz componentDidMount",res.data);
+            this.setState({title: post.title,
+                shortDescription: post.shortDescription,
+                mainContent:post.mainContent,
+                isPublished:post.isPublished,
+                postDate:post.postDate,
+                createdBy:post.createdBy,
+                categories:post.categories
+            });
 
-           const url='http://localhost:8000/api/post';
-           const formData = new FormData();
-        //    console.log("Ovo su ti images",this.state.images)
-
-        for(let i =0; i < this.state.images.length; i++) {
-            console.log("Images u for petlji",this.state.images[i]);
-            // formData.append('images',this.state.images[i].name);
-             formData.append('images',this.state.images[i]);
+        });
     }
 
 
-           
+    
+
+    updatePost(e) {
+        e.preventDefault();
+       
+        const valueArray = this.state.selectedOptions.map(item => item.value);
+        console.log("Ovo je valueArray" + JSON.stringify(valueArray));
+    
 
         let post = {
             title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray, createdBy: this.state.createdBy.value        
+            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray, createdBy: this.state.createdBy.value,
+            
         };
 
 
-        // axios.post(url,formData,post).then((res)=>{
-        //     console.log(res.data);
-        // }).catch((err)=>{
-        //     console.log(err);
-        // })
+       
+       
+        PostService.updatePost(post,this.state._id)
 
-        
-      
-
-        PostService.createPost(post,formData)
             .then(res => {
-                // navigate('/news-list/');
+               
                 // window.location.replace('http://localhost:3000/news-list');
-
             }).catch((error) => {
-                window.alert('Post failed');
                 console.log(error.message);
             });
-        }
-       
-        
-       
+
+    }
+
     
 
     changeTitleHandler(event) {
@@ -140,13 +120,9 @@ class CreatePostComponent extends Component {
         this.setState({ postDate: event.target.value });
     }
 
-    // cancel(){
-    //     this.props.history.push('/post');
-    // }
 
 
     handleSelect(event) {
-        //  console.log('Ovo je event', event.target.value);
         this.setState({ selectedOptions: event });
     }
 
@@ -160,8 +136,7 @@ class CreatePostComponent extends Component {
     readImage = (event) => {
         if (window.File && window.FileList && window.FileReader) {
             const files = event.target.files; //FileList object
-            if(files!=null){ 
-            // console.log("Ovo je files iz readImage",files)
+           
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 console.log("Ovo je file iz readImage", file)
@@ -179,7 +154,6 @@ class CreatePostComponent extends Component {
                 picReader.readAsDataURL(file);
             }
             document.querySelector("#pro-image").value = '';
-        }else { return}
         } else {
             console.log('Browser not support');
         }
@@ -233,8 +207,7 @@ class CreatePostComponent extends Component {
                 return (
                     {
                         ...styles,
-                        // backgroundColor: '##5561B3',
-                        // color: '##5561B3',
+                        
 
                         height: 50,
                         dropdownIndicator: { dropdownIndicatorStyles }
@@ -253,7 +226,6 @@ class CreatePostComponent extends Component {
                 return {
                     ...styles,
                     color: "#FFFFFF",
-                    //  textAlign: "center"
                     fontSize: 16,
                     fontWeight: 500,
                     fontFamily: "'Poppins', sans-serif",
@@ -272,34 +244,32 @@ class CreatePostComponent extends Component {
         return (
             <form>
                 <div className="heading-post">
-                    <h1>Add New Post</h1>
+                    <h1>Update Post</h1>
                     <div className='top-btns'>
-                        <button className="preview-button"><Isvg src={Eye} />Preview</button>
-                        <button className="save-button" onClick={this.savePost}><Isvg src={Save} />Save</button>     
+                        <button className="save-button" onClick={this.updatePost}><Isvg src={Save} />Save</button>
+
                     </div>
 
+
                 </div>
-                {/* <button className="save-button" onClick={this.savePost}><span>Save</span></button> */}
-                <div className="add-news-content">
+                <div className="d-flex flex-row">
 
                     <div className="left-form">
-                        <input className="title-input" placeholder="Title" type='text' value1={this.state.title}  onChange={this.changeTitleHandler} required />
+                        <input className="title-input" placeholder="Title" type='text' value={this.state.title} onChange={this.changeTitleHandler} />
                         <h2>Content</h2>
                         <div className="textarea-content">
                             <label>Short description</label>
-                            <textarea rows="5" cols="50" placeholder="Short content of the editor..." value2={this.state.shortDescription} onChange={this.changeShortDescriptionHandler}>
+                            <textarea rows="5" cols="50" placeholder="Short content of the editor..." value={this.state.shortDescription} onChange={this.changeShortDescriptionHandler}>
                             </textarea>
                         </div>
 
                         <div className="textarea-content">
                             <label>Main content</label>
-
-                            <textarea rows="20" cols="50" placeholder="Content of the editor..." value3={this.state.mainContent} onChange={this.changeMainContentHandler}>
+                            <textarea rows="20" cols="50" placeholder="Content of the editor..." value={this.state.mainContent} onChange={this.changeMainContentHandler}>
                             </textarea>
                         </div>
 
                         <div className='image-uploader'>
-                            {/* <ImageUploader /> */}
                             <h4>Images</h4>
                             <fieldset className="form-group">
                                 <input
@@ -320,22 +290,21 @@ class CreatePostComponent extends Component {
                                 {this.state.images.map((image, index) => (
                                     <div className={`preview-image preview-show-${index + 1}`} key={index}>
                                         <div className="image-cancel" data-no={index + 1} onClick={() => this.handleImageDelete(index)}>
-                                            <Isvg src={Cancel} />
+                                          <Isvg src={Cancel}/>
                                         </div>
-                                        <div className="image-zone">
+                                        <div className="image-zone">                                     
                                             <img id={`pro-img-${index + 1}`} src={image} alt="" />
-
+                                            
                                         </div>
-
+                                        
                                     </div>
                                 ))}
                                 <a href="javascript:void(0)" onClick={() => document.getElementById('pro-image').click()}>
                                     <div className='uploader-add-link'>
-                                        <Isvg src={Plus} />
-                                        <span className='span1'>Upload a File</span>
+                                    <Isvg src={Plus} />
+                                        <span className='span1'>Upload a File</span> 
                                         <span className='span2'> or drag and drop</span>
-                                    </div>
-                                    {/* <Isvg src={Plus} /> */}
+                                     </div>
                                 </a>
                             </div>
 
@@ -360,7 +329,7 @@ class CreatePostComponent extends Component {
 
                         <div className="date-content">
                             <label>Post Date</label>
-                            <input className="date-input" placeholder="5 May 2022" type='date' value6={this.state.postDate} onChange={this.changePostDateHandler} />
+                            <input className="date-input" placeholder="5 May 2022" type='date' value={this.state.postDate} onChange={this.changePostDateHandler} />
                         </div>
 
 
@@ -382,7 +351,6 @@ class CreatePostComponent extends Component {
 
                         <div className="published-content">
                             <label>Published</label>
-                            {/* <SwitchBooleanComponent /> */}
                             <label className="switch">
 
                                 <input type="checkbox" value={this.state.isPublished} onChange={this.changeIsPublishedHandler} />
@@ -411,7 +379,6 @@ class CreatePostComponent extends Component {
     async getListOfWriters() {
         const res = await axios.get('http://localhost:8000/api/writer');
         console.log('res', res);
-        //const outputArr = inputObj.writers.map(writer => writer);
         const writers = res.data.writers.map(d => ({
             "value": d._id,
             "label": d.name + ' ' + d.lastName
@@ -420,9 +387,7 @@ class CreatePostComponent extends Component {
         console.log('selectWriters su:' + JSON.stringify(writers));
     }
 
-    //   componentDidMount(){
-    //     this.getListOfWriters();
-    // }
+  
 
     handleWriterChange(e) {
         this.setState({ createdBy: e.value, name: e.label })
@@ -446,8 +411,10 @@ class CreatePostComponent extends Component {
     }
 
     componentDidMount() {
+       
         this.getListOfWriters();
         this.getListOfCategories();
+
     }
 
-} export default CreatePostComponent;
+} export default UpdatePostComponent;

@@ -39,6 +39,7 @@
   *::before,
   *::after {
     box-sizing: border-box;
+    position: relative;
   }
 /*   
   html {
@@ -1689,8 +1690,14 @@
   .table thead th {
     vertical-align: bottom;
     border-bottom: 2px solid #dee2e6;
+    color: #818FA5;
+    font-size: 13px;
+    text-transform: uppercase;
   }
-  
+  .table thead th:last-child {
+    text-align: right;
+    padding-right: 25px;
+  }
   .table tbody + tbody {
     border-top: 2px solid #dee2e6;
   }
@@ -2033,28 +2040,67 @@
   }
 
   .form-control1 {
-    display: inline;
-    width: 220px;
-    height: 50px;
-    border:none;
-    background-color: #FFFFFF;
-    border-radius: 15px;
-    float: right;
+      /* display: flex; */
+      width: 220px;
+      height: 50px;
+      border: none;
+      background-color: #FFFFFF;
+      border-radius: 15px;
+      float: right;
+    
   }
 
-  .form-control1 ::placeholder {
+ .form-control1::placeholder {
+    position: absolute;
     font-size: 16px;
-    color: green;
+    color: #161F5E;
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
+    margin-left: 60px;
+    margin-top: 12px;
+    margin-bottom: 12px;
 
   }
   
+
+.css-b62m3t-container{
+/* position: relative;
+bottom: -30px; */
+
+background: #FFFFFF;
+border-radius: 15px;
+}
+
+.top-serach-items{
+  margin-bottom:30px;
+  position:relative;
+}
+
+
+
+
+
+.search-magnifying{
+    /* display: flex; */
+    position: relative;
+    right: -1220px;
+    z-index: 5;
+    bottom: -68px;
+}
+
+.search-magnifying:hover{
+display: none;
+}
+
+
+
   @media (prefers-reduced-motion: reduce) {
     .form-control {
       transition: none;
     }
   }
+
+  
   
   .form-control::-ms-expand {
     background-color: transparent;
@@ -5101,6 +5147,10 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     color: #FFFFFF;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
   .page-item.disabled .page-link {
@@ -5136,11 +5186,13 @@
   .pagination-sm .page-item:first-child .page-link {
     border-top-left-radius: 0.2rem;
     border-bottom-left-radius: 0.2rem;
+
   }
   
   .pagination-sm .page-item:last-child .page-link {
     border-top-right-radius: 0.2rem;
     border-bottom-right-radius: 0.2rem;
+    
   }
   
   .badge {
@@ -10335,7 +10387,9 @@
 
 .drop-down-left-word {
   align-self: center;
-  padding: 15px;
+  /* padding: 15px;
+  position: relative;
+  bottom: -30px; */
 }
 
 .drop-down-left-word label{
@@ -10346,9 +10400,16 @@ font-family:'Poppins', sans-serif;
 color: #3A3F56;
 }
 
-.drop-down-right-word {
-  align-self: center;
-  padding-left: 10px;
+.drop-down-right {
+ 
+    /* align-self: flex-end; */
+    padding-left: 10px;
+    left: 5px;
+    
+    position: relative;
+    align-self: center;
+
+  
 }
 .drop-down-right-word label{
   font-size: 16px;
@@ -10357,21 +10418,49 @@ font-family:'Poppins', sans-serif;
 color: #3A3F56;
 }
 
-
+.update-delete-img-div{
+text-align: right;
+}
 
 .isvg-pen-update {
  height: 22px;
  width: 22px;
- position: relative;
- right: 20px;
+
 }
 .isvg-pen-delete{
   height: 22px;
   width: 22px;
-
-
+margin-left: 20px;
 }
 
+.title-td{
+
+font-weight: 600;
+font-family:'Poppins', sans-serif;
+color: #3A416F;
+font-size: 15px;
+width: 50%;
+}
+
+.name-arrows svg{
+  
+margin-left: 15px;
+}
+
+
+.table-striped>tbody>tr:nth-of-type(odd)>*{
+  --bs-table-accent-bg: white;
+}
+
+
+.table thead {
+  text-align:left; 
+}
+
+
+.table tbody{
+  text-align:left; 
+}
 /* 
 .css-13cymwt-control {
 -webkit-align-items: center;
@@ -10417,3 +10506,131 @@ height: 50px;
 align-self: center;
 padding-right: 20px;} */
 
+.active>.page-link {
+  
+  border-color: transparent;
+}
+
+.page-item.active {
+  border-color: transparent;  
+}
+
+
+ 
+
+.page-item.active .page-link {
+  
+  border-color: transparent !important;
+  
+}
+
+
+.disabled .page-link {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ 
+}
+
+.pagination .page-item:first-child .page-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+ }
+
+.pagination .page-item:first-child .page-link::before {
+  width: 12px;
+  height: 12px;
+  border-left: 3px solid #161F5E;
+  border-top: 3px solid #161F5E;
+  content: "";
+  display: block;
+  transform: rotate(-50deg);
+}
+
+
+.page-link span{  
+  display: none;
+}
+
+.disabled:last-child .page-link::before{
+  
+  transform: rotate(135deg);
+ }
+
+ .last-paragraph{ 
+  position: absolute;
+  margin-top: -60px;
+  margin-bottom: 35px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 400px;
+  color: #2A2F35;
+  width: 238;
+  height: 23px;
+  margin-right: -35px;
+  right: 100px;
+ }
+
+ .pagination .page-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ }
+
+ .pagination .page-item:last-child .page-link::before {
+  width: 12px;
+  height: 12px;
+  border-left: 3px solid #161F5E;
+  border-top: 3px solid #161F5E;
+  content: "";
+  display: block;
+  transform: rotate(135deg);
+}
+
+
+.css-1dimb5e-singleValue{
+  grid-area: 1/1/2/3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: hsl(0, 0%, 20%);
+  margin-left: 2px;
+  margin-right: 2px;
+  box-sizing: border-box;
+  right: 2px;
+  position: relative;
+  left: -6px;
+}
+
+.css-1hb7zxy-IndicatorsContainer .css-1xc3v61-indicatorContainer:last-child{
+  fill: #161F5E;
+  width: 30px;
+  height: 30px;
+  position: relative;
+  left: -15px;
+}
+
+
+@media only screen and (max-width: 632px) {
+  .last-paragraph {
+   position: absolute;
+  margin-top: -60px;
+  margin-bottom: 35px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 400px;
+  color: #2A2F35;
+  width: 238;
+  height: 23px;
+  margin-right: -35px;
+  padding-top: 50px;
+  padding-right: 120px;
+    }
+}
+
+.news-list-drop{
+  display: flex;
+}

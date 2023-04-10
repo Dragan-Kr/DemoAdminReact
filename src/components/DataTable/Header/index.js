@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ArraowUp from '../../../images/sortArrowUp.svg';
+import ArraowDown from '../../../images/sortArrowDown.svg';
+import Isvg from 'react-inlinesvg';
+import Arrows from '../../../images/arrows.svg';
+
+import IsvgComponent from "../../IsvgComponent";
 
 const Header = ({ headers, onSorting }) => {
     const [sortingField, setSortingField] = useState("");
@@ -24,17 +30,19 @@ const Header = ({ headers, onSorting }) => {
                             sortable ? onSortingChange(field) : null
                         }
                     >
-                        {name}
-
-                        {sortingField && sortingField === field && (
-                            <FontAwesomeIcon
-                                icon={
+                        {name==="Action" ?"Action": <IsvgComponent name={name} image={Arrows}/> }
+                        
+                        {/* {sortingField && sortingField === field && (
+                            
                                     sortingOrder === "asc"
-                                        ? "arrow-down"
-                                        : "arrow-up"
-                                }
-                            />
+                                        ?  <Isvg  src={Arrows}/>
+                                        :  <Isvg src={Arrows}/>
+                                
+                            
+
+                            
                         )}
+                        <Isvg  src={ArraowUp}/> */}
                     </th>
                 ))}
             </tr>

@@ -6,11 +6,13 @@ import  ProfilePicture from  '../../images/profilePicture.svg';
 import Doots from '../../images/doots.svg';
 
 
-function Header(){
+function Header({setElementClass}){
 
   return(
   <div className='header'>
-    <button className='button-side-bar'><Isvg src={ButtonSidebar}/></button>
+    <button className='button-side-bar' onClick = {()=> {
+      setElementClass(prev=>!prev)
+    }}><Isvg src={ButtonSidebar}/></button>
     <div className='header-content-right'>
         <input className='header-input' type='text' placeholder="Search something..." />
         <button className='head'><Isvg src={HeadPhone}/></button>

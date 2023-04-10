@@ -12,11 +12,16 @@ import DateFormat from 'dateformat';
 import Isvg from 'react-inlinesvg';
 
 
-import HeadPhone from '../../images/headPhone.svg';
-import Doots from '../../images/doots.svg';
+
 import Select from 'react-select';
 import Pen from '../../images/pen.svg';
 import Trash from '../../images/trash.svg';
+import SortArrowUp from '../../images/sortArrowUp.svg';
+import PagiantionArrow from '../../images/paginationArrow.svg';
+import Magnifying from '../../images/magnifying.svg';
+
+// import { useNavigate } from 'react-router-dom';
+
 /////////////////////////////ORIGINALNI KOD*///////////////////////////////////////
 
 
@@ -28,12 +33,14 @@ const DataTable = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
     const [sorting, setSorting] = useState({ field: "", order: "" });
+    const [isTyped,setIsTyped] = useState(false);
+    // const navigate = useNavigate();
     //  const [itemsPerPage,setItemsPerPage] = useState(2);
 
     const headers = [
-        { name: "NO.", field: "index", sortable: true },
+        { name: "NO.", field: "index", sortable: true, img: SortArrowUp },
         { name: "Title", field: "title", sortable: true },
-        { name: "ShortDescription", field: "shortDescription", sortable: true },
+        // { name: "ShortDescription", field: "shortDescription", sortable: true },
         { name: "Date", field: "postDate", sortable: true },
         { name: "Time", field: "postDate", sortable: true },
         { name: "Action", field: "", sortable: false },
@@ -42,9 +49,9 @@ const DataTable = () => {
     ];
 
     const options = [
-        { label: "1", value: 1 },
-        { label: "2", value: 2 },
-        { label: "3", value: 3 },
+        { label: "5", value: 5 },
+        { label: "8", value: 8 },
+        { label: "10", value: 10 },
     ];
 
     const [perPage, setPerPage] = useState(options[1].value);
@@ -66,13 +73,11 @@ const DataTable = () => {
         getData();
     }, []);
 
+
+
+
     const commentsData = useMemo(() => {
         let computedComments = comments;
-
-
-
-
-
         if (search) {
             computedComments = computedComments.filter(
                 comment =>
@@ -84,15 +89,36 @@ const DataTable = () => {
 
         setTotalItems(computedComments.length);
 
-        //Sorting comments
+        //Sorting comments--ORIGINAL
+        // if (sorting.field) {
+        //     const reversed = sorting.order === "asc" ? 1 : -1;
+        //     computedComments = computedComments.sort(
+        //         (a, b) =>
+        //             reversed * a[sorting.field].localeCompare(b[sorting.field])
+        //     );
+        // } 
+        ///////////////////
+
+
         if (sorting.field) {
-            const reversed = sorting.order === "asc" ? 1 : -1;
-            computedComments = computedComments.sort(
-                (a, b) =>
-                    reversed * a[sorting.field].localeCompare(b[sorting.field])
-            );
+            if (isNaN(computedComments[0][sorting.field])) {
+                const reversed = sorting.order === "asc" ? 1 : -1;
+                computedComments = computedComments.sort(
+                    (a, b) =>
+                        reversed * a[sorting.field].localeCompare(b[sorting.field])
+                );
+            } else {
+                const reversed = sorting.order === "asc" ? 1 : -1;
+                computedComments = computedComments.sort(
+                    (a, b) => reversed * (a[sorting.field] - b[sorting.field])
+                );
+            }
         }
-        console.log(computedComments)
+
+
+
+
+
         //Current Page slice
         return computedComments.slice(
             (currentPage - 1) * perPage,
@@ -101,17 +127,6 @@ const DataTable = () => {
     }, [comments, currentPage, search, sorting]);
 
 
-
-    ////TOP PART////
-
-
-    // const options = [
-    //     { label: "1", value: "1" },
-    //     { label: "2", value: "2" },
-    //     { label: "3", value: "3" },
-    // ];
-
-    // const [perPage, setPerPage] = useState(options[1].value);
 
 
     const colourStyles = {
@@ -145,10 +160,28 @@ const DataTable = () => {
 
     ////TOP PART////
 
-   
+    // const handleDeletePost = async (post) => {
+    //     const deletedPost = await deletePost(post._id);
+    //     setPosts(posts.filter((post) => post._id !== deletedPost._id));
+    //   };
+
+
+    const handleDeletePost = (post) => {
+        console.log("Ovo je post iz handleDeletePost", post);
+        PostService.deletePost(post._id).then((res) => {
+            setComments(comments.filter((comment) => comment._id !== post._id));
+        });
+    };
 
 
 
+
+    const editPost = (_id) => {
+        console.log("Ovo je _id iz editPost", _id);
+        window.location.replace(`http://localhost:3000/update-news/${_id}`);
+
+        // navigate('/update-news/');
+    }
 
 
 
@@ -160,21 +193,10 @@ const DataTable = () => {
                 <div className="col mb-3 col-12 text-center">
                     <div className="row">
 
-                        <div>
+                        <div className="top-serach-items">
 
-                            <div className="news-list-search">
-                                <Search
-                                    onSearch={value => {
-                                        setSearch(value);
-                                        setCurrentPage(1);
-                                    }}
-                                />
-
-
-                            </div>
-
-
-                            <div className="news-list-drop-down">
+                        <div className="news-list-drop-down">
+                            <div className="news-list-drop"> 
                                 <div className="drop-down-left-word">
                                     <label>Show </label>
 
@@ -187,12 +209,33 @@ const DataTable = () => {
                                     value={options.find(option => option.value === perPage)}
                                     onChange={option => setPerPage(option.value)}
                                 />
-                                <div className="drop-down-right-word"> <label className="drop-down-right-word">entries</label>  </div>
+                                <div className="drop-down-right"> <label className="drop-down-right-word">entries</label> 
+                                 </div>
+                                </div>
 
 
-                            </div>
+                            {/* <div className="news-list-search"> */}
+                          <div> 
+                            { !isTyped &&  <Isvg className="" src={Magnifying}/> }
 
+                            <Search
+                                onSearch={value => {
+                                    setSearch(value);
+                                    setCurrentPage(1);
+                                    setIsTyped(true);
+                                   
+                                }}
+                            />
+                           
+                           </div>
+                            {/* </div> */}
+
+
+                           
+                         {/* { !isTyped &&  <Isvg className="search-magnifying" src={Magnifying}/> } */}
+                         
                         </div>
+                    </div>
                     </div>
 
                     <table className="table table-striped">
@@ -201,6 +244,7 @@ const DataTable = () => {
                             onSorting={(field, order) =>
                                 setSorting({ field, order })
                             }
+
                         />
                         <tbody>
                             {commentsData.length > 0 && commentsData.map((comment) => (
@@ -209,20 +253,27 @@ const DataTable = () => {
                                     <th scope="row" key={comment._id}>
                                         {comment.index}
 
+
+
                                     </th>
-                                    <td>{comment.title}</td>
-                                    <td>{comment.shortDescription}</td>
+                                    <td className="title-td">{comment.title}</td>
+                                    {/* <td>{comment.shortDescription}</td> */}
                                     <td>{DateFormat(comment.postDate, "mm.dd.yyyy")}</td>
                                     <td>{DateFormat(comment.postDate, "h:MM")} h</td>
                                     <td>
-                                        <Isvg className='isvg-pen-update' src={Pen} />
-                                        <Isvg className='isvg-pen-delete' src={Trash} />
+                                        <div className="update-delete-img-div">
+                                            <button onClick={() => editPost(comment._id)}><Isvg className='isvg-pen-update' src={Pen} /></button>
 
+                                            <button onClick={() => handleDeletePost(comment)}>
+                                                <Isvg className='isvg-pen-delete' src={Trash} />
+                                            </button>
+                                        </div>
 
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
+                        {/* <div> <p className="last-paragraph">Showing 1 to {perPage} of {comments.length} entries</p> </div> */}
                     </table>
                     <div className="col-md-6">
                         <Pagination
@@ -231,13 +282,16 @@ const DataTable = () => {
                             currentPage={currentPage}
                             onPageChange={page => setCurrentPage(page)}
 
+
                         />
-                        <div> <p className="last-paragraph">Showing {perPage} of {comments.length} entries</p> </div>
+
                     </div>
-                    {/* <p className="last-paragraph">Showing 1 to {perPage} of {comments.length} entries</p> */}
+
                 </div>
             </div>
-            {/* {loader} */}
+            <div> <p className="last-paragraph">Showing 1 to {perPage} of {comments.length} entries</p> </div>
+
+            
         </>
     );
 };

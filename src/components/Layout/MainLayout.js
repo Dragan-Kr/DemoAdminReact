@@ -1,15 +1,20 @@
 import SideBar from '../Sidebar/MySideNav';
 import Header from '../Header/Header';
 import { Outlet } from 'react-router-dom';
-function MainLayout (){
+import { useState } from 'react';
+
+function MainLayout (props){
+
+const [elementClass, setElementClass] = useState(false)
+
 
 return(
 
 <div className='main-page'>
- <aside className='aside'><SideBar/></aside> 
+ <aside className={ `aside${elementClass? " responsive":""}`}><SideBar /></aside> 
  <div className='right-content'>
 
-   <header><Header/></header>
+   <header><Header setElementClass={setElementClass}/></header>
    
    <Outlet/>
  </div>
