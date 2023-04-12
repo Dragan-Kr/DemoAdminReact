@@ -12,8 +12,8 @@ class PostService{
         return axios.get(Post_API_Base_URL + '/'+postId);
     }
 
-    createPost(url,post,formData){
-        return axios.post(Post_API_Base_URL,post,formData);
+    createPost(post){
+        return axios.post(Post_API_Base_URL, post);
     }
 
     deletePost(postId){
@@ -26,6 +26,15 @@ class PostService{
 
     updatePost(post,postId){
         return axios.patch(Post_API_Base_URL + '/' + postId,post);
+    }
+    createPostWithUpload(formData) {
+        axios({
+            method: 'post',
+            url: Post_API_Base_URL,
+            data: formData,
+            headers: { 'Content-Type': 'multipart/form-data' },
+          })
+
     }
 
 }

@@ -33,7 +33,7 @@ const DataTable = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
     const [sorting, setSorting] = useState({ field: "", order: "" });
-    const [isTyped,setIsTyped] = useState(false);
+    const [isTyped, setIsTyped] = useState(false);
     // const navigate = useNavigate();
     //  const [itemsPerPage,setItemsPerPage] = useState(2);
 
@@ -195,47 +195,48 @@ const DataTable = () => {
 
                         <div className="top-serach-items">
 
-                        <div className="news-list-drop-down">
-                            <div className="news-list-drop"> 
-                                <div className="drop-down-left-word">
-                                    <label>Show </label>
+                            <div className="news-list-drop-down">
+                                <div className="news-list-drop">
+                                    <div className="drop-down-left-word">
+                                        <label>Show </label>
 
+                                    </div>
+
+                                    <Select
+                                        options={options}
+                                        styles={colourStyles}
+                                        defaultValue={options}
+                                        value={options.find(option => option.value === perPage)}
+                                        onChange={option => setPerPage(option.value)}
+                                    />
+                                    <div className="drop-down-right"> <label className="drop-down-right-word">entries</label>
+                                    </div>
                                 </div>
 
-                                <Select
-                                    options={options}
-                                    styles={colourStyles}
-                                    defaultValue={options}
-                                    value={options.find(option => option.value === perPage)}
-                                    onChange={option => setPerPage(option.value)}
-                                />
-                                <div className="drop-down-right"> <label className="drop-down-right-word">entries</label> 
-                                 </div>
+
+                                {/* <div className="news-list-search"> */}
+                                <div>
+                                    {!isTyped && <Isvg className="" src={Magnifying} />}
+                                    
+
+                                    <Search
+                                        onSearch={value => {
+                                            setSearch(value);
+                                            setCurrentPage(1);
+                                            setIsTyped(true);
+
+                                        }}
+                                    />
+
                                 </div>
+                                {/* </div> */}
 
 
-                            {/* <div className="news-list-search"> */}
-                          <div> 
-                            { !isTyped &&  <Isvg className="" src={Magnifying}/> }
 
-                            <Search
-                                onSearch={value => {
-                                    setSearch(value);
-                                    setCurrentPage(1);
-                                    setIsTyped(true);
-                                   
-                                }}
-                            />
-                           
-                           </div>
-                            {/* </div> */}
+                                {/* { !isTyped &&  <Isvg className="search-magnifying" src={Magnifying}/> } */}
 
-
-                           
-                         {/* { !isTyped &&  <Isvg className="search-magnifying" src={Magnifying}/> } */}
-                         
+                            </div>
                         </div>
-                    </div>
                     </div>
 
                     <table className="table table-striped">
@@ -291,7 +292,7 @@ const DataTable = () => {
             </div>
             <div> <p className="last-paragraph">Showing 1 to {perPage} of {comments.length} entries</p> </div>
 
-            
+
         </>
     );
 };

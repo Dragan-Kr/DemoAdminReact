@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import PostService from '../services/PostService';
+import ImageService from '../services/ImageService';
 import ImageUploader from './ImageUploader';
 import ImageUploaderSecondPart from './ImageUploaderSecondPart';
 import Isvg from 'react-inlinesvg';
@@ -9,11 +10,8 @@ import Save from "../images/save.svg";
 import Eye from "../images/eye.svg";
 import Plus from "../images/plus.svg";
 import Cancel from '../images/cancel.svg';
-// import FormData from 'formdata';
 import FormData from 'form-data';
-import { format } from 'date-fns'
-import { Navigate  } from 'react-router-dom';
-import { withRouter } from 'react-router-dom';
+
 
 
 class CreatePostComponent extends Component {
@@ -30,7 +28,8 @@ class CreatePostComponent extends Component {
             createdBy: [],
             categories: [],
             selectedOptions: '',
-            images: []
+            images: [],
+            images2:[]
             // formData: new FormData() 
         };
 
@@ -50,73 +49,161 @@ class CreatePostComponent extends Component {
 
     savePost(e) {
         e.preventDefault();
-       
 
-        if(this.state.title==='' && this.state.createdBy.length===0 && this.state.selectedOptions.length==0){
+
+        if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
             window.alert('Fill the Title, Written By and Categories filds');
             return;
         }
-        
-         else if(this.state.title===''){
+
+        else if (this.state.title === '') {
             window.alert('Fill the Title field');
             return;
         }
-        
-        else if(this.state.createdBy.length===0 ){
+
+        else if (this.state.createdBy.length === 0) {
             window.alert('Fill the Written By field');
             return;
         }
-        else if(this.state.selectedOptions.length ===0){
+        else if (this.state.selectedOptions.length === 0) {
             window.alert('Fill the Categories field');
             return;
         }
-        
-        const valueArray = this.state.selectedOptions.map(item => item.value);
-        
-        console.log("Ovo je valueArray" + JSON.stringify(valueArray));
 
-           const url='http://localhost:8000/api/post';
-           const formData = new FormData();
+        const selectedCategories = this.state.selectedOptions.map(item => item.value);
+
+        console.log("Ovo je valueArray" + JSON.stringify(selectedCategories));
+
+        const url = 'http://localhost:8000/api/post';
+        const formData = new FormData();
         //    console.log("Ovo su ti images",this.state.images)
+        // const imagePickerCallBack = data => {
+        //     const picturesData = [...pictures];
+        //     const index = picturesData.length;
+        //     const image = {
+        //       image: data.uri,
+        //       fileName: data.fileName,
+        //       type: data.type,
+        //       index: index,
+        //     };
+        let imagesForm = [];
+        for (let i = 0; i < this.state.images2.length; i++) {
+            // formData.append('title', this.state.title);
+            // formData.append('shortDescription', this.state.shortDescription);
+            // formData.append('mainContent', this.state.mainContent);
+            // formData.append('isPublished', this.state.isPublished);
+            // formData.append('postDate', this.state.postDate);
+            // formData.append('categories', selectedCategories);
+            // formData.append('createdBy', this.state.createdBy.value);
+            formData.append('images2[]', this.state.images2[i]);
 
-        for(let i =0; i < this.state.images.length; i++) {
-            console.log("Images u for petlji",this.state.images[i]);
-            // formData.append('images',this.state.images[i].name);
-             formData.append('images',this.state.images[i]);
-    }
+            imagesForm.push(formData)
+        }
+    //    console.log(  formData.get('files'));
+         console.log("Ovo je images2",this.state.images2)
 
 
-           
+
+        //Array of files converting to array of objects
+        const filesArray = [];
+
+        // Loop through the array of files
+        for (let i = 0; i < this.state.images2.length; i++) {
+          const file = this.state.images2[i];
+          const reader = new FileReader();
+        
+          // Use the FileReader API to read the contents of the file
+          reader.readAsDataURL(file);
+        
+          // When the file is loaded, create an object and push it to the array
+          reader.onload = function () {
+            filesArray.push({
+              name: file.name,
+            //   type: file.type,
+            //   size: file.size,
+            //   data: reader.result,
+            });
+          };
+        }
+        
+    
+        console.log("Ovo je filesArray",filesArray);
+
+
+
+
+        let imagesNames =[];
+
+        for (let i = 0; i < this.state.images2.length; i++) {
+            imagesNames.push(this.state.images2[i].name);
+
+        }
+
+console.log("imagesNames je",imagesNames)
+
+
+
+
+
+       ///////////////// 
+
 
         let post = {
             title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray, createdBy: this.state.createdBy.value        
+            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.createdBy.value,images:imagesNames
         };
+      console.log("Ovo su categories",this.state.categories)
+
+        fetch('http://localhost:8000/api/image',{
+            method:'POST',
+            // headers:{
+            //     'Content-Type':'multipart/form-data'
+            // },
+            body:formData
+
+            
+        })
+       
+
+        // ImageService.postImage(imagesForm)
+        //     .then(res => {
+        //         // navigate('/news-list/');
+        //         // window.location.replace('http://localhost:3000/news-list');
+
+        //     }).catch((error) => {
+        //         // window.alert('Post failed');
+        //         console.log(error.message);
+        //     });
 
 
-        // axios.post(url,formData,post).then((res)=>{
-        //     console.log(res.data);
-        // }).catch((err)=>{
-        //     console.log(err);
-        // })
 
-        
-      
+        // MOMO
+        // PostService.createPostWithUpload(formData) 
+        //     .then(res => {
+        //         // navigate('/news-list/');
+        //         // window.location.replace('http://localhost:3000/news-list');
 
-        PostService.createPost(post,formData)
+        //     }).catch((error) => {
+        //         window.alert('Post failed');
+        //         console.log(error.message);
+        //     });
+
+
+        PostService.createPost(post)
             .then(res => {
                 // navigate('/news-list/');
                 // window.location.replace('http://localhost:3000/news-list');
 
             }).catch((error) => {
-                window.alert('Post failed');
+                // window.alert('Post failed');
                 console.log(error.message);
             });
-        }
-       
-        
-       
-    
+
+    }
+
+
+
+
 
     changeTitleHandler(event) {
         this.setState({ title: event.target.value });
@@ -160,26 +247,30 @@ class CreatePostComponent extends Component {
     readImage = (event) => {
         if (window.File && window.FileList && window.FileReader) {
             const files = event.target.files; //FileList object
-            if(files!=null){ 
-            // console.log("Ovo je files iz readImage",files)
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                console.log("Ovo je file iz readImage", file)
-                if (!file.type.match('image')) continue;
 
-                const picReader = new FileReader();
+            console.log("Ovo su files iz readImage",files);
+            if (files != null) {
+                // console.log("Ovo je files iz readImage",files)
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    this.state.images2.push(file);
+                    console.log("Ovo je images2",this.state.images2)
+                    console.log("Ovo je jedan file iz readImage", file)
+                    if (!file.type.match('image')) continue;
 
-                picReader.addEventListener('load', (event) => {
-                    const picFile = event.target;
-                    const newImage = picFile.result;
-                    console.log("Ovo je newImage iz readImage", newImage);
-                    this.setState(prevState => ({ images: [...prevState.images, newImage] }))
-                });
+                    const picReader = new FileReader();
 
-                picReader.readAsDataURL(file);
-            }
-            document.querySelector("#pro-image").value = '';
-        }else { return}
+                    picReader.addEventListener('load', (event) => {
+                        const picFile = event.target;
+                        const newImage = picFile.result;
+                        console.log("Ovo je newImage iz picReader.addEventListener", newImage);
+                        this.setState(prevState => ({ images: [...prevState.images, newImage] }))
+                    });
+
+                    picReader.readAsDataURL(file);
+                }
+                document.querySelector("#pro-image").value = '';
+            } else { return }
         } else {
             console.log('Browser not support');
         }
@@ -188,6 +279,8 @@ class CreatePostComponent extends Component {
     handleImageUpload = e => {
         const files = Array.from(e.target.files);
         const newImages = files.map(file => URL.createObjectURL(file));
+
+        console.log("newImages iz handleImageUpload",files);
         this.setState(prevState => ({ images: [...prevState.images, ...newImages] }));
         console.log("Ovo je newImages iz handleImageLoad", newImages);
     };
@@ -275,7 +368,7 @@ class CreatePostComponent extends Component {
                     <h1>Add New Post</h1>
                     <div className='top-btns'>
                         <button className="preview-button"><Isvg src={Eye} />Preview</button>
-                        <button className="save-button" onClick={this.savePost}><Isvg src={Save} />Save</button>     
+                        <button className="save-button" onClick={this.savePost}><Isvg src={Save} />Save</button>
                     </div>
 
                 </div>
@@ -283,7 +376,7 @@ class CreatePostComponent extends Component {
                 <div className="add-news-content">
 
                     <div className="left-form">
-                        <input className="title-input" placeholder="Title" type='text' value1={this.state.title}  onChange={this.changeTitleHandler} required />
+                        <input className="title-input" placeholder="Title" type='text' value1={this.state.title} onChange={this.changeTitleHandler} required />
                         <h2>Content</h2>
                         <div className="textarea-content">
                             <label>Short description</label>
