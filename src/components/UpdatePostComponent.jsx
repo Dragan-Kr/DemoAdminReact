@@ -19,7 +19,7 @@ class UpdatePostComponent extends Component {
         super(props);
 
         this.state = {
-            _id: '',       
+            _id: props._id,
             title: '',
             shortDescription: '',
             mainContent: '',
@@ -28,7 +28,16 @@ class UpdatePostComponent extends Component {
             createdBy: [],
             categories: [],
             selectedOptions: '',
-            images: []
+            images: [],
+            images2: [],
+            firstCategories: [],
+            writers: [],
+            preselectedWriterId: '',
+            preselectedWriter: '',
+            preselectedWriters: [],
+            writerName: '',
+            preselectedCategories:[]
+
         };
 
         this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -43,52 +52,115 @@ class UpdatePostComponent extends Component {
         this.handleImageUpload = this.handleImageUpload.bind(this);
         this.readImage = this.readImage.bind(this);
         this.handleDrop = this.handleDrop.bind(this);
+        this.getWriter = this.getWriter.bind(this);
+        // this.getOneWriter = this.getOneWriter(this);
     }
 
 
-    componentWillMount(){
-        const url = window.location.href;
-        const id = url.substring(url.lastIndexOf('/') + 1).split("?")[0].split("#")[0];
-        this.setState({_id:id});
-        console.log("Ovo je id iz componentDidUpdate",id);
-        PostService.getPostById(id).then((res) =>{
+
+
+    componentDidMount() {
+        PostService.getPostById(this.state._id).then((res) => {
             let post = res.data;
-            console.log("Ovo je res.data iz componentDidMount",res.data);
-            this.setState({title: post.title,
-                shortDescription: post.shortDescription,
-                mainContent:post.mainContent,
-                isPublished:post.isPublished,
-                postDate:post.postDate,
-                createdBy:post.createdBy,
-                categories:post.categories
+            console.log("Ovo je res.data iz componentDidMount", res.data);
+            console.log("Ovo je postTitle iz componentDidMount", post.title);
+            this.setState({
+                title: res.data.post.title,
+                shortDescription: res.data.post.shortDescription,
+                mainContent: res.data.post.mainContent,
+                isPublished: res.data.post.isPublished,
+                postDate: res.data.post.postDate,
+                createdBy: res.data.post.createdBy,
+                preselectedCategories: res.data.post.categories,
+                index: res.data.post.index,
+                preselectedWriterId: res.data.post.createdBy
             });
 
         });
+
+
+        this.getListOfWriters();
+        this.getListOfCategories();
+        this.getOneWriter();
+        
     }
 
 
-    
-
     updatePost(e) {
         e.preventDefault();
-       
         const valueArray = this.state.selectedOptions.map(item => item.value);
         console.log("Ovo je valueArray" + JSON.stringify(valueArray));
-    
 
+        const formData = new FormData();
+
+        let imagesForm = [];
+        for (let i = 0; i < this.state.images2.length; i++) {
+
+            formData.append('images2[]', this.state.images2[i]);
+
+            imagesForm.push(formData)
+        }
+
+
+        //    console.log( formData.get('files'));
+        console.log("Ovo je images2", this.state.images2)
+
+
+
+        //Array of files converting to array of objects
+        const filesArray = [];
+
+        // Loop through the array of files
+        for (let i = 0; i < this.state.images2.length; i++) {
+            const file = this.state.images2[i];
+            const reader = new FileReader();
+
+            // Use the FileReader API to read the contents of the file
+            reader.readAsDataURL(file);
+
+            // When the file is loaded, create an object and push it to the array
+            reader.onload = function () {
+                filesArray.push({
+                    name: file.name,
+                    //   type: file.type,
+                    //   size: file.size,
+                    //   data: reader.result,
+                });
+            };
+        }
+
+
+        console.log("Ovo je filesArray", filesArray);
+
+
+        let imagesNames = [];
+
+        for (let i = 0; i < this.state.images2.length; i++) {
+            imagesNames.push(this.state.images2[i].name);
+        }
         let post = {
             title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray, createdBy: this.state.createdBy.value,
-            
+            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray, createdBy: this.state.createdBy, images: imagesNames
         };
 
+        //  this.setState({preselectedWriterId:post.createdBy})
 
-       
-       
-        PostService.updatePost(post,this.state._id)
+        // console.log("preselectedWriterId", this.state.preselectedWriterId);
+
+        fetch('http://localhost:8000/api/image', {
+            method: 'POST',
+            // headers:{
+            //     'Content-Type':'multipart/form-data'
+            // },
+            body: formData
+
+
+        })
+
+        PostService.updatePost(post, this.state._id)
 
             .then(res => {
-               
+
                 // window.location.replace('http://localhost:3000/news-list');
             }).catch((error) => {
                 console.log(error.message);
@@ -96,7 +168,7 @@ class UpdatePostComponent extends Component {
 
     }
 
-    
+
 
     changeTitleHandler(event) {
         this.setState({ title: event.target.value });
@@ -124,36 +196,55 @@ class UpdatePostComponent extends Component {
 
     handleSelect(event) {
         this.setState({ selectedOptions: event });
+        console.log("Ovo su selectedOptionsssss",this.state.selectedOptions)
     }
 
     handleWriterSelect(event) {
 
         console.log("Ovo je selectEvent", event);
-        this.setState({ createdBy: event });
+        this.setState({ createdBy: event.value });
     }
+
+    getWriter() {
+        console.log("Writer iz getWriter", this.state.writers)
+        return this.state.writers.map((writer) => {
+            console.log("Ovo je writter iz getWriter=>map", writer)
+            return <option value={writer.value}>
+                {writer.label}
+            </option>;
+        });
+    }
+
+
+
 
     ///////////ImageUploader constants//////////////////
     readImage = (event) => {
         if (window.File && window.FileList && window.FileReader) {
-            const files = event.target.files; //FileList object
-           
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                console.log("Ovo je file iz readImage", file)
-                if (!file.type.match('image')) continue;
+            const files = event.target.files; //FileList object        
+            if (files != null) {
+                console.log("Ovo je files iz readImage",files)
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    console.log("readImage=>files[i]",file)
+                    this.state.images2.push(file);
+                    console.log("Ovo je images2", this.state.images2)
+                    console.log("Ovo je jedan file iz readImage", file)
+                    if (!file.type.match('image')) continue;
 
-                const picReader = new FileReader();
+                    const picReader = new FileReader();
 
-                picReader.addEventListener('load', (event) => {
-                    const picFile = event.target;
-                    const newImage = picFile.result;
-                    console.log("Ovo je newImage iz readImage", newImage);
-                    this.setState(prevState => ({ images: [...prevState.images, newImage] }))
-                });
+                    picReader.addEventListener('load', (event) => {
+                        const picFile = event.target;
+                        const newImage = picFile.result;
+                        console.log("Ovo je newImage iz picReader.addEventListener", newImage);
+                        this.setState(prevState => ({ images: [...prevState.images, newImage] }))
+                    });
 
-                picReader.readAsDataURL(file);
-            }
-            document.querySelector("#pro-image").value = '';
+                    picReader.readAsDataURL(file);
+                }
+                document.querySelector("#pro-image").value = '';
+            } else { return }
         } else {
             console.log('Browser not support');
         }
@@ -161,6 +252,7 @@ class UpdatePostComponent extends Component {
 
     handleImageUpload = e => {
         const files = Array.from(e.target.files);
+        console.log("handleImageUpload=>files",files)
         const newImages = files.map(file => URL.createObjectURL(file));
         this.setState(prevState => ({ images: [...prevState.images, ...newImages] }));
         console.log("Ovo je newImages iz handleImageLoad", newImages);
@@ -183,6 +275,22 @@ class UpdatePostComponent extends Component {
         event.preventDefault();
     };
 
+
+    getOneWriter() {
+        console.log("OVO JE PRESELECTED WRITERID", this.state.createdBy);
+        //  const res = await axios.get('http://localhost:8000/api/oneWriter' + '/' + this.state.preselectedWriterId);
+        // const preselectedWriter = res.data.writer ? {
+        //     "value": res.data.writer._id,
+        //     "label": res.data.writer.name + ' ' + res.data.writer.lastName
+        // } : null;
+
+        // this.setState({ preselectedWriter: preselectedWriter })
+    };
+
+
+    handleOneWriterChange(e) {
+        this.setState({ preselectedWriter: e.value, name: e.label })
+    }
 
 
     /////////////////////////////////////////////////
@@ -207,7 +315,7 @@ class UpdatePostComponent extends Component {
                 return (
                     {
                         ...styles,
-                        
+
 
                         height: 50,
                         dropdownIndicator: { dropdownIndicatorStyles }
@@ -255,7 +363,7 @@ class UpdatePostComponent extends Component {
                 <div className="d-flex flex-row">
 
                     <div className="left-form">
-                        <input className="title-input" placeholder="Title" type='text' value={this.state.title} onChange={this.changeTitleHandler} />
+                        <input className="title-input" name='title' placeholder="Title" type='text' value={this.state.title} onChange={this.changeTitleHandler} />
                         <h2>Content</h2>
                         <div className="textarea-content">
                             <label>Short description</label>
@@ -290,21 +398,21 @@ class UpdatePostComponent extends Component {
                                 {this.state.images.map((image, index) => (
                                     <div className={`preview-image preview-show-${index + 1}`} key={index}>
                                         <div className="image-cancel" data-no={index + 1} onClick={() => this.handleImageDelete(index)}>
-                                          <Isvg src={Cancel}/>
+                                            <Isvg src={Cancel} />
                                         </div>
-                                        <div className="image-zone">                                     
+                                        <div className="image-zone">
                                             <img id={`pro-img-${index + 1}`} src={image} alt="" />
-                                            
+
                                         </div>
-                                        
+
                                     </div>
                                 ))}
                                 <a href="javascript:void(0)" onClick={() => document.getElementById('pro-image').click()}>
                                     <div className='uploader-add-link'>
-                                    <Isvg src={Plus} />
-                                        <span className='span1'>Upload a File</span> 
+                                        <Isvg src={Plus} />
+                                        <span className='span1'>Upload a File</span>
                                         <span className='span2'> or drag and drop</span>
-                                     </div>
+                                    </div>
                                 </a>
                             </div>
 
@@ -319,12 +427,27 @@ class UpdatePostComponent extends Component {
 
                         <div className="select-content">
                             <label>Written By</label>
-                            <Select
+
+                            <select className='writer-select' onChange={this.handleWriterSelect}>
+                                <option value="choose">
+                                    {/* {this.state.preselectedWriters.map((writer,index)=><div key={index}>
+                                        {writer.label}
+                                    </div>)} */}
+                                    {this.state.preselectedWriter.label}
+                                </option>
+                                {this.getWriter()}
+                            </select>
+
+
+                            {/* <Select
 
                                 options={this.state.writers}
-                                value={this.state.createdBy}
+                                value={this.state.writers.filter((option) => {
+                                    return option.value === this.state.createdBy;
+                                })}
                                 onChange={this.handleWriterSelect}
-                                styles={colourStyles} />
+                                styles={colourStyles} /> */}
+
                         </div>
 
                         <div className="date-content">
@@ -339,13 +462,17 @@ class UpdatePostComponent extends Component {
                             <label>Categories</label>
 
                             <Select
+                                // defaultValue={this.state.firstCategories}
+                                // isClearable={value.some((v) => !v.isFixed)}
+
                                 options={this.state.categories}
                                 placeholder="Select category"
-                                value={this.state.selectedOptions}
+                                value={this.state.selectedOptions ? this.state.selectedOptions:this.state.preselectedCategories}
                                 onChange={this.handleSelect}
                                 isSearchable={true}
                                 isMulti
                                 styles={colourStyles}
+                               
                             />
                         </div>
 
@@ -384,14 +511,45 @@ class UpdatePostComponent extends Component {
             "label": d.name + ' ' + d.lastName
         }))
         this.setState({ writers: writers })
-        console.log('selectWriters su:' + JSON.stringify(writers));
+        console.log('writers su:' + JSON.stringify(writers));
     }
 
-  
+
+
+
 
     handleWriterChange(e) {
         this.setState({ createdBy: e.value, name: e.label })
+        console.log("Ovo je createdBy iz handleWriterChange", this.state.createdBy)
     }
+
+
+
+
+
+
+    // async getListOfPreselectedWriters() {
+
+    //     const res = await fetch(`http://localhost:8000/api/writer/${this.state.preselectedWriterId}`)//kolega Rade
+
+    //     console.log("varijabl")
+
+
+
+    //     let writterArray = [];//
+    //     writterArray.push(res.data.writer);
+
+
+    //     console.log("writerArray", writterArray)
+
+    //     const preselectedWriters = res.data.writer.map(d => ({
+    //         "value": d._id,
+    //         "label": d.name + ' ' + d.lastName
+    //     }))
+    //     this.setState({ preselectedWriters: preselectedWriters, writerName: preselectedWriters[0].label })
+    //     console.log('preselectedWriters su:' + JSON.stringify(preselectedWriters));
+    // }
+
 
 
 
@@ -410,11 +568,44 @@ class UpdatePostComponent extends Component {
         this.setState({ categories: e.value, name: e.label })
     }
 
-    componentDidMount() {
-       
-        this.getListOfWriters();
-        this.getListOfCategories();
+    async getOneWriter() {
+        console.log("OVO JE PRESELECTED WRITERID", this.state.preselectedWriterId);
+        //  const res = await axios.get('http://localhost:8000/api/oneWriter' + '/' + this.state.preselectedWriterId);
+        //  const preselectedWriter = res.data.writer ? {
+        //     "value": res.data.writer._id,
+        //     "label": res.data.writer.name + ' ' + res.data.writer.lastName
+        // } : null;
 
-    }
+        // this.setState({ preselectedWriter: preselectedWriter })
+    };
+
+
+
+
+
+    // async getListOfFirstCategories() {
+    //     const res = await axios.get('http://localhost:8000/api/post' + '/' + this.state.createdBy);//ovde greska,ne trebq id od posta
+    //     console.log('getListOfFirstCategories => res ', res.data.post.categories);
+
+    //     let categoryIds = [];
+    //     for (let index in res.data.post.categories) {
+    //         categoryIds.push(res.data.post.categories[index])
+
+    //     }
+
+
+
+    //     // const firstCategories = res.data.post.map(d => ({
+    //     //     "value": d._id,
+    //     //     "label": d.name
+    //     // }))
+    //     // this.setState({ firstCategories: firstCategories })
+    //     // console.log('firstCategories su:' + JSON.stringify(firstCategories));
+    // }
+
+    // handleFirstCategoryChange(e) {
+    //     this.setState({ firstCategories: e.value, name: e.label })
+    // }
+
 
 } export default UpdatePostComponent;

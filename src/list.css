@@ -1693,6 +1693,9 @@
     color: #818FA5;
     font-size: 13px;
     text-transform: uppercase;
+    white-space: nowrap;
+
+
   }
   .table thead th:last-child {
     text-align: right;
@@ -2018,6 +2021,17 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+
+  @media (max-width:576px) {
+    .table-responsive {
+
+      margin-top: 60px;
+    }
+  
+  }
+
+
   
   .table-responsive > .table-bordered {
     border: 0;
@@ -2041,24 +2055,25 @@
 
   .form-control1 {
       /* display: flex; */
-      width: 220px;
+      /* width: 220px;
       height: 50px;
       border: none;
       background-color: #FFFFFF;
       border-radius: 15px;
-      float: right;
+      float: right; */
     
   }
 
  .form-control1::placeholder {
-    position: absolute;
+    /* position: absolute;
     font-size: 16px;
     color: #161F5E;
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
     margin-left: 60px;
     margin-top: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 12px; */
+    color: red;
 
   }
   
@@ -5087,6 +5102,7 @@ display: none;
     grid-column-gap: 10px;
     margin-top: 30px;
     align-items: flex-start;
+    overflow-y: scroll;
   }
   
   .page-link {
@@ -10560,6 +10576,8 @@ padding-right: 20px;} */
   transform: rotate(135deg);
  }
 
+
+
  .last-paragraph{ 
   position: absolute;
   margin-top: -60px;
@@ -10573,6 +10591,16 @@ padding-right: 20px;} */
   margin-right: -35px;
   right: 100px;
  }
+
+
+ @media only screen and (max-width: 777px) {
+
+  .last-paragraph{ 
+   left:30px;
+   top: 50px;
+   }
+}
+
 
  .pagination .page-link {
   display: flex;
@@ -10614,7 +10642,7 @@ padding-right: 20px;} */
   left: -15px;
 }
 
-
+/* 
 @media only screen and (max-width: 632px) {
   .last-paragraph {
    position: absolute;
@@ -10630,8 +10658,59 @@ padding-right: 20px;} */
   padding-top: 50px;
   padding-right: 120px;
     }
-}
+} */
+
+
+
+
 
 .news-list-drop{
   display: flex;
 }
+
+
+
+
+@media only screen and (max-width: 576px) {
+  .news-list-drop{
+    margin-bottom: 30px;
+  }
+  
+}
+
+.search {
+ 
+  background-color: #fff;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  border: none;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+
+
+@media only screen and (max-width: 576px) {
+.search {
+ 
+  width: 220px;
+  margin-left: auto;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+}
+
+
+
+
+
+.search input {
+  border: none;
+  outline: none;
+  padding-left: 16px;
+  width: 170px;
+ 
+}
+

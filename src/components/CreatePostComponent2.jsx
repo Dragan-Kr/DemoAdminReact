@@ -29,7 +29,7 @@ class CreatePostComponent extends Component {
             categories: [],
             selectedOptions: '',
             images: [],
-            images2:[]
+            images2: []
             // formData: new FormData() 
         };
 
@@ -76,31 +76,18 @@ class CreatePostComponent extends Component {
 
         const url = 'http://localhost:8000/api/post';
         const formData = new FormData();
-        //    console.log("Ovo su ti images",this.state.images)
-        // const imagePickerCallBack = data => {
-        //     const picturesData = [...pictures];
-        //     const index = picturesData.length;
-        //     const image = {
-        //       image: data.uri,
-        //       fileName: data.fileName,
-        //       type: data.type,
-        //       index: index,
-        //     };
+
         let imagesForm = [];
         for (let i = 0; i < this.state.images2.length; i++) {
-            // formData.append('title', this.state.title);
-            // formData.append('shortDescription', this.state.shortDescription);
-            // formData.append('mainContent', this.state.mainContent);
-            // formData.append('isPublished', this.state.isPublished);
-            // formData.append('postDate', this.state.postDate);
-            // formData.append('categories', selectedCategories);
-            // formData.append('createdBy', this.state.createdBy.value);
+
             formData.append('images2[]', this.state.images2[i]);
 
             imagesForm.push(formData)
         }
-    //    console.log(  formData.get('files'));
-         console.log("Ovo je images2",this.state.images2)
+
+
+        //    console.log(  formData.get('files'));
+        console.log("Ovo je images2", this.state.images2)
 
 
 
@@ -109,61 +96,57 @@ class CreatePostComponent extends Component {
 
         // Loop through the array of files
         for (let i = 0; i < this.state.images2.length; i++) {
-          const file = this.state.images2[i];
-          const reader = new FileReader();
-        
-          // Use the FileReader API to read the contents of the file
-          reader.readAsDataURL(file);
-        
-          // When the file is loaded, create an object and push it to the array
-          reader.onload = function () {
-            filesArray.push({
-              name: file.name,
-            //   type: file.type,
-            //   size: file.size,
-            //   data: reader.result,
-            });
-          };
+            const file = this.state.images2[i];
+            const reader = new FileReader();
+
+            // Use the FileReader API to read the contents of the file
+            reader.readAsDataURL(file);
+
+            // When the file is loaded, create an object and push it to the array
+            reader.onload = function () {
+                filesArray.push({
+                    name: file.name,
+                    //   type: file.type,
+                    //   size: file.size,
+                    //   data: reader.result,
+                });
+            };
         }
-        
-    
-        console.log("Ovo je filesArray",filesArray);
+
+
+        console.log("Ovo je filesArray", filesArray);
 
 
 
 
-        let imagesNames =[];
+        let imagesNames = [];
 
         for (let i = 0; i < this.state.images2.length; i++) {
             imagesNames.push(this.state.images2[i].name);
 
         }
 
-console.log("imagesNames je",imagesNames)
+        console.log("imagesNames je", imagesNames)
 
-
-
-
-
-       ///////////////// 
+        ///////////////// 
 
 
         let post = {
             title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.createdBy.value,images:imagesNames
+            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.createdBy.value, images: imagesNames
         };
-      console.log("Ovo su categories",this.state.categories)
+        console.log("Ovo su categories", this.state.categories)
 
-        fetch('http://localhost:8000/api/image',{
-            method:'POST',
+        fetch('http://localhost:8000/api/image', {
+            method: 'POST',
             // headers:{
             //     'Content-Type':'multipart/form-data'
             // },
-            body:formData
+            body: formData
 
-            
+
         })
-       
+
 
         // ImageService.postImage(imagesForm)
         //     .then(res => {
@@ -248,13 +231,13 @@ console.log("imagesNames je",imagesNames)
         if (window.File && window.FileList && window.FileReader) {
             const files = event.target.files; //FileList object
 
-            console.log("Ovo su files iz readImage",files);
+            console.log("Ovo su files iz readImage", files);
             if (files != null) {
                 // console.log("Ovo je files iz readImage",files)
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     this.state.images2.push(file);
-                    console.log("Ovo je images2",this.state.images2)
+                    console.log("Ovo je images2", this.state.images2)
                     console.log("Ovo je jedan file iz readImage", file)
                     if (!file.type.match('image')) continue;
 
@@ -280,7 +263,7 @@ console.log("imagesNames je",imagesNames)
         const files = Array.from(e.target.files);
         const newImages = files.map(file => URL.createObjectURL(file));
 
-        console.log("newImages iz handleImageUpload",files);
+        console.log("newImages iz handleImageUpload", files);
         this.setState(prevState => ({ images: [...prevState.images, ...newImages] }));
         console.log("Ovo je newImages iz handleImageLoad", newImages);
     };

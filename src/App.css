@@ -248,30 +248,30 @@ color: #6D7587;
 }
 
 
-
+/* 
 @media only screen and (max-width: 1200px) {
   .side-bar .heading-side-bar  {
    display: none;
   }
-}
+} */
 
 
-@media only screen and (max-width: 1200px) {
+/* @media only screen and (max-width: 1200px) {
   .side-bar .heading-side-bar   {
    display: none;
   }
-}
-@media only screen and (max-width: 1200px) {
+} */
+/* @media only screen and (max-width: 1200px) {
   .side-bar .side-bar-title div span   {
    display: none;
   }
-}
+} */
 
-@media only screen and (max-width: 1200px) {
+/* @media only screen and (max-width: 1200px) {
   .side-bar .side-bar-title  .open-arrow-down   {
    display: none;
   }
-}
+} */
 
 
 
@@ -349,7 +349,7 @@ text-decoration: none;
   padding: 0;
 }
 
-@media only screen and (max-width: 1050px) {
+@media only screen and (max-width: 1200px) {
   .header .button-side-bar {
     padding-left: 20px;
   }
@@ -428,15 +428,25 @@ position: relative;
   padding: 20px;
   border-radius: 10px;
   width: 12.834%;
- 
 }
 
-@media only screen and (max-width: 1050px) {
+@media only screen and (max-width: 1200px) {
   .main-page .aside {
     display: none;
    
   }
 }
+
+
+/* @media only screen and (max-width: 1050px) {
+  .main-page .aside {
+    display: none;
+   
+  }
+} */
+
+
+
 
 /* #root {
   height: 100%;
@@ -446,9 +456,10 @@ position: relative;
   width: 85.027%;
 }
 
-@media only screen and (max-width: 1050px) {
+@media only screen and (max-width: 1200px) {
   .main-page .right-content {
     width: 100%;
+    margin-right: 0px;
   }
 }
 
@@ -649,6 +660,17 @@ padding-left: 10px;
    
     }
 
+
+    .right-form .select-content .writer-select{
+      border-radius: 15px;
+      background-color: #F4F5FC;
+      height: 50px;
+      font-size: 16px;;
+      font-family: 'Poppins', sans-serif;
+      color: #6D7587;
+      font-weight: 400;
+      
+    }
 
  
 
@@ -864,16 +886,26 @@ margin-bottom: 20px; */
   }
 
 
+
+
 .news-list-drop-down{
   display: flex;
-  width: 100px;
   height: 50px;
   margin-bottom: 20px;
   font-size: 16px;
 font-weight: 400;
 font-family:'Poppins', sans-serif;
 color: #3A3F56;
+justify-content: space-between;
 }
+
+
+@media (max-width: 576px) {
+  .news-list-drop-down{
+    flex-direction: column;
+  }
+}
+
 
 .news-list-drop-down label{
   display: inline-block;
@@ -1168,4 +1200,29 @@ display: none !important;
     
     bottom: 3px;
     position: relative;
+}
+
+
+
+@media only screen and (max-width: 1200px) {
+  .right-content .row {
+margin: 0px;
+  }
+}
+
+
+.col {
+  padding: 0px !important;
+}
+
+.col-12 {
+  padding: 0px !important;
+}
+
+.row {
+  margin: 0px !important;
+}
+
+.top-serach-items {
+ padding: 0px;
 }

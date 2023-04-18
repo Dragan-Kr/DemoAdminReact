@@ -215,12 +215,12 @@ const DataTable = () => {
 
 
                                 {/* <div className="news-list-search"> */}
-                                <div>
-                                    {!isTyped && <Isvg className="" src={Magnifying} />}
-                                    
+                                <div className="search">
+                                    {/* {!isTyped && <Isvg className="" src={Magnifying} />} */}
+                                    <Isvg className="" src={Magnifying} />
 
                                     <Search
-                                        onSearch={value => {
+                                            onSearch={value => {
                                             setSearch(value);
                                             setCurrentPage(1);
                                             setIsTyped(true);
@@ -238,7 +238,7 @@ const DataTable = () => {
                             </div>
                         </div>
                     </div>
-
+                    <div class="table-responsive">
                     <table className="table table-striped">
                         <TableHeader
                             headers={headers}
@@ -276,6 +276,7 @@ const DataTable = () => {
                         </tbody>
                         {/* <div> <p className="last-paragraph">Showing 1 to {perPage} of {comments.length} entries</p> </div> */}
                     </table>
+                    </div>
                     <div className="col-md-6">
                         <Pagination
                             total={totalItems}
