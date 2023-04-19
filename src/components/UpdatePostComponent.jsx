@@ -51,7 +51,6 @@ class UpdatePostComponent extends Component {
         this.readImage = this.readImage.bind(this);
         this.handleDrop = this.handleDrop.bind(this);
         this.getWriter = this.getWriter.bind(this);
-        // this.getOneWriter = this.getOneWriter(this);
     }
 
 
@@ -74,18 +73,15 @@ class UpdatePostComponent extends Component {
             });
 
         });
-
         this.getListOfPreselectedCategories();
         this.getListOfPreselectedWriter();
         this.getListOfWriters();
         this.getListOfCategories();
-
     }
 
 
     //  
     getListOfPreselectedWriter() {
-
         const res = axios.get('http://localhost:8000/api/writer' + '/' + this.state.preselectedWriterId);
         console.log("getListOfPreselectedWriter=>this.state.preselectedWriterId", this.state.preselectedWriterId)
         console.log("getListOfPreselectedWriter=>res.data", res.data);
@@ -348,7 +344,7 @@ class UpdatePostComponent extends Component {
 
         const dateObject = new Date(this.state.postDate);
 
-        const defaultValue = dateObject.toISOString().split('T')[0];
+        const defaultDate = dateObject.toISOString().slice(0, 10);
 
         return (
             <form>
@@ -452,7 +448,7 @@ class UpdatePostComponent extends Component {
 
                         <div className="date-content">
                             <label>Post Date</label>
-                            <input className="date-input" type='date' defaultValue={defaultValue} value={this.state.postDate} onChange={this.changePostDateHandler} />
+                            <input className="date-input" type='date' value={defaultDate} onChange={this.changePostDateHandler} />
                         </div>
 
 
@@ -479,7 +475,7 @@ class UpdatePostComponent extends Component {
                             <label>Published</label>
                             <label className="switch">
 
-                                <input  type="checkbox" value={this.state.isPublished} checked={this.state.isPublished} onChange={this.changeIsPublishedHandler} />
+                                <input type="checkbox" value={this.state.isPublished} checked={this.state.isPublished} onChange={this.changeIsPublishedHandler} />
                                 <span className="slider round"></span>
                             </label>
 
@@ -498,8 +494,6 @@ class UpdatePostComponent extends Component {
 
         )
 
-
-
     }
 
     async getListOfWriters() {
@@ -512,9 +506,6 @@ class UpdatePostComponent extends Component {
         this.setState({ writers: writers })
         console.log('writers su:' + JSON.stringify(writers));
     }
-
-
-
 
 
     handleWriterChange(e) {
@@ -536,15 +527,6 @@ class UpdatePostComponent extends Component {
         this.setState({ categories: e.value, name: e.label })
     }
 
-    async getOneWriter() {
-        console.log("OVO JE PRESELECTED WRITERID", this.state.preselectedWriterId);
-        //  const res = await axios.get('http://localhost:8000/api/oneWriter' + '/' + this.state.preselectedWriterId);
-        //  const preselectedWriter = res.data.writer ? {
-        //     "value": res.data.writer._id,
-        //     "label": res.data.writer.name + ' ' + res.data.writer.lastName
-        // } : null;
-
-        // this.setState({ preselectedWriter: preselectedWriter })
-    };
+   
 
 } export default UpdatePostComponent;
