@@ -33,11 +33,9 @@ class UpdatePostComponent extends Component {
             firstCategories: [],
             writers: [],
             preselectedWriterId: '',
-            preselectedWriter: '',
             preselectedWriters: [],
             writerName: '',
-            preselectedCategories:[]
-
+            preselectedCategories: []
         };
 
         this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -61,9 +59,7 @@ class UpdatePostComponent extends Component {
 
     componentDidMount() {
         PostService.getPostById(this.state._id).then((res) => {
-            let post = res.data;
             console.log("Ovo je res.data iz componentDidMount", res.data);
-            console.log("Ovo je postTitle iz componentDidMount", post.title);
             this.setState({
                 title: res.data.post.title,
                 shortDescription: res.data.post.shortDescription,
@@ -71,6 +67,7 @@ class UpdatePostComponent extends Component {
                 isPublished: res.data.post.isPublished,
                 postDate: res.data.post.postDate,
                 createdBy: res.data.post.createdBy,
+                categories: res.data.post.categories,
                 preselectedCategories: res.data.post.categories,
                 index: res.data.post.index,
                 preselectedWriterId: res.data.post.createdBy
@@ -78,18 +75,40 @@ class UpdatePostComponent extends Component {
 
         });
 
-
+        this.getListOfPreselectedCategories();
+        this.getListOfPreselectedWriter();
         this.getListOfWriters();
         this.getListOfCategories();
-        this.getOneWriter();
-        
+
     }
 
+
+    //  
+    getListOfPreselectedWriter() {
+
+        const res = axios.get('http://localhost:8000/api/writer' + '/' + this.state.preselectedWriterId);
+        console.log("getListOfPreselectedWriter=>this.state.preselectedWriterId", this.state.preselectedWriterId)
+        console.log("getListOfPreselectedWriter=>res.data", res.data);
+    }
+
+    getListOfPreselectedCategories() {
+        console.log("Ovo su preselectedCategoriesssssssssssss", this.state.preselectedCategories)
+        let preselectedCategoriesArray = [];
+        // for (let index in this.state.preselectedCategories) {
+        //     let res =  axios.get('http://localhost:8000/api/category' + '/' + this.state.preselectedCategories[index]);
+        //     console.log("getListOfPreselectedCategories=>res", res);
+        // }
+
+    }
+
+    // handleFirstCategoryChange(e) {
+    //     this.setState({ firstCategories: e.value, name: e.label })
+    // }
 
     updatePost(e) {
         e.preventDefault();
         const valueArray = this.state.selectedOptions.map(item => item.value);
-        console.log("Ovo je valueArray" + JSON.stringify(valueArray));
+        // console.log("Ovo je valueArray" + JSON.stringify(valueArray));
 
         const formData = new FormData();
 
@@ -103,7 +122,7 @@ class UpdatePostComponent extends Component {
 
 
         //    console.log( formData.get('files'));
-        console.log("Ovo je images2", this.state.images2)
+        // console.log("Ovo je images2", this.state.images2)
 
 
 
@@ -130,7 +149,7 @@ class UpdatePostComponent extends Component {
         }
 
 
-        console.log("Ovo je filesArray", filesArray);
+        // console.log("Ovo je filesArray", filesArray);
 
 
         let imagesNames = [];
@@ -145,7 +164,6 @@ class UpdatePostComponent extends Component {
 
         //  this.setState({preselectedWriterId:post.createdBy})
 
-        // console.log("preselectedWriterId", this.state.preselectedWriterId);
 
         fetch('http://localhost:8000/api/image', {
             method: 'POST',
@@ -183,7 +201,7 @@ class UpdatePostComponent extends Component {
     }
 
     changeIsPublishedHandler(event) {
-        console.log('Ovo je iz IsPublished evenet' + event.target.value);
+        // console.log('Ovo je iz IsPublished evenet' + event.target.value);
         this.setState({ isPublished: event.target.checked });
     }
 
@@ -196,19 +214,15 @@ class UpdatePostComponent extends Component {
 
     handleSelect(event) {
         this.setState({ selectedOptions: event });
-        console.log("Ovo su selectedOptionsssss",this.state.selectedOptions)
     }
 
     handleWriterSelect(event) {
 
-        console.log("Ovo je selectEvent", event);
         this.setState({ createdBy: event.value });
     }
 
     getWriter() {
-        console.log("Writer iz getWriter", this.state.writers)
         return this.state.writers.map((writer) => {
-            console.log("Ovo je writter iz getWriter=>map", writer)
             return <option value={writer.value}>
                 {writer.label}
             </option>;
@@ -223,10 +237,10 @@ class UpdatePostComponent extends Component {
         if (window.File && window.FileList && window.FileReader) {
             const files = event.target.files; //FileList object        
             if (files != null) {
-                console.log("Ovo je files iz readImage",files)
+                console.log("Ovo je files iz readImage", files)
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    console.log("readImage=>files[i]",file)
+                    console.log("readImage=>files[i]", file)
                     this.state.images2.push(file);
                     console.log("Ovo je images2", this.state.images2)
                     console.log("Ovo je jedan file iz readImage", file)
@@ -252,7 +266,7 @@ class UpdatePostComponent extends Component {
 
     handleImageUpload = e => {
         const files = Array.from(e.target.files);
-        console.log("handleImageUpload=>files",files)
+        console.log("handleImageUpload=>files", files)
         const newImages = files.map(file => URL.createObjectURL(file));
         this.setState(prevState => ({ images: [...prevState.images, ...newImages] }));
         console.log("Ovo je newImages iz handleImageLoad", newImages);
@@ -274,19 +288,6 @@ class UpdatePostComponent extends Component {
     handleDragOver = (event) => {
         event.preventDefault();
     };
-
-
-    getOneWriter() {
-        console.log("OVO JE PRESELECTED WRITERID", this.state.createdBy);
-        //  const res = await axios.get('http://localhost:8000/api/oneWriter' + '/' + this.state.preselectedWriterId);
-        // const preselectedWriter = res.data.writer ? {
-        //     "value": res.data.writer._id,
-        //     "label": res.data.writer.name + ' ' + res.data.writer.lastName
-        // } : null;
-
-        // this.setState({ preselectedWriter: preselectedWriter })
-    };
-
 
     handleOneWriterChange(e) {
         this.setState({ preselectedWriter: e.value, name: e.label })
@@ -345,9 +346,9 @@ class UpdatePostComponent extends Component {
 
         };
 
+        const dateObject = new Date(this.state.postDate);
 
-
-
+        const defaultValue = dateObject.toISOString().split('T')[0];
 
         return (
             <form>
@@ -431,9 +432,8 @@ class UpdatePostComponent extends Component {
                             <select className='writer-select' onChange={this.handleWriterSelect}>
                                 <option value="choose">
                                     {/* {this.state.preselectedWriters.map((writer,index)=><div key={index}>
-                                        {writer.label}
                                     </div>)} */}
-                                    {this.state.preselectedWriter.label}
+                                    dfs
                                 </option>
                                 {this.getWriter()}
                             </select>
@@ -452,10 +452,8 @@ class UpdatePostComponent extends Component {
 
                         <div className="date-content">
                             <label>Post Date</label>
-                            <input className="date-input" placeholder="5 May 2022" type='date' value={this.state.postDate} onChange={this.changePostDateHandler} />
+                            <input className="date-input" type='date' defaultValue={defaultValue} value={this.state.postDate} onChange={this.changePostDateHandler} />
                         </div>
-
-
 
 
                         <div className="categories-content">
@@ -464,15 +462,16 @@ class UpdatePostComponent extends Component {
                             <Select
                                 // defaultValue={this.state.firstCategories}
                                 // isClearable={value.some((v) => !v.isFixed)}
-
                                 options={this.state.categories}
                                 placeholder="Select category"
-                                value={this.state.selectedOptions ? this.state.selectedOptions:this.state.preselectedCategories}
+                                // value={this.state.selectedOptions ? this.state.selectedOptions:this.state.preselectedCategories}
+                                value={this.state.selectedOptions}
+
                                 onChange={this.handleSelect}
                                 isSearchable={true}
                                 isMulti
                                 styles={colourStyles}
-                               
+
                             />
                         </div>
 
@@ -480,7 +479,7 @@ class UpdatePostComponent extends Component {
                             <label>Published</label>
                             <label className="switch">
 
-                                <input type="checkbox" value={this.state.isPublished} onChange={this.changeIsPublishedHandler} />
+                                <input  type="checkbox" value={this.state.isPublished} checked={this.state.isPublished} onChange={this.changeIsPublishedHandler} />
                                 <span className="slider round"></span>
                             </label>
 
@@ -524,37 +523,6 @@ class UpdatePostComponent extends Component {
     }
 
 
-
-
-
-
-    // async getListOfPreselectedWriters() {
-
-    //     const res = await fetch(`http://localhost:8000/api/writer/${this.state.preselectedWriterId}`)//kolega Rade
-
-    //     console.log("varijabl")
-
-
-
-    //     let writterArray = [];//
-    //     writterArray.push(res.data.writer);
-
-
-    //     console.log("writerArray", writterArray)
-
-    //     const preselectedWriters = res.data.writer.map(d => ({
-    //         "value": d._id,
-    //         "label": d.name + ' ' + d.lastName
-    //     }))
-    //     this.setState({ preselectedWriters: preselectedWriters, writerName: preselectedWriters[0].label })
-    //     console.log('preselectedWriters su:' + JSON.stringify(preselectedWriters));
-    // }
-
-
-
-
-
-
     async getListOfCategories() {
         const res = await axios.get('http://localhost:8000/api/category');
         const categories = res.data.categories.map(d => ({
@@ -578,34 +546,5 @@ class UpdatePostComponent extends Component {
 
         // this.setState({ preselectedWriter: preselectedWriter })
     };
-
-
-
-
-
-    // async getListOfFirstCategories() {
-    //     const res = await axios.get('http://localhost:8000/api/post' + '/' + this.state.createdBy);//ovde greska,ne trebq id od posta
-    //     console.log('getListOfFirstCategories => res ', res.data.post.categories);
-
-    //     let categoryIds = [];
-    //     for (let index in res.data.post.categories) {
-    //         categoryIds.push(res.data.post.categories[index])
-
-    //     }
-
-
-
-    //     // const firstCategories = res.data.post.map(d => ({
-    //     //     "value": d._id,
-    //     //     "label": d.name
-    //     // }))
-    //     // this.setState({ firstCategories: firstCategories })
-    //     // console.log('firstCategories su:' + JSON.stringify(firstCategories));
-    // }
-
-    // handleFirstCategoryChange(e) {
-    //     this.setState({ firstCategories: e.value, name: e.label })
-    // }
-
 
 } export default UpdatePostComponent;
