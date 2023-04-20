@@ -25,7 +25,7 @@ class UpdatePostComponent extends Component {
             mainContent: '',
             isPublished: false,
             postDate: new Date(),
-            createdBy: [],
+            createdBy: '',
             categories: [],
             selectedOptions: '',
             images: [],
@@ -33,9 +33,13 @@ class UpdatePostComponent extends Component {
             firstCategories: [],
             writers: [],
             preselectedWriterId: '',
-            preselectedWriters: [],
+            // preselectedWriters: [],
             writerName: '',
-            preselectedCategories: []
+            preselectedCategories: [],
+            preselectedCategoriesArray: [],
+            preselectedWriter: [],
+            selectedWriter: '',
+            valueArray: []
         };
 
         this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -56,9 +60,10 @@ class UpdatePostComponent extends Component {
 
 
 
-    componentDidMount() {
-        PostService.getPostById(this.state._id).then((res) => {
-            console.log("Ovo je res.data iz componentDidMount", res.data);
+    async componentDidMount() {
+
+        await PostService.getPostById(this.state._id).then((res) => {
+
             this.setState({
                 title: res.data.post.title,
                 shortDescription: res.data.post.shortDescription,
@@ -69,31 +74,102 @@ class UpdatePostComponent extends Component {
                 categories: res.data.post.categories,
                 preselectedCategories: res.data.post.categories,
                 index: res.data.post.index,
-                preselectedWriterId: res.data.post.createdBy
+                preselectedWriterId: res.data.post.createdBy,
+                // selectedOptions: res.data.categories
+            }, () => {
+                console.log("this.state.selectedOptions", this.state.selectedOptions)
+                this.getListOfPreselectedCategories();
+                this.getPreselectedWriter();
+                this.getListOfWriters();
+                this.getListOfCategories();
+            });
+        })
+            .catch(function (error) {
+                console.log("Error in fetching market updates");
             });
 
-        });
-        this.getListOfPreselectedCategories();
-        this.getListOfPreselectedWriter();
-        this.getListOfWriters();
-        this.getListOfCategories();
+
+
     }
 
 
-    //  
-    getListOfPreselectedWriter() {
-        const res = axios.get('http://localhost:8000/api/writer' + '/' + this.state.preselectedWriterId);
-        console.log("getListOfPreselectedWriter=>this.state.preselectedWriterId", this.state.preselectedWriterId)
-        console.log("getListOfPreselectedWriter=>res.data", res.data);
+
+    getPreselectedWriter() {
+        let preselectedWriter = [];
+        axios.get('http://localhost:8000/api/writer' + '/' + this.state.createdBy)
+            .then((res) => {
+                console.log("getListOfPreselectedWriter=>res.data", res.data)
+                preselectedWriter.push(res.data.writer);
+                console.log("getListOfPreselectedWriter=>preselectedWriter", preselectedWriter)
+
+
+                // const writers = res.data.writers.map(d => ({
+                //     "value": d._id,
+                //     "label": d.name + ' ' + d.lastName
+                // }))
+                // this.setState({ writers: writers })
+
+                const preselectedWriter2 = preselectedWriter.map(d => ({
+                    "value": d._id,
+                    "label": d.name + ' ' + d.lastName
+                }))
+
+
+                this.setState({ preselectedWriter: preselectedWriter2 });
+                console.log("preselectedWriter", preselectedWriter)
+            })
+            .catch(function (error) {
+                console.log("Error in fetching market updates");
+            });
     }
 
     getListOfPreselectedCategories() {
-        console.log("Ovo su preselectedCategoriesssssssssssss", this.state.preselectedCategories)
+
+
         let preselectedCategoriesArray = [];
-        // for (let index in this.state.preselectedCategories) {
-        //     let res =  axios.get('http://localhost:8000/api/category' + '/' + this.state.preselectedCategories[index]);
-        //     console.log("getListOfPreselectedCategories=>res", res);
-        // }
+        for (let index in this.state.preselectedCategories) {
+            if (typeof index === 'undefined' || index < 0 || index >= this.state.preselectedCategories.length) {
+                console.log('Invalid index value:', index);
+                return;
+            }
+            // console.log(" this.state.preselectedCategories[index]", this.state.preselectedCategories[index])
+            axios.get('http://localhost:8000/api/category' + '/' + this.state.preselectedCategories[index])
+                .then((res) => {
+                    console.log("getListOfPreselectedCategories=>res.data", res.data);
+                    preselectedCategoriesArray.push(res.data.category);
+                    console.log("then=>preselectedCategoriesArray", preselectedCategoriesArray)
+
+
+
+                    const preselectedCategoriesArray2 = preselectedCategoriesArray.map((d => ({
+                        "value": d._id,
+                        "label": d.name
+                    })));
+                    console.log("preselectedCategoriesArray2", preselectedCategoriesArray2)
+
+                    this.setState({ preselectedCategoriesArray: preselectedCategoriesArray2 })
+
+
+                }
+
+                )
+                .catch(function (error) {
+                    console.log("Error in fetching market updates");
+                });
+
+        }
+
+
+        // const categories = res.data.categories.map(d => ({
+        //     "value": d._id,
+        //     "label": d.name
+        // }))
+        // this.setState({ categories: categories })
+
+
+
+
+
 
     }
 
@@ -103,82 +179,202 @@ class UpdatePostComponent extends Component {
 
     updatePost(e) {
         e.preventDefault();
-        const valueArray = this.state.selectedOptions.map(item => item.value);
-        // console.log("Ovo je valueArray" + JSON.stringify(valueArray));
 
-        const formData = new FormData();
+             this.setState({ selectedOptions: this.state.preselectedCategoriesArray }, () => {///ovde je problem
 
-        let imagesForm = [];
-        for (let i = 0; i < this.state.images2.length; i++) {
+               this.setState({ valueArray: this.state.selectedOptions }, () => {
 
-            formData.append('images2[]', this.state.images2[i]);
+                console.log("OVO je this.state.selectedOptions", this.state.selectedOptions)
+                console.log("UpdatePost=>=>valueArray", this.state.valueArray)///prazno
+                const formData = new FormData();
 
-            imagesForm.push(formData)
-        }
+                let imagesForm = [];
+                for (let i = 0; i < this.state.images2.length; i++) {
 
+                    formData.append('images2[]', this.state.images2[i]);
 
-        //    console.log( formData.get('files'));
-        // console.log("Ovo je images2", this.state.images2)
+                    imagesForm.push(formData)
+                }
 
+                //Array of files converting to array of objects
+                const filesArray = [];
 
+                // Loop through the array of files
+                for (let i = 0; i < this.state.images2.length; i++) {
+                    const file = this.state.images2[i];
+                    const reader = new FileReader();
 
-        //Array of files converting to array of objects
-        const filesArray = [];
+                    // Use the FileReader API to read the contents of the file
+                    reader.readAsDataURL(file);
 
-        // Loop through the array of files
-        for (let i = 0; i < this.state.images2.length; i++) {
-            const file = this.state.images2[i];
-            const reader = new FileReader();
-
-            // Use the FileReader API to read the contents of the file
-            reader.readAsDataURL(file);
-
-            // When the file is loaded, create an object and push it to the array
-            reader.onload = function () {
-                filesArray.push({
-                    name: file.name,
-                    //   type: file.type,
-                    //   size: file.size,
-                    //   data: reader.result,
-                });
-            };
-        }
+                    // When the file is loaded, create an object and push it to the array
+                    reader.onload = function () {
+                        filesArray.push({
+                            name: file.name,
+                            //   type: file.type,
+                            //   size: file.size,
+                            //   data: reader.r
+                        });
+                    };
+                }
 
 
-        // console.log("Ovo je filesArray", filesArray);
+                // console.log("Ovo je filesArray", filesArray);
 
 
-        let imagesNames = [];
+                let imagesNames = [];
 
-        for (let i = 0; i < this.state.images2.length; i++) {
-            imagesNames.push(this.state.images2[i].name);
-        }
-        let post = {
-            title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray, createdBy: this.state.createdBy, images: imagesNames
-        };
+                for (let i = 0; i < this.state.images2.length; i++) {
+                    imagesNames.push(this.state.images2[i].name);
+                }
 
-        //  this.setState({preselectedWriterId:post.createdBy})
+                console.log("iznad let post=>this.state.selectedWriter", this.state.selectedWriter)
+
+                if (this.state.selectedWriter === '') { ///KADA KORISNIK NE MJENJA POLJA ZA WRITERA I CATEGORIES
+                    console.log("USOOO")
+
+                    let valueArray2 = [];
+                    valueArray2 = this.state.valueArray.map(item => item.value);
+                    console.log("Ispod varijable=>valueArray", this.state.valueArray)///prazno
+
+                    this.setState({ selectedWriter: this.state.preselectedWriter }, () => {
+                        console.log("iznad let post=>this.state.selectedWriter", this.state.selectedWriter)
+
+                        let selectedWriterValue = this.state.selectedWriter.map(item => item.value);
+                        console.log("selectedWriterValue", selectedWriterValue)
 
 
-        fetch('http://localhost:8000/api/image', {
-            method: 'POST',
-            // headers:{
-            //     'Content-Type':'multipart/form-data'
-            // },
-            body: formData
+                        console.log("valueArray2", valueArray2)
+
+
+                        let post = {////////////////////////////////////////
+                            title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray2, createdBy: selectedWriterValue[0], images: imagesNames//valueArray2 i selectedWriterValue[0] su dobre
+                        };
+
+                        //  this.setState({preselectedWriterId:post.createdBy})
+                        console.log("spod let post=>this.state.selectedWriter", this.state.selectedWriter)
+
+
+                        fetch('http://localhost:8000/api/image', {
+                            method: 'POST',
+                            // headers:{
+                            //     'Content-Type':'multipart/form-data'
+                            // },
+                            body: formData
+
+
+                        })
+
+                        console.log("Post.createdBy", post.createdBy);
+                        console.log("Post.categories", post.categories)
+                        console.log("POST", post);
+                        PostService.updatePost(post, this.state._id)
+
+                            .then(res => {
+
+                                // window.location.replace('http://localhost:3000/news-list');
+                            }).catch((error) => {
+                                console.log(error.message);
+                            });
+                        console.log("valueArray izvan setState", this.state.valueArray)
+
+
+                    });
+
+
+                } else {
+                    ////////////////////////////
+                    e.preventDefault();
+
+                    console.log("USOO U ELSE")
+                    // let valueArray = this.state.selectedOptions.map(item => item.value);
+                    // console.log("Ovo je valueArray" + JSON.stringify(valueArray));
+                    // console.log("ELSE->VALUEARRAY",valueArray)
+                    const formData = new FormData();
+
+                    let imagesForm = [];
+                    for (let i = 0; i < this.state.images2.length; i++) {
+
+                        formData.append('images2[]', this.state.images2[i]);
+
+                        imagesForm.push(formData)
+                    }
+
+
+
+                    //Array of files converting to array of objects
+                    const filesArray = [];
+
+                    // Loop through the array of files
+                    for (let i = 0; i < this.state.images2.length; i++) {
+                        const file = this.state.images2[i];
+                        const reader = new FileReader();
+
+                        // Use the FileReader API to read the contents of the file
+                        reader.readAsDataURL(file);
+
+                        // When the file is loaded, create an object and push it to the array
+                        reader.onload = function () {
+                            filesArray.push({
+                                name: file.name,
+                                
+                            });
+                        };
+                    }
+
+
+                    // console.log("Ovo je filesArray", filesArray);
+
+
+                    let imagesNames = [];
+
+                    for (let i = 0; i < this.state.images2.length; i++) {
+                        imagesNames.push(this.state.images2[i].name);
+                    }
+
+                    console.log("ELSE->Iznad let post->this.state.selectedOptions",this.state.selectedOptions)
+
+
+                    let post = {
+                        title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                        isPublished: this.state.isPublished, postDate: this.state.postDate, categories: this.state.selectedOptions, createdBy: this.state.selectedWriter.value, images: imagesNames
+                    };
+
+                    //  this.setState({preselectedWriterId:post.createdBy})
+
+
+                    fetch('http://localhost:8000/api/image', {
+                        method: 'POST',
+                        // headers:{
+                        //     'Content-Type':'multipart/form-data'
+                        // },
+                        body: formData
+
+
+                    })
+
+                    console.log("ELSE->POST",post);
+
+                    PostService.updatePost(post, this.state._id)
+
+                        .then(res => {
+
+                            // window.location.replace('http://localhost:3000/news-list');
+                        }).catch((error) => {
+                            console.log(error.message);
+                        });
+
+
+
+
+                }
+            });
 
 
         })
 
-        PostService.updatePost(post, this.state._id)
 
-            .then(res => {
-
-                // window.location.replace('http://localhost:3000/news-list');
-            }).catch((error) => {
-                console.log(error.message);
-            });
 
     }
 
@@ -214,7 +410,12 @@ class UpdatePostComponent extends Component {
 
     handleWriterSelect(event) {
 
-        this.setState({ createdBy: event.value });
+        console.log("EVENT", event)
+        // this.setState({ createdBy: event.value });
+        this.setState({ selectedWriter: event }, () => {
+            console.log("handleWriterSelect=>selectedWriter", this.state.selectedWriter)//value=....,label=....
+        });
+
     }
 
     getWriter() {
@@ -425,25 +626,21 @@ class UpdatePostComponent extends Component {
                         <div className="select-content">
                             <label>Written By</label>
 
-                            <select className='writer-select' onChange={this.handleWriterSelect}>
+                            {/* <select className='writer-select' onChange={this.handleWriterSelect}>
                                 <option value="choose">
-                                    {/* {this.state.preselectedWriters.map((writer,index)=><div key={index}>
-                                    </div>)} */}
+                                    {this.state.preselectedWriters.map((writer,index)=><div key={index}>
+                                    </div>)}
                                     dfs
                                 </option>
                                 {this.getWriter()}
-                            </select>
+                            </select> */}
 
 
-                            {/* <Select
-
+                            <Select
                                 options={this.state.writers}
-                                value={this.state.writers.filter((option) => {
-                                    return option.value === this.state.createdBy;
-                                })}
+                                value={this.state.selectedWriter ? this.state.selectedWriter : this.state.preselectedWriter}
                                 onChange={this.handleWriterSelect}
-                                styles={colourStyles} /> */}
-
+                                styles={colourStyles} />
                         </div>
 
                         <div className="date-content">
@@ -460,8 +657,8 @@ class UpdatePostComponent extends Component {
                                 // isClearable={value.some((v) => !v.isFixed)}
                                 options={this.state.categories}
                                 placeholder="Select category"
-                                // value={this.state.selectedOptions ? this.state.selectedOptions:this.state.preselectedCategories}
-                                value={this.state.selectedOptions}
+                                value={this.state.selectedOptions ? this.state.selectedOptions : this.state.preselectedCategoriesArray}
+                                // value={this.state.preselectedCategoriesArray}
 
                                 onChange={this.handleSelect}
                                 isSearchable={true}
@@ -527,6 +724,6 @@ class UpdatePostComponent extends Component {
         this.setState({ categories: e.value, name: e.label })
     }
 
-   
+
 
 } export default UpdatePostComponent;
