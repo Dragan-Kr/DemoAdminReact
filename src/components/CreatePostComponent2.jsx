@@ -73,7 +73,7 @@ class CreatePostComponent extends Component {
         const selectedCategories = this.state.selectedOptions.map(item => item.value);
 
 
-        console.log("this.state.selectedOptions",this.state.selectedOptions)
+        console.log("this.state.selectedOptions", this.state.selectedOptions)
         const url = 'http://localhost:8000/api/post';
         const formData = new FormData();
 
@@ -131,14 +131,15 @@ class CreatePostComponent extends Component {
         ///////////////// 
 
 
-        console.log("iznda posta=>selectedCategories",selectedCategories)
-        console.log("iznad posta=>this.state.createdBy",this.state.createdBy.value)
+        console.log("iznda posta=>selectedCategories", selectedCategories)
+        console.log("iznad posta=>this.state.createdBy", this.state.createdBy.value)
         let post = {
             title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
             isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.createdBy.value, images: imagesNames
         };
         console.log("Ovo su categories", this.state.categories)
 
+        console.log("FORM DATA", formData)
         fetch('http://localhost:8000/api/image', {
             method: 'POST',
             // headers:{
@@ -264,8 +265,7 @@ class CreatePostComponent extends Component {
     handleImageUpload = e => {
         const files = Array.from(e.target.files);
         const newImages = files.map(file => URL.createObjectURL(file));
-
-        console.log("newImages iz handleImageUpload", files);
+        console.log("files iz handleImageUpload", files);
         this.setState(prevState => ({ images: [...prevState.images, ...newImages] }));
         console.log("Ovo je newImages iz handleImageLoad", newImages);
     };

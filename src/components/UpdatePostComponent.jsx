@@ -39,7 +39,8 @@ class UpdatePostComponent extends Component {
             preselectedCategoriesArray: [],
             preselectedWriter: [],
             selectedWriter: '',
-            valueArray: []
+            valueArray: [],
+            imageFile:''
         };
 
         this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -64,6 +65,7 @@ class UpdatePostComponent extends Component {
 
         await PostService.getPostById(this.state._id).then((res) => {
 
+            console.log("RES->",res);
             this.setState({
                 title: res.data.post.title,
                 shortDescription: res.data.post.shortDescription,
@@ -75,32 +77,39 @@ class UpdatePostComponent extends Component {
                 preselectedCategories: res.data.post.categories,
                 index: res.data.post.index,
                 preselectedWriterId: res.data.post.createdBy,
+                imageFile:res.data.file
                 // selectedOptions: res.data.categories
             }, () => {
-                console.log("this.state.selectedOptions", this.state.selectedOptions)
                 this.getListOfPreselectedCategories();
                 this.getPreselectedWriter();
                 this.getListOfWriters();
                 this.getListOfCategories();
+                this.convertImageFile(this.state.imageFile);
             });
         })
             .catch(function (error) {
-                console.log("Error in fetching market updates");
+                console.log("Error in data");
             });
 
 
 
     }
 
-
+convertImageFile(imageFile){
+console.log("ImageFile",imageFile)
+const json = JSON.stringify(imageFile);
+const blob = new Blob([json], { type: 'text/plain;charset=utf-8' })
+console.log("Blob",blob);
+// this.setState({imageFile:blob},()=>{
+//     console.log("ImageFile u setState u convertImageFile",this.state.imageFile)
+// });
+}
 
     getPreselectedWriter() {
         let preselectedWriter = [];
         axios.get('http://localhost:8000/api/writer' + '/' + this.state.createdBy)
             .then((res) => {
-                console.log("getListOfPreselectedWriter=>res.data", res.data)
                 preselectedWriter.push(res.data.writer);
-                console.log("getListOfPreselectedWriter=>preselectedWriter", preselectedWriter)
 
 
                 // const writers = res.data.writers.map(d => ({
@@ -116,7 +125,6 @@ class UpdatePostComponent extends Component {
 
 
                 this.setState({ preselectedWriter: preselectedWriter2 });
-                console.log("preselectedWriter", preselectedWriter)
             })
             .catch(function (error) {
                 console.log("Error in fetching market updates");
@@ -138,9 +146,6 @@ class UpdatePostComponent extends Component {
                     console.log("getListOfPreselectedCategories=>res.data", res.data);
                     preselectedCategoriesArray.push(res.data.category);
                     console.log("then=>preselectedCategoriesArray", preselectedCategoriesArray)
-
-
-
                     const preselectedCategoriesArray2 = preselectedCategoriesArray.map((d => ({
                         "value": d._id,
                         "label": d.name
@@ -179,8 +184,6 @@ class UpdatePostComponent extends Component {
 
     updatePost(e) {
         e.preventDefault();
-
-
         if (this.state.selectedOptions === '') {//categories nepromjenjen
             this.setState({ selectedOptions: this.state.preselectedCategoriesArray }, () => {///ovde je problem
 
@@ -279,8 +282,6 @@ class UpdatePostComponent extends Component {
                             console.log("valueArray izvan setState", this.state.valueArray)
 
                         });
-
-
                     } else {
                         ////////////////////////////
                         e.preventDefault();
@@ -557,8 +558,12 @@ class UpdatePostComponent extends Component {
                 console.log("Ovo je files iz readImage", files)
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
+
                     console.log("readImage=>files[i]", file)
-                    this.state.images2.push(file);
+                    console.log("ImageFile u readImage",this.state.imageFile)
+                    // this.state.images2.push(file);
+                    // this.state.images2.push(this.state.imageFile);nije to 
+
                     console.log("Ovo je images2", this.state.images2)
                     console.log("Ovo je jedan file iz readImage", file)
                     if (!file.type.match('image')) continue;
@@ -572,12 +577,13 @@ class UpdatePostComponent extends Component {
                         this.setState(prevState => ({ images: [...prevState.images, newImage] }))
                     });
 
+                    
                     picReader.readAsDataURL(file);
                 }
                 document.querySelector("#pro-image").value = '';
             } else { return }
         } else {
-            console.log('Browser not support');
+            console.log('Browser does not support');
         }
     }
 
@@ -586,7 +592,7 @@ class UpdatePostComponent extends Component {
         console.log("handleImageUpload=>files", files)
         const newImages = files.map(file => URL.createObjectURL(file));
         this.setState(prevState => ({ images: [...prevState.images, ...newImages] }));
-        console.log("Ovo je newImages iz handleImageLoad", newImages);
+        console.log("handleImageLoad=>newImages", newImages);
     };
 
     handleImageDelete = index => {
