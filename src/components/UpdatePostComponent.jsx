@@ -180,117 +180,14 @@ class UpdatePostComponent extends Component {
     updatePost(e) {
         e.preventDefault();
 
-             this.setState({ selectedOptions: this.state.preselectedCategoriesArray }, () => {///ovde je problem
 
-               this.setState({ valueArray: this.state.selectedOptions }, () => {
+        if (this.state.selectedOptions === '') {//categories nepromjenjen
+            this.setState({ selectedOptions: this.state.preselectedCategoriesArray }, () => {///ovde je problem
 
-                console.log("OVO je this.state.selectedOptions", this.state.selectedOptions)
-                console.log("UpdatePost=>=>valueArray", this.state.valueArray)///prazno
-                const formData = new FormData();
+                this.setState({ valueArray: this.state.selectedOptions }, () => {
 
-                let imagesForm = [];
-                for (let i = 0; i < this.state.images2.length; i++) {
-
-                    formData.append('images2[]', this.state.images2[i]);
-
-                    imagesForm.push(formData)
-                }
-
-                //Array of files converting to array of objects
-                const filesArray = [];
-
-                // Loop through the array of files
-                for (let i = 0; i < this.state.images2.length; i++) {
-                    const file = this.state.images2[i];
-                    const reader = new FileReader();
-
-                    // Use the FileReader API to read the contents of the file
-                    reader.readAsDataURL(file);
-
-                    // When the file is loaded, create an object and push it to the array
-                    reader.onload = function () {
-                        filesArray.push({
-                            name: file.name,
-                            //   type: file.type,
-                            //   size: file.size,
-                            //   data: reader.r
-                        });
-                    };
-                }
-
-
-                // console.log("Ovo je filesArray", filesArray);
-
-
-                let imagesNames = [];
-
-                for (let i = 0; i < this.state.images2.length; i++) {
-                    imagesNames.push(this.state.images2[i].name);
-                }
-
-                console.log("iznad let post=>this.state.selectedWriter", this.state.selectedWriter)
-
-                if (this.state.selectedWriter === '') { ///KADA KORISNIK NE MJENJA POLJA ZA WRITERA I CATEGORIES
-                    console.log("USOOO")
-
-                    let valueArray2 = [];
-                    valueArray2 = this.state.valueArray.map(item => item.value);
-                    console.log("Ispod varijable=>valueArray", this.state.valueArray)///prazno
-
-                    this.setState({ selectedWriter: this.state.preselectedWriter }, () => {
-                        console.log("iznad let post=>this.state.selectedWriter", this.state.selectedWriter)
-
-                        let selectedWriterValue = this.state.selectedWriter.map(item => item.value);
-                        console.log("selectedWriterValue", selectedWriterValue)
-
-
-                        console.log("valueArray2", valueArray2)
-
-
-                        let post = {////////////////////////////////////////
-                            title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-                            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray2, createdBy: selectedWriterValue[0], images: imagesNames//valueArray2 i selectedWriterValue[0] su dobre
-                        };
-
-                        //  this.setState({preselectedWriterId:post.createdBy})
-                        console.log("spod let post=>this.state.selectedWriter", this.state.selectedWriter)
-
-
-                        fetch('http://localhost:8000/api/image', {
-                            method: 'POST',
-                            // headers:{
-                            //     'Content-Type':'multipart/form-data'
-                            // },
-                            body: formData
-
-
-                        })
-
-                        console.log("Post.createdBy", post.createdBy);
-                        console.log("Post.categories", post.categories)
-                        console.log("POST", post);
-                        PostService.updatePost(post, this.state._id)
-
-                            .then(res => {
-
-                                // window.location.replace('http://localhost:3000/news-list');
-                            }).catch((error) => {
-                                console.log(error.message);
-                            });
-                        console.log("valueArray izvan setState", this.state.valueArray)
-
-
-                    });
-
-
-                } else {
-                    ////////////////////////////
-                    e.preventDefault();
-
-                    console.log("USOO U ELSE")
-                    // let valueArray = this.state.selectedOptions.map(item => item.value);
-                    // console.log("Ovo je valueArray" + JSON.stringify(valueArray));
-                    // console.log("ELSE->VALUEARRAY",valueArray)
+                    console.log("OVO je this.state.selectedOptions", this.state.selectedOptions)
+                    console.log("UpdatePost=>=>valueArray", this.state.valueArray)///prazno
                     const formData = new FormData();
 
                     let imagesForm = [];
@@ -300,8 +197,6 @@ class UpdatePostComponent extends Component {
 
                         imagesForm.push(formData)
                     }
-
-
 
                     //Array of files converting to array of objects
                     const filesArray = [];
@@ -318,7 +213,9 @@ class UpdatePostComponent extends Component {
                         reader.onload = function () {
                             filesArray.push({
                                 name: file.name,
-                                
+                                //   type: file.type,
+                                //   size: file.size,
+                                //   data: reader.r
                             });
                         };
                     }
@@ -333,48 +230,271 @@ class UpdatePostComponent extends Component {
                         imagesNames.push(this.state.images2[i].name);
                     }
 
-                    console.log("ELSE->Iznad let post->this.state.selectedOptions",this.state.selectedOptions)
+                    console.log("iznad let post=>this.state.selectedWriter", this.state.selectedWriter)
+                    ////dovde
+                    if (this.state.selectedWriter === '') { ///writer ne promjenjen
+                        console.log("USOOO")
+
+                        let valueArray2 = [];
+                        valueArray2 = this.state.valueArray.map(item => item.value);
+                        console.log("Ispod varijable=>valueArray", this.state.valueArray)///prazno
+
+                        this.setState({ selectedWriter: this.state.preselectedWriter }, () => {
+                            console.log("iznad let post=>this.state.selectedWriter", this.state.selectedWriter)
+
+                            let selectedWriterValue = this.state.selectedWriter.map(item => item.value);
+                            console.log("selectedWriterValue", selectedWriterValue)
 
 
-                    let post = {
-                        title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-                        isPublished: this.state.isPublished, postDate: this.state.postDate, categories: this.state.selectedOptions, createdBy: this.state.selectedWriter.value, images: imagesNames
-                    };
-
-                    //  this.setState({preselectedWriterId:post.createdBy})
+                            console.log("valueArray2", valueArray2)
 
 
-                    fetch('http://localhost:8000/api/image', {
-                        method: 'POST',
-                        // headers:{
-                        //     'Content-Type':'multipart/form-data'
-                        // },
-                        body: formData
+                            let post = {////////////////////////////////////////
+                                title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                                isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArray2, createdBy: selectedWriterValue[0], images: imagesNames//valueArray2 i selectedWriterValue[0] su dobre
+                            };
+
+                            //  this.setState({preselectedWriterId:post.createdBy})
+                            console.log("spod let post=>this.state.selectedWriter", this.state.selectedWriter)
 
 
-                    })
+                            fetch('http://localhost:8000/api/image', {
+                                method: 'POST',
+                                // headers:{
+                                //     'Content-Type':'multipart/form-data'
+                                // },
+                                body: formData
+                            })
 
-                    console.log("ELSE->POST",post);
+                            console.log("Post.createdBy", post.createdBy);
+                            console.log("Post.categories", post.categories)
+                            console.log("POST", post);
+                            PostService.updatePost(post, this.state._id)
+                                .then(res => {
 
-                    PostService.updatePost(post, this.state._id)
+                                    // window.location.replace('http://localhost:3000/news-list');
+                                }).catch((error) => {
+                                    console.log(error.message);
+                                });
+                            console.log("valueArray izvan setState", this.state.valueArray)
 
-                        .then(res => {
-
-                            // window.location.replace('http://localhost:3000/news-list');
-                        }).catch((error) => {
-                            console.log(error.message);
                         });
 
 
+                    } else {
+                        ////////////////////////////
+                        e.preventDefault();
+
+                        // let valueArray = this.state.selectedOptions.map(item => item.value);
+                        // console.log("Ovo je valueArray" + JSON.stringify(valueArray));
+                        // console.log("ELSE->VALUEARRAY",valueArray)
+
+                        console.log("USAO U ELSE->WRITER PROMJENJEN A CATEGORIJE OSTALE ISTE")
+                        const formData = new FormData();
+
+                        let imagesForm = [];
+                        for (let i = 0; i < this.state.images2.length; i++) {
+
+                            formData.append('images2[]', this.state.images2[i]);
+
+                            imagesForm.push(formData)
+                        }
 
 
-                }
-            });
+
+                        //Array of files converting to array of objects
+                        const filesArray = [];
+
+                        // Loop through the array of files
+                        for (let i = 0; i < this.state.images2.length; i++) {
+                            const file = this.state.images2[i];
+                            const reader = new FileReader();
+
+                            // Use the FileReader API to read the contents of the file
+                            reader.readAsDataURL(file);
+
+                            // When the file is loaded, create an object and push it to the array
+                            reader.onload = function () {
+                                filesArray.push({
+                                    name: file.name,
+
+                                });
+                            };
+                        }
 
 
-        })
+                        // console.log("Ovo je filesArray", filesArray);
 
 
+                        let imagesNames = [];
+
+                        for (let i = 0; i < this.state.images2.length; i++) {
+                            imagesNames.push(this.state.images2[i].name);
+                        }
+
+                        console.log("ELSE->Iznad let post->this.state.selectedOptions", this.state.selectedOptions)
+
+
+                        let selectedOptionsValue = this.state.selectedOptions.map(item => item.value)
+                        let post = {
+                            title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                            isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedOptionsValue, createdBy: this.state.selectedWriter.value, images: imagesNames
+                        };
+
+
+                        console.log("POST iz elsa", post)
+
+                        //  this.setState({preselectedWriterId:post.createdBy})
+
+
+                        fetch('http://localhost:8000/api/image', {
+                            method: 'POST',
+                            // headers:{
+                            //     'Content-Type':'multipart/form-data'
+                            // },
+                            body: formData
+
+
+                        })
+
+
+                        PostService.updatePost(post, this.state._id)
+
+                            .then(res => {
+
+                                // window.location.replace('http://localhost:3000/news-list');
+                            }).catch((error) => {
+                                console.log(error.message);
+                            });
+
+                    }
+                });
+
+
+            })
+
+        } else {
+
+            console.log("USOO U ELSE")
+
+            const formData = new FormData();
+
+            let imagesForm = [];
+            for (let i = 0; i < this.state.images2.length; i++) {
+
+                formData.append('images2[]', this.state.images2[i]);
+
+                imagesForm.push(formData)
+            }
+
+            //Array of files converting to array of objects
+            const filesArray = [];
+
+            // Loop through the array of files
+            for (let i = 0; i < this.state.images2.length; i++) {
+                const file = this.state.images2[i];
+                const reader = new FileReader();
+
+                // Use the FileReader API to read the contents of the file
+                reader.readAsDataURL(file);
+
+                // When the file is loaded, create an object and push it to the array
+                reader.onload = function () {
+                    filesArray.push({
+                        name: file.name,
+                        //   type: file.type,
+                        //   size: file.size,
+                        //   data: reader.r
+                    });
+                };
+            }
+
+
+            // console.log("Ovo je filesArray", filesArray);
+
+
+            let imagesNames = [];
+
+            for (let i = 0; i < this.state.images2.length; i++) {
+                imagesNames.push(this.state.images2[i].name);
+            }
+
+            console.log("iznad let post=>this.state.selectedWriter", this.state.selectedWriter)
+            ///
+
+
+
+            let valueArrayOfSelectedCategories = [];
+            valueArrayOfSelectedCategories = this.state.selectedOptions.map(item => item.value);
+
+            if (this.state.selectedWriter !== '') {
+
+
+                console.log("Izabrane vrijednosti i pisca i kategorije")
+                let post = {////////////////////////////////////////
+                    title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                    isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArrayOfSelectedCategories, createdBy: this.state.selectedWriter.value, images: imagesNames//valueArray2 i selectedWriterValue[0] su dobre
+                };
+                console.log("ELSE->POST", post);
+
+                fetch('http://localhost:8000/api/image', {
+                    method: 'POST',
+                    // headers:{
+                    //     'Content-Type':'multipart/form-data'
+                    // },
+                    body: formData
+
+
+                })
+
+
+
+                PostService.updatePost(post, this.state._id)
+
+                    .then(res => {
+
+                        // window.location.replace('http://localhost:3000/news-list');
+                    }).catch((error) => {
+                        console.log(error.message);
+                    });
+            }
+            else {//pisac osto nepromjenjen
+
+
+                console.log("PISAC OSTAO NEPROMJENJEN")
+                console.log("Izabrane vrijednosti i pisca i kategorije")
+
+                let valueArrayOfSelectedCategories = [];
+                valueArrayOfSelectedCategories = this.state.selectedOptions.map(item => item.value);
+                let post = {////////////////////////////////////////
+                    title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                    isPublished: this.state.isPublished, postDate: this.state.postDate, categories: valueArrayOfSelectedCategories, createdBy: this.state.selectedWriter.value, images: imagesNames//valueArray2 i selectedWriterValue[0] su dobre
+                };
+                console.log("ELSE->POST", post);
+
+                fetch('http://localhost:8000/api/image', {
+                    method: 'POST',
+                    // headers:{
+                    //     'Content-Type':'multipart/form-data'
+                    // },
+                    body: formData
+
+
+                })
+
+
+
+                PostService.updatePost(post, this.state._id)
+                    .then(res => {
+
+                        // window.location.replace('http://localhost:3000/news-list');
+                    }).catch((error) => {
+                        console.log(error.message);
+                    });
+            }
+
+
+        }
 
     }
 
