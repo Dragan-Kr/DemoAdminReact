@@ -10642,6 +10642,10 @@ padding-right: 20px;} */
   left: -15px;
 }
 
+.css-1hb7zxy-IndicatorsContainer .css-1xc3v61-indicatorContainer:last-child svg{
+display: none !important;
+}
+
 /* 
 @media only screen and (max-width: 632px) {
   .last-paragraph {
@@ -10714,3 +10718,8 @@ padding-right: 20px;} */
  
 }
 
+
+
+.css-3w2yfm-ValueContainer {
+  flex-wrap: initial !important;
+}

@@ -178,7 +178,7 @@ class CreatePostComponent extends Component {
         PostService.createPost(post)
             .then(res => {
                 // navigate('/news-list/');
-                // window.location.replace('http://localhost:3000/news-list');
+                window.location.replace('http://localhost:3000/news-list');
 
             }).catch((error) => {
                 // window.alert('Post failed');
@@ -274,6 +274,10 @@ class CreatePostComponent extends Component {
         const newImages = [...this.state.images];
         newImages.splice(index, 1);
         this.setState({ images: newImages });
+
+        const images2 =[...this.state.images2];
+        images2.splice(index,1);
+        this.setState({images2:images2});
     };
 
     handleDrop = (event) => {

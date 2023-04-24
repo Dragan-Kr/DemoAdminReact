@@ -11,7 +11,7 @@ const [elementClass, setElementClass] = useState(false)
 return(
 
 <div className='main-page'>
- <aside className={ `aside${elementClass? " responsive":""}`}><SideBar /></aside> 
+ <aside className={ `aside${elementClass? " responsive":""}`}><SideBar setElementClass = {setElementClass}/></aside> 
  <div className='right-content'>
 
    <header><Header setElementClass={setElementClass}/></header>

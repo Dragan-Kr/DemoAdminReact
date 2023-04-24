@@ -22,6 +22,15 @@ import Magnifying from '../../images/magnifying.svg';
 
 // import { useNavigate } from 'react-router-dom';
 
+
+///Modal////
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+
+
+
+///Modal///
+
 /////////////////////////////ORIGINALNI KOD*///////////////////////////////////////
 
 
@@ -34,6 +43,12 @@ const DataTable = () => {
     const [search, setSearch] = useState("");
     const [sorting, setSorting] = useState({ field: "", order: "" });
     const [isTyped, setIsTyped] = useState(false);
+
+    //Delete dialog-modal//
+    const [show,setShow] = useState(false);
+    const [deletePost,setDeletePost]=useState("");
+    //Delete dialog-modal//
+
     // const navigate = useNavigate();
     //  const [itemsPerPage,setItemsPerPage] = useState(2);
 
@@ -166,14 +181,19 @@ const DataTable = () => {
     //   };
 
 
-    const handleDeletePost = (post) => {
-        console.log("Ovo je post iz handleDeletePost", post);
-        PostService.deletePost(post._id).then((res) => {
-            setComments(comments.filter((comment) => comment._id !== post._id));
+    const handleDeletePost = () => {
+      
+        // console.log("Ovo je post iz handleDeletePost", post);
+        PostService.deletePost(deletePost._id).then((res) => {
+            setComments(comments.filter((comment) => comment._id !== deletePost._id));
         });
+        setShow(false);
     };
 
-
+const handleClickDelete=(post)=>{
+    setShow(true);
+    setDeletePost(post);
+}
 
 
     const editPost = (_id) => {
@@ -183,13 +203,35 @@ const DataTable = () => {
         // navigate('/update-news/');
     }
 
-
+    //Delete dialog//
+const handleClose = ()=>{
+    setShow(false);
+}
+    //Delete dialog//
 
 
 
     return (
         <>
             <div className="row w-100">
+              {/* Delete dialog */}
+              <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Do you want to delete {deletePost.title} item</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Be careful</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleDeletePost}>
+            OK
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+           Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+              {/* Delete dialog */}
+
                 <div className="col mb-3 col-12 text-center">
                     <div className="row">
 
@@ -265,7 +307,7 @@ const DataTable = () => {
                                         <div className="update-delete-img-div">
                                             <button onClick={() => editPost(comment._id)}><Isvg className='isvg-pen-update' src={Pen} /></button>
 
-                                            <button onClick={() => handleDeletePost(comment)}>
+                                            <button onClick={() => handleClickDelete(comment)}>
                                                 <Isvg className='isvg-pen-delete' src={Trash} />
                                             </button>
                                         </div>

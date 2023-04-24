@@ -7,7 +7,7 @@ import News  from '../../images/news1.svg'
 import Arrow from '../../images/arrow.svg'
 import Isvg from 'react-inlinesvg';
 
-function MySideNav(){
+function MySideNav({setElementClass}){
 
 // const navigate = useNavigate();
 const [openMenu, setOpenMenu] = useState(false)
@@ -19,10 +19,19 @@ function openNewsMenu() {
     }
 }
 
+// function closeSideMany(){
+//   setOpenMenu(false)
+//   if(openMenu) {
+//     setOpenMenu(true)
+//   }
+// }
 
 return (
       <div className="side-bar">
+        <div className="title-mobile-close"> 
           <h1 className="heading-side-bar">demo<span>admin</span></h1>
+          <div onClick={()=>{setElementClass(prev=>false)}}>X</div>
+          </div>
           <div className="side-bar-title" onClick={openNewsMenu}>
               <div>
                   <Isvg className='isvg-news' src={News}/><span>News </span> 
