@@ -13,6 +13,7 @@ import Cancel from '../images/cancel.svg';
 import FormData from 'form-data';
 import { format } from 'date-fns'
 import Index from '../pages/Pages/index';
+import { fi } from 'date-fns/locale';
 
 class UpdatePostComponent extends Component {
     constructor(props) {
@@ -95,55 +96,54 @@ class UpdatePostComponent extends Component {
             });
     }
 
+   
     showPreselectedImage(imageFile) {
-        const picReader = new FileReader();
+        let dataurl = this.state.imageFile;
+        let filename=this.state.imageFileForBlob.name;
 
-        const json = JSON.stringify(this.state.imageFileForBlob);
-        console.log("Object to String=>json", json)
+        var arr = dataurl.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = window.atob(arr[1]), 
+        n = bstr.length, 
+        u8arr = new Uint8Array(n);
         
-        let blob = new Blob([json], { type: "image/jpeg" });
-        console.log("BLOB", blob);
+        while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        let file1 = new File([u8arr], filename, {type:mime});    
+        console.log("FILE1",file1)
+
 
 
         let tempImageArray = [];
         let tempBlobArray = [];
-      
-
-        picReader.addEventListener("load", (event) => {
-            //bez ovoga nece da prikaze selektovanu sliku
-            const picFile = blob;
-            const newImage = picFile;
-            console.log(
-                "showPreselectedImage=>Ovo je newImage iz picReader.addEventListener",
-                newImage
-            );
-            // this.setState(prevState => ({ images: [...prevState.images, newImage] }),()=>{
-            //     console.log("Ovo su images nakon setovanja",this.state.images)
-            // })
-        });
-
-
-
-        // const base64String = this.state.imageFile;
-
-        // const byteCharacters = window.atob(base64String.split(",")[1]);
-        // const byteNumbers = new Array(byteCharacters.length);
-        // for (let i = 0; i < byteCharacters.length; i++) {
-        //     byteNumbers[i] = byteCharacters.charCodeAt(i);
-        // }
-        // const byteArray = new Uint8Array(byteNumbers);
-        // const blob = new Blob([byteArray], { type: 'image/jpeg' });
-        // console.log("BLOB",blob);
-
         tempImageArray.push(this.state.imageFile);
-        tempBlobArray.push({ blob })
+
+       
+               
+        tempBlobArray.push({ file1 })
+        console.log("tempBlobArray",tempBlobArray[0].file1)///ovako treba
+
+        let testArr = [];
+        testArr.push(tempBlobArray[0].file1);
+        console.log("testArr",testArr)
+
+
+
         this.setState({ tempImageArray: tempImageArray });
         this.setState({ images: tempImageArray }, () => {
             console.log("Ovo su images iz showPreselectedImage", this.state.images)
         })
-        this.setState({ images2: tempBlobArray })/////Ovde kada odkomentarisem  nastaje problem
+        // this.setState({ images2: tempBlobArray })
+        this.setState({ images2: testArr })
 
     }
+
+
+
+
+
 
     getPreselectedWriter() {
         let preselectedWriter = [];
@@ -642,6 +642,7 @@ class UpdatePostComponent extends Component {
                         );
                     });
 
+                    console.log("Ovo je file iznad icReader.readAsDataURL(file)",file);
                     picReader.readAsDataURL(file); //bez ovoga nece da prikaze selektovanu sliku
                 }
                 document.querySelector("#pro-image").value = "";

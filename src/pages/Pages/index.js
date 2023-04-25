@@ -92,7 +92,9 @@ const DataTable = () => {
 
 
     const commentsData = useMemo(() => {
-        let computedComments = comments;
+        let computedComments=[];
+        if(comments.length>0) { 
+         computedComments = comments;
         if (search) {
             computedComments = computedComments.filter(
                 comment =>
@@ -139,6 +141,10 @@ const DataTable = () => {
             (currentPage - 1) * perPage,
             (currentPage - 1) * perPage + perPage
         );
+        }else{
+         return  computedComments = [];
+           
+        }
     }, [comments, currentPage, search, sorting]);
 
 
@@ -290,7 +296,7 @@ const handleClose = ()=>{
 
                         />
                         <tbody>
-                            {commentsData.length > 0 && commentsData.map((comment) => (
+                            {commentsData.length > 0 ? commentsData.map((comment) => (
 
                                 <tr>
                                     <th scope="row" key={comment._id}>
@@ -314,7 +320,7 @@ const handleClose = ()=>{
 
                                     </td>
                                 </tr>
-                            ))}
+                            )):<div><h1>NOTHING TO SHOW</h1></div>}
                         </tbody>
                         {/* <div> <p className="last-paragraph">Showing 1 to {perPage} of {comments.length} entries</p> </div> */}
                     </table>
