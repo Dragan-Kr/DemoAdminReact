@@ -77,6 +77,7 @@ class CreatePostComponent extends Component {
         const url = 'http://localhost:8000/api/post';
         const formData = new FormData();
 
+        if(this.state.images2.length>0) { 
         let imagesForm = [];
         for (let i = 0; i < this.state.images2.length; i++) {
 
@@ -150,31 +151,6 @@ class CreatePostComponent extends Component {
 
         })
 
-
-        // ImageService.postImage(imagesForm)
-        //     .then(res => {
-        //         // navigate('/news-list/');
-        //         // window.location.replace('http://localhost:3000/news-list');
-
-        //     }).catch((error) => {
-        //         // window.alert('Post failed');
-        //         console.log(error.message);
-        //     });
-
-
-
-        // MOMO
-        // PostService.createPostWithUpload(formData) 
-        //     .then(res => {
-        //         // navigate('/news-list/');
-        //         // window.location.replace('http://localhost:3000/news-list');
-
-        //     }).catch((error) => {
-        //         window.alert('Post failed');
-        //         console.log(error.message);
-        //     });
-
-
         PostService.createPost(post)
             .then(res => {
                 // navigate('/news-list/');
@@ -184,7 +160,29 @@ class CreatePostComponent extends Component {
                 // window.alert('Post failed');
                 console.log(error.message);
             });
+        }
+        else{
 
+            let post = {
+                title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.createdBy.value
+            };
+            console.log("Ovo su categories", this.state.categories)
+    
+            console.log("FORM DATA", formData)
+           
+    
+            PostService.createPost(post)
+                .then(res => {
+                    // navigate('/news-list/');
+                    window.location.replace('http://localhost:3000/news-list');
+    
+                }).catch((error) => {
+                    // window.alert('Post failed');
+                    console.log(error.message);
+                });
+
+        }
     }
 
 

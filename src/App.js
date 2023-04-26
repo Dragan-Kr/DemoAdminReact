@@ -92,7 +92,7 @@ import HomePage from "./components/HomePage/HomePage";
 import UpdatePostComponent from "./components/UpdatePostComponent";
 import UpdatePost from "./components/UpdatePost";
 
-
+import DropDownTestComponent from "./components/DropDownTestComponent"
 
 function App() {
     return (
@@ -104,8 +104,9 @@ function App() {
             <Route path="/" element={HomePage}/>
             <Route path="/add-news" element={<CreatePostComponent2/>}/>
             <Route path="/news-list" element={<DataTable/>}/>
-            {/* <Route path="/update-news/:id" element={<UpdatePostComponent/>}/> */}
             <Route path="/update-news/:id" element={<UpdatePost/>}/>
+            <Route path="/drop" element={<DropDownTestComponent/>}/>
+
         </Route>
         </Routes>
         </BrowserRouter>

@@ -42,7 +42,7 @@ class UpdatePostComponent extends Component {
             selectedWriter: "",
             valueArray: [],
             imageFile: [],
-            imageFileForBlob:[],
+            imageFileForBlob: [],
             tempImageArray: [],
         };
 
@@ -65,83 +65,160 @@ class UpdatePostComponent extends Component {
     async componentDidMount() {
         await PostService.getPostById(this.state._id)
             .then((res) => {
-                console.log("RES->", res);
-                this.setState(
-                    {
-                        title: res.data.post.title,
-                        shortDescription: res.data.post.shortDescription,
-                        mainContent: res.data.post.mainContent,
-                        isPublished: res.data.post.isPublished,
-                        postDate: res.data.post.postDate,
-                        createdBy: res.data.post.createdBy,
-                        categories: res.data.post.categories,
-                        preselectedCategories: res.data.post.categories,
-                        index: res.data.post.index,
-                        preselectedWriterId: res.data.post.createdBy,
-                        imageFile: res.data.file.data,
-                        imageFileForBlob:res.data.file2
-                        // selectedOptions: res.data.categories
-                    },
-                    () => {
-                        this.getListOfPreselectedCategories();
-                        this.getPreselectedWriter();
-                        this.getListOfWriters();
-                        this.getListOfCategories();
-                        this.showPreselectedImage(this.state.imageFile);
+                console.log("Array.isArray(res.data", Array.isArray(res.data));
+
+
+                if (Array.isArray(res.data)) {
+
+                    console.log("RES->", res);
+
+                    let tempFileDataArr = [];
+                    let tempFile2DataArr = [];
+                    for (let index in res.data) {
+                        tempFileDataArr.push(res.data[index].file.data);
+                        tempFile2DataArr.push(res.data[index].file2)
                     }
-                );
+                    console.log("tempFileDataArr", tempFileDataArr)
+                    console.log("tempFile2DataArr", tempFile2DataArr)
+
+
+                    ////
+                    this.setState(
+                        {
+                            title: res.data[0].post.title,
+                            shortDescription: res.data[0].post.shortDescription,
+                            mainContent: res.data[0].post.mainContent,
+                            isPublished: res.data[0].post.isPublished,
+                            postDate: res.data[0].post.postDate,
+                            createdBy: res.data[0].post.createdBy,
+                            categories: res.data[0].post.categories,
+                            preselectedCategories: res.data[0].post.categories,
+                            index: res.data[0].post.index,
+                            preselectedWriterId: res.data[0].post.createdBy,
+                            imageFile: tempFileDataArr,///data:image/jpeg;base64,/......
+                            imageFileForBlob: tempFile2DataArr
+                            // selectedOptions: res.data.categories ovo treba da bude selektovano
+                        },
+                        () => {
+                            console.log("TITLE", this.state.title)
+                            this.getListOfPreselectedCategories();
+                            this.getPreselectedWriter();
+                            this.getListOfWriters();
+                            this.getListOfCategories();
+                            this.showPreselectedImage(this.state.imageFile);
+                        }
+                    );
+
+
+
+                } else {
+                    this.setState(
+                        {
+                            title: res.data.post.title,
+                            shortDescription: res.data.post.shortDescription,
+                            mainContent: res.data.post.mainContent,
+                            isPublished: res.data.post.isPublished,
+                            postDate: res.data.post.postDate,
+                            createdBy: res.data.post.createdBy,
+                            categories: res.data.post.categories,
+                            preselectedCategories: res.data.post.categories,
+                            index: res.data.post.index,
+                            preselectedWriterId: res.data.post.createdBy,
+                            // imageFile: res.data.file.data,
+                            // imageFileForBlob:res.data.file2
+                            // selectedOptions: res.data.categories
+                        },
+                        () => {
+                            this.getListOfPreselectedCategories();
+                            this.getPreselectedWriter();
+                            this.getListOfWriters();
+                            this.getListOfCategories();
+                            // this.showPreselectedImage(this.state.imageFile);
+                        }
+                    );
+
+
+                }
             })
             .catch(function (error) {
                 console.log("Error in data");
             });
     }
 
-   
+
     showPreselectedImage(imageFile) {
-        let dataurl = this.state.imageFile;
-        let filename=this.state.imageFileForBlob.name;
+        // let dataurl = this.state.imageFile;
+        // let filename=this.state.imageFileForBlob.name;
 
-        var arr = dataurl.split(','),
-        mime = arr[0].match(/:(.*?);/)[1],
-        bstr = window.atob(arr[1]), 
-        n = bstr.length, 
-        u8arr = new Uint8Array(n);
-        
-        while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
-        }
+        // var arr = dataurl.split(','),
+        // mime = arr[0].match(/:(.*?);/)[1],
+        // bstr = window.atob(arr[1]), 
+        // n = bstr.length, 
+        // u8arr = new Uint8Array(n);
 
-        let file1 = new File([u8arr], filename, {type:mime});    
-        console.log("FILE1",file1)
+        // while(n--){
+        // u8arr[n] = bstr.charCodeAt(n);
+        // }
+
+        // let file1 = new File([u8arr], filename, {type:mime});    
+        // console.log("FILE1",file1)
 
 
+
+        // let tempImageArray = [];
+        // let tempBlobArray = [];
+        // tempImageArray.push(this.state.imageFile);
+
+
+
+        // tempBlobArray.push({ file1 })
+        // console.log("tempBlobArray",tempBlobArray[0].file1)///ovako treba
+
+        // let testArr = [];
+        // testArr.push(tempBlobArray[0].file1);
+        // console.log("testArr",testArr)
+
+
+
+        // this.setState({ tempImageArray: tempImageArray });
+        // this.setState({ images: tempImageArray }, () => {
+        //     console.log("Ovo su images iz showPreselectedImage", this.state.images)
+        // })
+        // // this.setState({ images2: tempBlobArray })
+        // this.setState({ images2: testArr })
+
+        let dataurls = this.state.imageFile;
+        let filenames = this.state.imageFileForBlob.map(file => file.name);
 
         let tempImageArray = [];
         let tempBlobArray = [];
-        tempImageArray.push(this.state.imageFile);
 
-       
-               
-        tempBlobArray.push({ file1 })
-        console.log("tempBlobArray",tempBlobArray[0].file1)///ovako treba
+        dataurls.forEach((dataurl, index) => {
+            let arr = dataurl.split(','),
+                mime = arr[0].match(/:(.*?);/)[1],
+                bstr = window.atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
 
-        let testArr = [];
-        testArr.push(tempBlobArray[0].file1);
-        console.log("testArr",testArr)
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
 
+            let file = new File([u8arr], filenames[index], { type: mime });
 
+            tempImageArray.push(dataurl);
+            tempBlobArray.push({ file });
+        });
 
-        this.setState({ tempImageArray: tempImageArray });
+        let testArr = tempBlobArray.map(blob => blob.file);
+
+        this.setState({ tempImageArray });
         this.setState({ images: tempImageArray }, () => {
             console.log("Ovo su images iz showPreselectedImage", this.state.images)
-        })
-        // this.setState({ images2: tempBlobArray })
-        this.setState({ images2: testArr })
+        });
+        this.setState({ images2: testArr });
 
     }
-
-
-
 
 
 
@@ -228,6 +305,8 @@ class UpdatePostComponent extends Component {
 
     updatePost(e) {
         e.preventDefault();
+
+        
         if (this.state.selectedOptions === "") {
             //categories nepromjenjen
             this.setState(
@@ -338,9 +417,28 @@ class UpdatePostComponent extends Component {
                                     console.log("Post.createdBy", post.createdBy);
                                     console.log("Post.categories", post.categories);
                                     console.log("POST", post);
+
+                                    if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                                        window.alert('Fill the Title, Written By and Categories filds');
+                                        return;
+                                    }
+                            
+                                    else if (this.state.title === '') {
+                                        window.alert('Fill the Title field');
+                                        return;
+                                    }
+                            
+                                    else if (this.state.createdBy.length === 0) {
+                                        window.alert('Fill the Written By field');
+                                        return;
+                                    }
+                                    else if (this.state.selectedOptions.length === 0) {
+                                        window.alert('Fill the Categories field');
+                                        return;
+                                    }
                                     PostService.updatePost(post, this.state._id)
                                         .then((res) => {
-                                            // window.location.replace('http://localhost:3000/news-list');
+                                            window.location.replace('http://localhost:3000/news-list');
                                         })
                                         .catch((error) => {
                                             console.log(error.message);
@@ -428,11 +526,29 @@ class UpdatePostComponent extends Component {
                                 // },
                                 body: formData,
                             });
+                            if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                                window.alert('Fill the Title, Written By and Categories filds');
+                                return;
+                            }
+                    
+                            else if (this.state.title === '') {
+                                window.alert('Fill the Title field');
+                                return;
+                            }
+                    
+                            else if (this.state.createdBy.length === 0) {
+                                window.alert('Fill the Written By field');
+                                return;
+                            }
+                            else if (this.state.selectedOptions.length === 0) {
+                                window.alert('Fill the Categories field');
+                                return;
+                            }
 
                             PostService.updatePost(post, this.state._id)
 
                                 .then((res) => {
-                                    // window.location.replace('http://localhost:3000/news-list');
+                                       window.location.replace('http://localhost:3000/news-list');
                                 })
                                 .catch((error) => {
                                     console.log(error.message);
@@ -516,11 +632,29 @@ class UpdatePostComponent extends Component {
                     // },
                     body: formData,
                 });
+                if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                    window.alert('Fill the Title, Written By and Categories filds');
+                    return;
+                }
+        
+                else if (this.state.title === '') {
+                    window.alert('Fill the Title field');
+                    return;
+                }
+        
+                else if (this.state.createdBy.length === 0) {
+                    window.alert('Fill the Written By field');
+                    return;
+                }
+                else if (this.state.selectedOptions.length === 0) {
+                    window.alert('Fill the Categories field');
+                    return;
+                }
 
                 PostService.updatePost(post, this.state._id)
 
                     .then((res) => {
-                        // window.location.replace('http://localhost:3000/news-list');
+                        window.location.replace('http://localhost:3000/news-list');
                     })
                     .catch((error) => {
                         console.log(error.message);
@@ -555,10 +689,28 @@ class UpdatePostComponent extends Component {
                     // },
                     body: formData,
                 });
+                if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                    window.alert('Fill the Title, Written By and Categories filds');
+                    return;
+                }
+        
+                else if (this.state.title === '') {
+                    window.alert('Fill the Title field');
+                    return;
+                }
+        
+                else if (this.state.createdBy.length === 0) {
+                    window.alert('Fill the Written By field');
+                    return;
+                }
+                else if (this.state.selectedOptions.length === 0) {
+                    window.alert('Fill the Categories field');
+                    return;
+                }
 
                 PostService.updatePost(post, this.state._id)
                     .then((res) => {
-                        // window.location.replace('http://localhost:3000/news-list');
+                         window.location.replace('http://localhost:3000/news-list');
                     })
                     .catch((error) => {
                         console.log(error.message);
@@ -619,9 +771,9 @@ class UpdatePostComponent extends Component {
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     this.state.images2.push(file);
-                    console.log("IMAGES2",this.state.images2)
+                    console.log("IMAGES2", this.state.images2)
 
-                    
+
                     if (!file.type.match("image")) continue;
 
                     const picReader = new FileReader();
@@ -642,7 +794,7 @@ class UpdatePostComponent extends Component {
                         );
                     });
 
-                    console.log("Ovo je file iznad icReader.readAsDataURL(file)",file);
+                    console.log("Ovo je file iznad icReader.readAsDataURL(file)", file);
                     picReader.readAsDataURL(file); //bez ovoga nece da prikaze selektovanu sliku
                 }
                 document.querySelector("#pro-image").value = "";
@@ -678,7 +830,7 @@ class UpdatePostComponent extends Component {
         const images2 = [...this.state.images2];
         images2.splice(index, 1);
         this.setState({ images2: images2 });
-        
+
     };
 
     // handlePreselectedImageDelete = (index) => {

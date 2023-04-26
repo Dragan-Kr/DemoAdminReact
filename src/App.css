@@ -490,8 +490,7 @@ border-radius: 15px;
  color: #222631;
  font-size: 22px;
  font-weight: bold;
- font-family: 'Open Sans';
-  }
+ font-family: 'Poppins', sans-serif;  }
 
 .left-form .image-uploader{
   /* display: flex; */
@@ -1106,7 +1105,7 @@ margin-bottom: 14px;
 
 .heading-post h1 {
   font-size: 26px;
-  font-family:"Open Sans";
+  font-family: 'Poppins', sans-serif;
   color: #222631;
   font-weight: 700;
   align-self: center;

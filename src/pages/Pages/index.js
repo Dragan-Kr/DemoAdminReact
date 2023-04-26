@@ -45,8 +45,8 @@ const DataTable = () => {
     const [isTyped, setIsTyped] = useState(false);
 
     //Delete dialog-modal//
-    const [show,setShow] = useState(false);
-    const [deletePost,setDeletePost]=useState("");
+    const [show, setShow] = useState(false);
+    const [deletePost, setDeletePost] = useState("");
     //Delete dialog-modal//
 
     // const navigate = useNavigate();
@@ -69,7 +69,7 @@ const DataTable = () => {
         { label: "10", value: 10 },
     ];
 
-    const [perPage, setPerPage] = useState(options[1].value);
+    const [perPage, setPerPage] = useState(options[0].value);
 
     useEffect(() => {
         const getData = () => {
@@ -92,60 +92,60 @@ const DataTable = () => {
 
 
     const commentsData = useMemo(() => {
-        let computedComments=[];
-        if(comments.length>0) { 
-         computedComments = comments;
-        if (search) {
-            computedComments = computedComments.filter(
-                comment =>
-                    comment.title.toLowerCase().includes(search.toLowerCase()) ||
-                    comment.shortDescription.toLowerCase().includes(search.toLowerCase())
-                // comment.postDate.includes(search.t)
-            );
-        }
-
-        setTotalItems(computedComments.length);
-
-        //Sorting comments--ORIGINAL
-        // if (sorting.field) {
-        //     const reversed = sorting.order === "asc" ? 1 : -1;
-        //     computedComments = computedComments.sort(
-        //         (a, b) =>
-        //             reversed * a[sorting.field].localeCompare(b[sorting.field])
-        //     );
-        // } 
-        ///////////////////
-
-
-        if (sorting.field) {
-            if (isNaN(computedComments[0][sorting.field])) {
-                const reversed = sorting.order === "asc" ? 1 : -1;
-                computedComments = computedComments.sort(
-                    (a, b) =>
-                        reversed * a[sorting.field].localeCompare(b[sorting.field])
-                );
-            } else {
-                const reversed = sorting.order === "asc" ? 1 : -1;
-                computedComments = computedComments.sort(
-                    (a, b) => reversed * (a[sorting.field] - b[sorting.field])
+        let computedComments = [];
+        if (comments.length > 0) {
+            computedComments = comments;
+            if (search) {
+                computedComments = computedComments.filter(
+                    comment =>
+                        comment.title.toLowerCase().includes(search.toLowerCase()) ||
+                        comment.shortDescription.toLowerCase().includes(search.toLowerCase())
+                    // comment.postDate.includes(search.t)
                 );
             }
+
+            setTotalItems(computedComments.length);
+
+            //Sorting comments--ORIGINAL
+            // if (sorting.field) {
+            //     const reversed = sorting.order === "asc" ? 1 : -1;
+            //     computedComments = computedComments.sort(
+            //         (a, b) =>
+            //             reversed * a[sorting.field].localeCompare(b[sorting.field])
+            //     );
+            // } 
+            ///////////////////
+
+
+            if (sorting.field) {
+                if (isNaN(computedComments[0][sorting.field])) {
+                    const reversed = sorting.order === "asc" ? 1 : -1;
+                    computedComments = computedComments.sort(
+                        (a, b) =>
+                            reversed * a[sorting.field].localeCompare(b[sorting.field])
+                    );
+                } else {
+                    const reversed = sorting.order === "asc" ? 1 : -1;
+                    computedComments = computedComments.sort(
+                        (a, b) => reversed * (a[sorting.field] - b[sorting.field])
+                    );
+                }
+            }
+
+
+
+
+
+            //Current Page slice
+            return computedComments.slice(
+                (currentPage - 1) * perPage,
+                (currentPage - 1) * perPage + perPage
+            );
+        } else {
+            return computedComments = [];
+
         }
-
-
-
-
-
-        //Current Page slice
-        return computedComments.slice(
-            (currentPage - 1) * perPage,
-            (currentPage - 1) * perPage + perPage
-        );
-        }else{
-         return  computedComments = [];
-           
-        }
-    }, [comments, currentPage, search, sorting]);
+    }, [comments, currentPage, search, sorting,perPage]);
 
 
 
@@ -188,7 +188,7 @@ const DataTable = () => {
 
 
     const handleDeletePost = () => {
-      
+
         // console.log("Ovo je post iz handleDeletePost", post);
         PostService.deletePost(deletePost._id).then((res) => {
             setComments(comments.filter((comment) => comment._id !== deletePost._id));
@@ -196,10 +196,10 @@ const DataTable = () => {
         setShow(false);
     };
 
-const handleClickDelete=(post)=>{
-    setShow(true);
-    setDeletePost(post);
-}
+    const handleClickDelete = (post) => {
+        setShow(true);
+        setDeletePost(post);
+    }
 
 
     const editPost = (_id) => {
@@ -210,9 +210,9 @@ const handleClickDelete=(post)=>{
     }
 
     //Delete dialog//
-const handleClose = ()=>{
-    setShow(false);
-}
+    const handleClose = () => {
+        setShow(false);
+    }
     //Delete dialog//
 
 
@@ -220,29 +220,27 @@ const handleClose = ()=>{
     return (
         <>
             <div className="row w-100">
-              {/* Delete dialog */}
-              <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Do you want to delete {deletePost.title} item</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Be careful</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleDeletePost}>
-            OK
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-           Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
+                {/* Delete dialog */}
+                <Modal show={show} onHide={handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Do you want to delete {deletePost.title} item</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Be careful</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleDeletePost}>
+                            OK
+                        </Button>
+                        <Button variant="primary" onClick={handleClose}>
+                            Cancel
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
 
-              {/* Delete dialog */}
+                {/* Delete dialog */}
 
                 <div className="col mb-3 col-12 text-center">
                     <div className="row">
-
                         <div className="top-serach-items">
-
                             <div className="news-list-drop-down">
                                 <div className="news-list-drop">
                                     <div className="drop-down-left-word">
@@ -256,6 +254,7 @@ const handleClose = ()=>{
                                         defaultValue={options}
                                         value={options.find(option => option.value === perPage)}
                                         onChange={option => setPerPage(option.value)}
+                                        
                                     />
                                     <div className="drop-down-right"> <label className="drop-down-right-word">entries</label>
                                     </div>
@@ -268,62 +267,58 @@ const handleClose = ()=>{
                                     <Isvg className="" src={Magnifying} />
 
                                     <Search
-                                            onSearch={value => {
+                                        onSearch={value => {
                                             setSearch(value);
                                             setCurrentPage(1);
                                             setIsTyped(true);
-
                                         }}
                                     />
 
                                 </div>
                                 {/* </div> */}
-
-
-
                                 {/* { !isTyped &&  <Isvg className="search-magnifying" src={Magnifying}/> } */}
 
                             </div>
                         </div>
                     </div>
                     <div class="table-responsive">
-                    <table className="table table-striped">
-                        <TableHeader
-                            headers={headers}
-                            onSorting={(field, order) =>
-                                setSorting({ field, order })
-                            }
+                        <table className="table table-striped">
+                            <TableHeader
+                                headers={headers}
+                                onSorting={(field, order) =>
+                                    setSorting({ field, order })
+                                }
 
-                        />
-                        <tbody>
-                            {commentsData.length > 0 ? commentsData.map((comment) => (
+                            />
+                            <tbody>
+                                {commentsData.length > 0 ? commentsData.map((comment) => (
 
-                                <tr>
-                                    <th scope="row" key={comment._id}>
-                                        {comment.index}
+                                    <tr>
+                                        <th scope="row" key={comment._id}>
+                                            {comment.index}
 
 
 
-                                    </th>
-                                    <td className="title-td">{comment.title}</td>
-                                    {/* <td>{comment.shortDescription}</td> */}
-                                    <td>{DateFormat(comment.postDate, "mm.dd.yyyy")}</td>
-                                    <td>{DateFormat(comment.postDate, "h:MM")} h</td>
-                                    <td>
-                                        <div className="update-delete-img-div">
-                                            <button onClick={() => editPost(comment._id)}><Isvg className='isvg-pen-update' src={Pen} /></button>
+                                        </th>
+                                        <td className="title-td">{comment.title}</td>
+                                        {/* <td>{comment.shortDescription}</td> */}
+                                        <td>{DateFormat(comment.postDate, "mm.dd.yyyy")}</td>
+                                        <td>{DateFormat(comment.postDate, "h:MM")} h</td>
+                                        <td>
+                                            <div className="update-delete-img-div">
+                                                <button onClick={() => editPost(comment._id)}><Isvg className='isvg-pen-update' src={Pen} /></button>
 
-                                            <button onClick={() => handleClickDelete(comment)}>
-                                                <Isvg className='isvg-pen-delete' src={Trash} />
-                                            </button>
-                                        </div>
+                                                <button onClick={() => handleClickDelete(comment)}>
+                                                    <Isvg className='isvg-pen-delete' src={Trash} />
+                                                </button>
+                                            </div>
 
-                                    </td>
-                                </tr>
-                            )):<div><h1>NOTHING TO SHOW</h1></div>}
-                        </tbody>
-                        {/* <div> <p className="last-paragraph">Showing 1 to {perPage} of {comments.length} entries</p> </div> */}
-                    </table>
+                                        </td>
+                                    </tr>
+                                )) : <div><h1>NOTHING TO SHOW</h1></div>}
+                            </tbody>
+                            {/* <div> <p className="last-paragraph">Showing 1 to {perPage} of {comments.length} entries</p> </div> */}
+                        </table>
                     </div>
                     <div className="col-md-6">
                         <Pagination
