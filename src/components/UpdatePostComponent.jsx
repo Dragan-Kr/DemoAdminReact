@@ -63,129 +63,111 @@ class UpdatePostComponent extends Component {
     }
 
     async componentDidMount() {
-        await PostService.getPostById(this.state._id)
-            .then((res) => {
-                console.log("Array.isArray(res.data", Array.isArray(res.data));
+
+        if (this.state._id === 0) {
+
+            this.getListOfWriters();
+            this.getListOfCategories();
 
 
-                if (Array.isArray(res.data)) {
+        } else {
+            await PostService.getPostById(this.state._id)
+                .then((res) => {
+                    console.log("Array.isArray(res.data", Array.isArray(res.data));
 
-                    console.log("RES->", res);
 
-                    let tempFileDataArr = [];
-                    let tempFile2DataArr = [];
-                    for (let index in res.data) {
-                        tempFileDataArr.push(res.data[index].file.data);
-                        tempFile2DataArr.push(res.data[index].file2)
+                    if (Array.isArray(res.data)) {
+
+                        console.log("RES->", res);
+
+                        let tempFileDataArr = [];
+                        let tempFile2DataArr = [];
+                        for (let index in res.data) {
+                            tempFileDataArr.push(res.data[index].file.data);
+                            tempFile2DataArr.push(res.data[index].file2)
+                        }
+                        console.log("tempFileDataArr", tempFileDataArr)
+                        console.log("tempFile2DataArr", tempFile2DataArr)
+
+
+                        ////
+                        this.setState(
+                            {
+                                title: res.data[0].post.title,
+                                shortDescription: res.data[0].post.shortDescription,
+                                mainContent: res.data[0].post.mainContent,
+                                isPublished: res.data[0].post.isPublished,
+                                postDate: res.data[0].post.postDate,
+                                createdBy: res.data[0].post.createdBy,
+                                categories: res.data[0].post.categories,
+                                preselectedCategories: res.data[0].post.categories,
+                                index: res.data[0].post.index,
+                                preselectedWriterId: res.data[0].post.createdBy,
+                                imageFile: tempFileDataArr,///data:image/jpeg;base64,/......
+                                imageFileForBlob: tempFile2DataArr
+                                // selectedOptions: res.data.categories ovo treba da bude selektovano
+                            },
+                            () => {
+                                console.log("TITLE", this.state.title)
+                                this.getListOfPreselectedCategories();
+                                this.getPreselectedWriter();
+                                this.getListOfWriters();
+                                this.getListOfCategories();
+                                this.showPreselectedImage(this.state.imageFile);
+                            }
+                        );
+
+
+
+                    } else {
+                        this.setState(
+                            {
+                                title: res.data.post.title,
+                                shortDescription: res.data.post.shortDescription,
+                                mainContent: res.data.post.mainContent,
+                                isPublished: res.data.post.isPublished,
+                                postDate: res.data.post.postDate,
+                                createdBy: res.data.post.createdBy,
+                                categories: res.data.post.categories,
+                                preselectedCategories: res.data.post.categories,
+                                index: res.data.post.index,
+                                preselectedWriterId: res.data.post.createdBy,
+                                // imageFile: res.data.file.data,
+                                // imageFileForBlob:res.data.file2
+                                // selectedOptions: res.data.categories
+                            },
+                            () => {
+                                this.getListOfPreselectedCategories();
+                                this.getPreselectedWriter();
+                                this.getListOfWriters();
+                                this.getListOfCategories();
+                                // this.showPreselectedImage(this.state.imageFile);
+                            }
+                        );
+
+
                     }
-                    console.log("tempFileDataArr", tempFileDataArr)
-                    console.log("tempFile2DataArr", tempFile2DataArr)
-
-
-                    ////
-                    this.setState(
-                        {
-                            title: res.data[0].post.title,
-                            shortDescription: res.data[0].post.shortDescription,
-                            mainContent: res.data[0].post.mainContent,
-                            isPublished: res.data[0].post.isPublished,
-                            postDate: res.data[0].post.postDate,
-                            createdBy: res.data[0].post.createdBy,
-                            categories: res.data[0].post.categories,
-                            preselectedCategories: res.data[0].post.categories,
-                            index: res.data[0].post.index,
-                            preselectedWriterId: res.data[0].post.createdBy,
-                            imageFile: tempFileDataArr,///data:image/jpeg;base64,/......
-                            imageFileForBlob: tempFile2DataArr
-                            // selectedOptions: res.data.categories ovo treba da bude selektovano
-                        },
-                        () => {
-                            console.log("TITLE", this.state.title)
-                            this.getListOfPreselectedCategories();
-                            this.getPreselectedWriter();
-                            this.getListOfWriters();
-                            this.getListOfCategories();
-                            this.showPreselectedImage(this.state.imageFile);
-                        }
-                    );
-
-
-
-                } else {
-                    this.setState(
-                        {
-                            title: res.data.post.title,
-                            shortDescription: res.data.post.shortDescription,
-                            mainContent: res.data.post.mainContent,
-                            isPublished: res.data.post.isPublished,
-                            postDate: res.data.post.postDate,
-                            createdBy: res.data.post.createdBy,
-                            categories: res.data.post.categories,
-                            preselectedCategories: res.data.post.categories,
-                            index: res.data.post.index,
-                            preselectedWriterId: res.data.post.createdBy,
-                            // imageFile: res.data.file.data,
-                            // imageFileForBlob:res.data.file2
-                            // selectedOptions: res.data.categories
-                        },
-                        () => {
-                            this.getListOfPreselectedCategories();
-                            this.getPreselectedWriter();
-                            this.getListOfWriters();
-                            this.getListOfCategories();
-                            // this.showPreselectedImage(this.state.imageFile);
-                        }
-                    );
-
-
-                }
-            })
-            .catch(function (error) {
-                console.log("Error in data");
-            });
+                })
+                .catch(function (error) {
+                    console.log("Error in data");
+                });
+        }
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
     showPreselectedImage(imageFile) {
-        // let dataurl = this.state.imageFile;
-        // let filename=this.state.imageFileForBlob.name;
-
-        // var arr = dataurl.split(','),
-        // mime = arr[0].match(/:(.*?);/)[1],
-        // bstr = window.atob(arr[1]), 
-        // n = bstr.length, 
-        // u8arr = new Uint8Array(n);
-
-        // while(n--){
-        // u8arr[n] = bstr.charCodeAt(n);
-        // }
-
-        // let file1 = new File([u8arr], filename, {type:mime});    
-        // console.log("FILE1",file1)
-
-
-
-        // let tempImageArray = [];
-        // let tempBlobArray = [];
-        // tempImageArray.push(this.state.imageFile);
-
-
-
-        // tempBlobArray.push({ file1 })
-        // console.log("tempBlobArray",tempBlobArray[0].file1)///ovako treba
-
-        // let testArr = [];
-        // testArr.push(tempBlobArray[0].file1);
-        // console.log("testArr",testArr)
-
-
-
-        // this.setState({ tempImageArray: tempImageArray });
-        // this.setState({ images: tempImageArray }, () => {
-        //     console.log("Ovo su images iz showPreselectedImage", this.state.images)
-        // })
-        // // this.setState({ images2: tempBlobArray })
-        // this.setState({ images2: testArr })
 
         let dataurls = this.state.imageFile;
         let filenames = this.state.imageFileForBlob.map(file => file.name);
@@ -229,11 +211,6 @@ class UpdatePostComponent extends Component {
             .then((res) => {
                 preselectedWriter.push(res.data.writer);
 
-                // const writers = res.data.writers.map(d => ({
-                //     "value": d._id,
-                //     "label": d.name + ' ' + d.lastName
-                // }))
-                // this.setState({ writers: writers })
 
                 const preselectedWriter2 = preselectedWriter.map((d) => ({
                     value: d._id,
@@ -291,175 +268,165 @@ class UpdatePostComponent extends Component {
                     console.log("Error in fetching market updates");
                 });
         }
-
-        // const categories = res.data.categories.map(d => ({
-        //     "value": d._id,
-        //     "label": d.name
-        // }))
-        // this.setState({ categories: categories })
     }
 
-    // handleFirstCategoryChange(e) {
-    //     this.setState({ firstCategories: e.value, name: e.label })
-    // }
 
     updatePost(e) {
         e.preventDefault();
 
+        if (this.state._id === 0) {
+            if (this.state.title === '' && this.state.selectedWriter.length === 0 && this.state.selectedOptions.length == 0) {
+                window.alert('Fill the Title, Written By and Categories filds');
+                return;
+            }
+    
+            else if (this.state.title === '') {
+                window.alert('Fill the Title field');
+                return;
+            }
+    
+            else if (this.state.createdBy.length === 0) {
+                window.alert('Fill the Written By field');
+                return;
+            }
+            else if (this.state.selectedOptions.length === 0) {
+                window.alert('Fill the Categories field');
+                return;
+            }
+    
+            const selectedCategories = this.state.selectedOptions.map(item => item.value);
+    
+    
+            console.log("this.state.selectedOptions", this.state.selectedOptions)
+            const url = 'http://localhost:8000/api/post';
+            const formData = new FormData();
+    
+            if(this.state.images2.length>0) { 
+            let imagesForm = [];
+            for (let i = 0; i < this.state.images2.length; i++) {
+    
+                formData.append('images2[]', this.state.images2[i]);
+    
+                imagesForm.push(formData)
+            }
+    
+    
+            //    console.log(  formData.get('files'));
+            console.log("Ovo je images2", this.state.images2)
+    
+    
+    
+            //Array of files converting to array of objects
+            const filesArray = [];
+    
+            // Loop through the array of files
+            for (let i = 0; i < this.state.images2.length; i++) {
+                const file = this.state.images2[i];
+                const reader = new FileReader();
+    
+                // Use the FileReader API to read the contents of the file
+                reader.readAsDataURL(file);
+    
+                // When the file is loaded, create an object and push it to the array
+                reader.onload = function () {
+                    filesArray.push({
+                        name: file.name,
+                        //   type: file.type,
+                        //   size: file.size,
+                        //   data: reader.result,
+                    });
+                };
+            }
+    
+    
+            console.log("Ovo je filesArray", filesArray);
+    
+    
+    
+    
+            let imagesNames = [];
+    
+            for (let i = 0; i < this.state.images2.length; i++) {
+                imagesNames.push(this.state.images2[i].name);
+    
+            }
+    
+            console.log("imagesNames je", imagesNames)
+    
+            ///////////////// 
+    
+    
+            console.log("iznda posta=>selectedCategories", selectedCategories)
+            console.log("iznad posta=>this.state.createdBy", this.state.createdBy.value)
+            let post = {
+                title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.selectedWriter, images: imagesNames
+            };
+            console.log("Ovo su categories", this.state.categories)
+    
+            console.log("FORM DATA", formData)
+            fetch('http://localhost:8000/api/image', {
+                method: 'POST',
+                // headers:{
+                //     'Content-Type':'multipart/form-data'
+                // },
+                body: formData
+    
+    
+            })
+    
+            PostService.createPost(post)
+                .then(res => {
+                    // navigate('/news-list/');
+                    window.location.replace('http://localhost:3000/news-list');
+    
+                }).catch((error) => {
+                    // window.alert('Post failed');
+                    console.log(error.message);
+                });
+            }
+            else{
+    
+                let post = {
+                    title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
+                    isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.createdBy.value
+                };
+                console.log("Ovo su categories", this.state.categories)
         
-        if (this.state.selectedOptions === "") {
-            //categories nepromjenjen
-            this.setState(
-                { selectedOptions: this.state.preselectedCategoriesArray },
-                () => {
-                    ///ovde je problem
+                console.log("FORM DATA", formData)
+               
+        
+                PostService.createPost(post)
+                    .then(res => {
+                        // navigate('/news-list/');
+                        window.location.replace('http://localhost:3000/news-list');
+        
+                    }).catch((error) => {
+                        // window.alert('Post failed');
+                        console.log(error.message);
+                    });
+    
+            }
 
-                    this.setState({ valueArray: this.state.selectedOptions }, () => {
-                        console.log(
-                            "OVO je this.state.selectedOptions",
-                            this.state.selectedOptions
-                        );
-                        console.log("UpdatePost=>=>valueArray", this.state.valueArray); ///prazno
-                        const formData = new FormData();
 
-                        let imagesForm = [];
-                        for (let i = 0; i < this.state.images2.length; i++) {
-                            formData.append("images2[]", this.state.images2[i]);
 
-                            imagesForm.push(formData);
-                        }
 
-                        //Array of files converting to array of objects
-                        const filesArray = [];
 
-                        // Loop through the array of files
-                        for (let i = 0; i < this.state.images2.length; i++) {
-                            let file = this.state.images2[i];
-                            const reader = new FileReader();
+        } else {
 
-                            // Use the FileReader API to read the contents of the file
-                            console.log("Preselektovana slika koja treba da se procita", file)
-                            reader.readAsDataURL(file);
+            if (this.state.selectedOptions === "") {
+                //categories nepromjenjen
+                this.setState(
+                    { selectedOptions: this.state.preselectedCategoriesArray },
+                    () => {
+                        ///ovde je problem
 
-                            // When the file is loaded, create an object and push it to the array
-                            reader.onload = function () {
-                                filesArray.push({
-                                    name: file.name,
-                                    //   type: file.type,
-                                    //   size: file.size,
-                                    //   data: reader.r
-                                });
-                            };
-                        }
-
-                        // console.log("Ovo je filesArray", filesArray);
-
-                        let imagesNames = [];
-
-                        for (let i = 0; i < this.state.images2.length; i++) {
-                            imagesNames.push(this.state.images2[i].name);
-                        }
-
-                        console.log(
-                            "iznad let post=>this.state.selectedWriter",
-                            this.state.selectedWriter
-                        );
-                        ////dovde
-                        if (this.state.selectedWriter === "") {
-                            ///writer ne promjenjen
-                            console.log("USOOO");
-
-                            let valueArray2 = [];
-                            valueArray2 = this.state.valueArray.map((item) => item.value);
-                            console.log("Ispod varijable=>valueArray", this.state.valueArray); ///prazno
-
-                            this.setState(
-                                { selectedWriter: this.state.preselectedWriter },
-                                () => {
-                                    console.log(
-                                        "iznad let post=>this.state.selectedWriter",
-                                        this.state.selectedWriter
-                                    );
-
-                                    let selectedWriterValue = this.state.selectedWriter.map(
-                                        (item) => item.value
-                                    );
-                                    console.log("selectedWriterValue", selectedWriterValue);
-
-                                    console.log("valueArray2", valueArray2);
-
-                                    let post = {
-                                        ////////////////////////////////////////
-                                        title: this.state.title,
-                                        shortDescription: this.state.shortDescription,
-                                        mainContent: this.state.mainContent,
-                                        isPublished: this.state.isPublished,
-                                        postDate: this.state.postDate,
-                                        categories: valueArray2,
-                                        createdBy: selectedWriterValue[0],
-                                        images: imagesNames, //valueArray2 i selectedWriterValue[0] su dobre
-                                    };
-
-                                    //  this.setState({preselectedWriterId:post.createdBy})
-                                    console.log(
-                                        "spod let post=>this.state.selectedWriter",
-                                        this.state.selectedWriter
-                                    );
-
-                                    fetch("http://localhost:8000/api/image", {
-                                        method: "POST",
-                                        // headers:{
-                                        //     'Content-Type':'multipart/form-data'
-                                        // },
-                                        body: formData,
-                                    });
-
-                                    console.log("Post.createdBy", post.createdBy);
-                                    console.log("Post.categories", post.categories);
-                                    console.log("POST", post);
-
-                                    if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
-                                        window.alert('Fill the Title, Written By and Categories filds');
-                                        return;
-                                    }
-                            
-                                    else if (this.state.title === '') {
-                                        window.alert('Fill the Title field');
-                                        return;
-                                    }
-                            
-                                    else if (this.state.createdBy.length === 0) {
-                                        window.alert('Fill the Written By field');
-                                        return;
-                                    }
-                                    else if (this.state.selectedOptions.length === 0) {
-                                        window.alert('Fill the Categories field');
-                                        return;
-                                    }
-                                    PostService.updatePost(post, this.state._id)
-                                        .then((res) => {
-                                            window.location.replace('http://localhost:3000/news-list');
-                                        })
-                                        .catch((error) => {
-                                            console.log(error.message);
-                                        });
-                                    console.log(
-                                        "valueArray izvan setState",
-                                        this.state.valueArray
-                                    );
-                                }
-                            );
-                        } else {
-                            ////////////////////////////
-                            e.preventDefault();
-
-                            // let valueArray = this.state.selectedOptions.map(item => item.value);
-                            // console.log("Ovo je valueArray" + JSON.stringify(valueArray));
-                            // console.log("ELSE->VALUEARRAY",valueArray)
-
+                        this.setState({ valueArray: this.state.selectedOptions }, () => {
                             console.log(
-                                "USAO U ELSE->WRITER PROMJENJEN A CATEGORIJE OSTALE ISTE"
+                                "OVO je this.state.selectedOptions",
+                                this.state.selectedOptions
                             );
+                            console.log("UpdatePost=>=>valueArray", this.state.valueArray); ///prazno
                             const formData = new FormData();
 
                             let imagesForm = [];
@@ -474,16 +441,20 @@ class UpdatePostComponent extends Component {
 
                             // Loop through the array of files
                             for (let i = 0; i < this.state.images2.length; i++) {
-                                const file = this.state.images2[i];
+                                let file = this.state.images2[i];
                                 const reader = new FileReader();
 
                                 // Use the FileReader API to read the contents of the file
+                                console.log("Preselektovana slika koja treba da se procita", file)
                                 reader.readAsDataURL(file);
 
                                 // When the file is loaded, create an object and push it to the array
                                 reader.onload = function () {
                                     filesArray.push({
                                         name: file.name,
+                                        //   type: file.type,
+                                        //   size: file.size,
+                                        //   data: reader.r
                                     });
                                 };
                             }
@@ -497,226 +468,365 @@ class UpdatePostComponent extends Component {
                             }
 
                             console.log(
-                                "ELSE->Iznad let post->this.state.selectedOptions",
-                                this.state.selectedOptions
+                                "iznad let post=>this.state.selectedWriter",
+                                this.state.selectedWriter
                             );
+                            ////dovde
+                            if (this.state.selectedWriter === "") {
+                                ///writer ne promjenjen
+                                console.log("USOOO");
 
-                            let selectedOptionsValue = this.state.selectedOptions.map(
-                                (item) => item.value
-                            );
-                            let post = {
-                                title: this.state.title,
-                                shortDescription: this.state.shortDescription,
-                                mainContent: this.state.mainContent,
-                                isPublished: this.state.isPublished,
-                                postDate: this.state.postDate,
-                                categories: selectedOptionsValue,
-                                createdBy: this.state.selectedWriter.value,
-                                images: imagesNames,
-                            };
+                                let valueArray2 = [];
+                                valueArray2 = this.state.valueArray.map((item) => item.value);
+                                console.log("Ispod varijable=>valueArray", this.state.valueArray); ///prazno
 
-                            console.log("POST iz elsa", post);
+                                this.setState(
+                                    { selectedWriter: this.state.preselectedWriter },
+                                    () => {
+                                        console.log(
+                                            "iznad let post=>this.state.selectedWriter",
+                                            this.state.selectedWriter
+                                        );
 
-                            //  this.setState({preselectedWriterId:post.createdBy})
+                                        let selectedWriterValue = this.state.selectedWriter.map(
+                                            (item) => item.value
+                                        );
+                                        console.log("selectedWriterValue", selectedWriterValue);
 
-                            fetch("http://localhost:8000/api/image", {
-                                method: "POST",
-                                // headers:{
-                                //     'Content-Type':'multipart/form-data'
-                                // },
-                                body: formData,
-                            });
-                            if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
-                                window.alert('Fill the Title, Written By and Categories filds');
-                                return;
-                            }
-                    
-                            else if (this.state.title === '') {
-                                window.alert('Fill the Title field');
-                                return;
-                            }
-                    
-                            else if (this.state.createdBy.length === 0) {
-                                window.alert('Fill the Written By field');
-                                return;
-                            }
-                            else if (this.state.selectedOptions.length === 0) {
-                                window.alert('Fill the Categories field');
-                                return;
-                            }
+                                        console.log("valueArray2", valueArray2);
 
-                            PostService.updatePost(post, this.state._id)
+                                        let post = {
+                                            ////////////////////////////////////////
+                                            title: this.state.title,
+                                            shortDescription: this.state.shortDescription,
+                                            mainContent: this.state.mainContent,
+                                            isPublished: this.state.isPublished,
+                                            postDate: this.state.postDate,
+                                            categories: valueArray2,
+                                            createdBy: selectedWriterValue[0],
+                                            images: imagesNames, //valueArray2 i selectedWriterValue[0] su dobre
+                                        };
 
-                                .then((res) => {
-                                       window.location.replace('http://localhost:3000/news-list');
-                                })
-                                .catch((error) => {
-                                    console.log(error.message);
+                                        //  this.setState({preselectedWriterId:post.createdBy})
+                                        console.log(
+                                            "spod let post=>this.state.selectedWriter",
+                                            this.state.selectedWriter
+                                        );
+
+                                        fetch("http://localhost:8000/api/image", {
+                                            method: "POST",
+                                            // headers:{
+                                            //     'Content-Type':'multipart/form-data'
+                                            // },
+                                            body: formData,
+                                        });
+
+                                        console.log("Post.createdBy", post.createdBy);
+                                        console.log("Post.categories", post.categories);
+                                        console.log("POST", post);
+
+                                        if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                                            window.alert('Fill the Title, Written By and Categories filds');
+                                            return;
+                                        }
+
+                                        else if (this.state.title === '') {
+                                            window.alert('Fill the Title field');
+                                            return;
+                                        }
+
+                                        else if (this.state.createdBy.length === 0) {
+                                            window.alert('Fill the Written By field');
+                                            return;
+                                        }
+                                        else if (this.state.selectedOptions.length === 0) {
+                                            window.alert('Fill the Categories field');
+                                            return;
+                                        }
+                                        PostService.updatePost(post, this.state._id)
+                                            .then((res) => {
+                                                window.location.replace('http://localhost:3000/news-list');
+                                            })
+                                            .catch((error) => {
+                                                console.log(error.message);
+                                            });
+                                        console.log(
+                                            "valueArray izvan setState",
+                                            this.state.valueArray
+                                        );
+                                    }
+                                );
+                            } else {
+                                ////////////////////////////
+                                e.preventDefault();
+
+                                // let valueArray = this.state.selectedOptions.map(item => item.value);
+                                // console.log("Ovo je valueArray" + JSON.stringify(valueArray));
+                                // console.log("ELSE->VALUEARRAY",valueArray)
+
+                                console.log(
+                                    "USAO U ELSE->WRITER PROMJENJEN A CATEGORIJE OSTALE ISTE"
+                                );
+                                const formData = new FormData();
+
+                                let imagesForm = [];
+                                for (let i = 0; i < this.state.images2.length; i++) {
+                                    formData.append("images2[]", this.state.images2[i]);
+
+                                    imagesForm.push(formData);
+                                }
+
+                                //Array of files converting to array of objects
+                                const filesArray = [];
+
+                                // Loop through the array of files
+                                for (let i = 0; i < this.state.images2.length; i++) {
+                                    const file = this.state.images2[i];
+                                    const reader = new FileReader();
+
+                                    // Use the FileReader API to read the contents of the file
+                                    reader.readAsDataURL(file);
+
+                                    // When the file is loaded, create an object and push it to the array
+                                    reader.onload = function () {
+                                        filesArray.push({
+                                            name: file.name,
+                                        });
+                                    };
+                                }
+
+                                // console.log("Ovo je filesArray", filesArray);
+
+                                let imagesNames = [];
+
+                                for (let i = 0; i < this.state.images2.length; i++) {
+                                    imagesNames.push(this.state.images2[i].name);
+                                }
+
+                                console.log(
+                                    "ELSE->Iznad let post->this.state.selectedOptions",
+                                    this.state.selectedOptions
+                                );
+
+                                let selectedOptionsValue = this.state.selectedOptions.map(
+                                    (item) => item.value
+                                );
+                                let post = {
+                                    title: this.state.title,
+                                    shortDescription: this.state.shortDescription,
+                                    mainContent: this.state.mainContent,
+                                    isPublished: this.state.isPublished,
+                                    postDate: this.state.postDate,
+                                    categories: selectedOptionsValue,
+                                    createdBy: this.state.selectedWriter.value,
+                                    images: imagesNames,
+                                };
+
+                                console.log("POST iz elsa", post);
+
+                                //  this.setState({preselectedWriterId:post.createdBy})
+
+                                fetch("http://localhost:8000/api/image", {
+                                    method: "POST",
+                                    // headers:{
+                                    //     'Content-Type':'multipart/form-data'
+                                    // },
+                                    body: formData,
                                 });
-                        }
-                    });
-                }
-            );
-        } else {
-            console.log("USOO U ELSE");
+                                if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                                    window.alert('Fill the Title, Written By and Categories filds');
+                                    return;
+                                }
 
-            const formData = new FormData();
+                                else if (this.state.title === '') {
+                                    window.alert('Fill the Title field');
+                                    return;
+                                }
 
-            let imagesForm = [];
-            for (let i = 0; i < this.state.images2.length; i++) {
-                formData.append("images2[]", this.state.images2[i]);
+                                else if (this.state.createdBy.length === 0) {
+                                    window.alert('Fill the Written By field');
+                                    return;
+                                }
+                                else if (this.state.selectedOptions.length === 0) {
+                                    window.alert('Fill the Categories field');
+                                    return;
+                                }
 
-                imagesForm.push(formData);
-            }
+                                PostService.updatePost(post, this.state._id)
 
-            //Array of files converting to array of objects
-            const filesArray = [];
-
-            // Loop through the array of files
-            for (let i = 0; i < this.state.images2.length; i++) {
-                const file = this.state.images2[i];
-                const reader = new FileReader();
-
-                // Use the FileReader API to read the contents of the file
-                reader.readAsDataURL(file);
-
-                // When the file is loaded, create an object and push it to the array
-                reader.onload = function () {
-                    filesArray.push({
-                        name: file.name,
-                        //   type: file.type,
-                        //   size: file.size,
-                        //   data: reader.r
-                    });
-                };
-            }
-
-            // console.log("Ovo je filesArray", filesArray);
-
-            let imagesNames = [];
-
-            for (let i = 0; i < this.state.images2.length; i++) {
-                imagesNames.push(this.state.images2[i].name);
-            }
-
-            console.log(
-                "iznad let post=>this.state.selectedWriter",
-                this.state.selectedWriter
-            );
-            ///
-
-            let valueArrayOfSelectedCategories = [];
-            valueArrayOfSelectedCategories = this.state.selectedOptions.map(
-                (item) => item.value
-            );
-
-            if (this.state.selectedWriter !== "") {
-                console.log("Izabrane vrijednosti i pisca i kategorije");
-                let post = {
-                    ////////////////////////////////////////
-                    title: this.state.title,
-                    shortDescription: this.state.shortDescription,
-                    mainContent: this.state.mainContent,
-                    isPublished: this.state.isPublished,
-                    postDate: this.state.postDate,
-                    categories: valueArrayOfSelectedCategories,
-                    createdBy: this.state.selectedWriter.value,
-                    images: imagesNames, //valueArray2 i selectedWriterValue[0] su dobre
-                };
-                console.log("ELSE->POST", post);
-
-                fetch("http://localhost:8000/api/image", {
-                    method: "POST",
-                    // headers:{
-                    //     'Content-Type':'multipart/form-data'
-                    // },
-                    body: formData,
-                });
-                if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
-                    window.alert('Fill the Title, Written By and Categories filds');
-                    return;
-                }
-        
-                else if (this.state.title === '') {
-                    window.alert('Fill the Title field');
-                    return;
-                }
-        
-                else if (this.state.createdBy.length === 0) {
-                    window.alert('Fill the Written By field');
-                    return;
-                }
-                else if (this.state.selectedOptions.length === 0) {
-                    window.alert('Fill the Categories field');
-                    return;
-                }
-
-                PostService.updatePost(post, this.state._id)
-
-                    .then((res) => {
-                        window.location.replace('http://localhost:3000/news-list');
-                    })
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
+                                    .then((res) => {
+                                        window.location.replace('http://localhost:3000/news-list');
+                                    })
+                                    .catch((error) => {
+                                        console.log(error.message);
+                                    });
+                            }
+                        });
+                    }
+                );
             } else {
-                //pisac osto nepromjenjen
+                console.log("USOO U ELSE");
 
-                console.log("PISAC OSTAO NEPROMJENJEN");
-                console.log("Izabrane vrijednosti i pisca i kategorije");
+                const formData = new FormData();
+
+                let imagesForm = [];
+                for (let i = 0; i < this.state.images2.length; i++) {
+                    formData.append("images2[]", this.state.images2[i]);
+
+                    imagesForm.push(formData);
+                }
+
+                //Array of files converting to array of objects
+                const filesArray = [];
+
+                // Loop through the array of files
+                for (let i = 0; i < this.state.images2.length; i++) {
+                    const file = this.state.images2[i];
+                    const reader = new FileReader();
+
+                    // Use the FileReader API to read the contents of the file
+                    reader.readAsDataURL(file);
+
+                    // When the file is loaded, create an object and push it to the array
+                    reader.onload = function () {
+                        filesArray.push({
+                            name: file.name,
+                            //   type: file.type,
+                            //   size: file.size,
+                            //   data: reader.r
+                        });
+                    };
+                }
+
+                // console.log("Ovo je filesArray", filesArray);
+
+                let imagesNames = [];
+
+                for (let i = 0; i < this.state.images2.length; i++) {
+                    imagesNames.push(this.state.images2[i].name);
+                }
+
+                console.log(
+                    "iznad let post=>this.state.selectedWriter",
+                    this.state.selectedWriter
+                );
+                ///
 
                 let valueArrayOfSelectedCategories = [];
                 valueArrayOfSelectedCategories = this.state.selectedOptions.map(
                     (item) => item.value
                 );
-                let post = {
-                    ////////////////////////////////////////
-                    title: this.state.title,
-                    shortDescription: this.state.shortDescription,
-                    mainContent: this.state.mainContent,
-                    isPublished: this.state.isPublished,
-                    postDate: this.state.postDate,
-                    categories: valueArrayOfSelectedCategories,
-                    createdBy: this.state.selectedWriter.value,
-                    images: imagesNames, //valueArray2 i selectedWriterValue[0] su dobre
-                };
-                console.log("ELSE->POST", post);
 
-                fetch("http://localhost:8000/api/image", {
-                    method: "POST",
-                    // headers:{
-                    //     'Content-Type':'multipart/form-data'
-                    // },
-                    body: formData,
-                });
-                if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
-                    window.alert('Fill the Title, Written By and Categories filds');
-                    return;
-                }
-        
-                else if (this.state.title === '') {
-                    window.alert('Fill the Title field');
-                    return;
-                }
-        
-                else if (this.state.createdBy.length === 0) {
-                    window.alert('Fill the Written By field');
-                    return;
-                }
-                else if (this.state.selectedOptions.length === 0) {
-                    window.alert('Fill the Categories field');
-                    return;
-                }
+                if (this.state.selectedWriter !== "") {
+                    console.log("Izabrane vrijednosti i pisca i kategorije");
+                    let post = {
+                        ////////////////////////////////////////
+                        title: this.state.title,
+                        shortDescription: this.state.shortDescription,
+                        mainContent: this.state.mainContent,
+                        isPublished: this.state.isPublished,
+                        postDate: this.state.postDate,
+                        categories: valueArrayOfSelectedCategories,
+                        createdBy: this.state.selectedWriter.value,
+                        images: imagesNames, //valueArray2 i selectedWriterValue[0] su dobre
+                    };
+                    console.log("ELSE->POST", post);
 
-                PostService.updatePost(post, this.state._id)
-                    .then((res) => {
-                         window.location.replace('http://localhost:3000/news-list');
-                    })
-                    .catch((error) => {
-                        console.log(error.message);
+                    fetch("http://localhost:8000/api/image", {
+                        method: "POST",
+                        // headers:{
+                        //     'Content-Type':'multipart/form-data'
+                        // },
+                        body: formData,
                     });
+                    if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                        window.alert('Fill the Title, Written By and Categories filds');
+                        return;
+                    }
+
+                    else if (this.state.title === '') {
+                        window.alert('Fill the Title field');
+                        return;
+                    }
+
+                    else if (this.state.createdBy.length === 0) {
+                        window.alert('Fill the Written By field');
+                        return;
+                    }
+                    else if (this.state.selectedOptions.length === 0) {
+                        window.alert('Fill the Categories field');
+                        return;
+                    }
+
+                    PostService.updatePost(post, this.state._id)
+
+                        .then((res) => {
+                            window.location.replace('http://localhost:3000/news-list');
+                        })
+                        .catch((error) => {
+                            console.log(error.message);
+                        });
+                } else {
+                    //pisac osto nepromjenjen
+
+                    console.log("PISAC OSTAO NEPROMJENJEN");
+                    console.log("Izabrane vrijednosti i pisca i kategorije");
+
+                    let valueArrayOfSelectedCategories = [];
+                    valueArrayOfSelectedCategories = this.state.selectedOptions.map(
+                        (item) => item.value
+                    );
+                    let post = {
+                        ////////////////////////////////////////
+                        title: this.state.title,
+                        shortDescription: this.state.shortDescription,
+                        mainContent: this.state.mainContent,
+                        isPublished: this.state.isPublished,
+                        postDate: this.state.postDate,
+                        categories: valueArrayOfSelectedCategories,
+                        createdBy: this.state.selectedWriter.value,
+                        images: imagesNames, //valueArray2 i selectedWriterValue[0] su dobre
+                    };
+                    console.log("ELSE->POST", post);
+
+                    fetch("http://localhost:8000/api/image", {
+                        method: "POST",
+                        // headers:{
+                        //     'Content-Type':'multipart/form-data'
+                        // },
+                        body: formData,
+                    });
+                    if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                        window.alert('Fill the Title, Written By and Categories filds');
+                        return;
+                    }
+
+                    else if (this.state.title === '') {
+                        window.alert('Fill the Title field');
+                        return;
+                    }
+
+                    else if (this.state.createdBy.length === 0) {
+                        window.alert('Fill the Written By field');
+                        return;
+                    }
+                    else if (this.state.selectedOptions.length === 0) {
+                        window.alert('Fill the Categories field');
+                        return;
+                    }
+
+                    PostService.updatePost(post, this.state._id)
+                        .then((res) => {
+                            window.location.replace('http://localhost:3000/news-list');
+                        })
+                        .catch((error) => {
+                            console.log(error.message);
+                        });
+                }
+
             }
         }
+
     }
 
     changeTitleHandler(event) {
@@ -1014,16 +1124,6 @@ class UpdatePostComponent extends Component {
                     <div className="right-form">
                         <div className="select-content">
                             <label>Written By</label>
-
-                            {/* <select className='writer-select' onChange={this.handleWriterSelect}>
-                                  <option value="choose">
-                                      {this.state.preselectedWriters.map((writer,index)=><div key={index}>
-                                      </div>)}
-                                      dfs
-                                  </option>
-                                  {this.getWriter()}
-                              </select> */}
-
                             <Select
                                 options={this.state.writers}
                                 value={

@@ -2,6 +2,12 @@ import React from 'react';
 import CreatePostComponent from './CreatePostComponent2';
 import { useParams } from "react-router-dom";
 import UpdatePostComponent from './UpdatePostComponent';
+// import PostService from '../services/PostService';
+
+
+
+
+
 
 
 
@@ -9,7 +15,9 @@ import UpdatePostComponent from './UpdatePostComponent';
 const UpdatePost = (props) => {
 
     let { id } = useParams(); 
-    console.log("Id iz UpdatePost",id)
+
+    if(id!==undefined){ 
+        console.log("ima id")
     return (
 
         <div>
@@ -17,7 +25,18 @@ const UpdatePost = (props) => {
         </div>
 
     )
+ }else{
+    console.log("id je 0",id)
+    
+    return (
 
+        <div>
+            <UpdatePostComponent _id={0} />
+        </div>
+
+    )
+
+ }
 
 };
 export default UpdatePost;

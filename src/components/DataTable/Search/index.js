@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 
-const Search = ({ onSearch }) => {
-    const [search, setSearch] = useState("");
+const Search = ({ onChange }) => {
+    const [searchTerm, setSearchTerm] = useState("");
 
     const onInputChange = value => {
-        setSearch(value);
-        onSearch(value);
+        setSearchTerm(value);
+        onChange(value);
+        console.log("Search=>searchTerm",value)
     };
     return (
         <input
@@ -13,7 +14,7 @@ const Search = ({ onSearch }) => {
             className="form-control1"
            //s style={{ width: "240px" }}
             placeholder="Filter results"
-            value={search}
+            value={searchTerm}
             onChange={e => onInputChange(e.target.value)}
         />
     );

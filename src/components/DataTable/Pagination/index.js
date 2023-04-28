@@ -2,9 +2,9 @@ import React, { useEffect, useState, useMemo } from "react";
 import Pagination from "react-bootstrap/Pagination";
 
 const PaginationComponent = ({
-    total = 0,
-    itemsPerPage =2,
-    currentPage = 1,
+    total,
+    itemsPerPage,
+    currentPage,
     onPageChange
 }) => {
     const [totalPages, setTotalPages] = useState(0);

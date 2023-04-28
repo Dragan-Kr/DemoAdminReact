@@ -102,10 +102,11 @@ function App() {
       
         <Route element={<MainLayout/>}>
             <Route path="/" element={HomePage}/>
-            <Route path="/add-news" element={<CreatePostComponent2/>}/>
+            {/* <Route path="/add-news" element={<CreatePostComponent2/>}/> */}
             <Route path="/news-list" element={<DataTable/>}/>
             <Route path="/update-news/:id" element={<UpdatePost/>}/>
-            <Route path="/drop" element={<DropDownTestComponent/>}/>
+            <Route path="/add-news/" element={<UpdatePost/>}/>
+            
 
         </Route>
         </Routes>
