@@ -157,16 +157,6 @@ class UpdatePostComponent extends Component {
 
 
 
-
-
-
-
-
-
-
-
-
-
     showPreselectedImage(imageFile) {
 
         let dataurls = this.state.imageFile;
@@ -275,7 +265,7 @@ class UpdatePostComponent extends Component {
         e.preventDefault();
 
         if (this.state._id === 0) {
-            if (this.state.title === '' && this.state.selectedWriter.length === 0 && this.state.selectedOptions.length == 0) {
+            if (this.state.title === '' && this.state.selectedWriter === '' && this.state.selectedOptions.length == 0) {
                 window.alert('Fill the Title, Written By and Categories filds');
                 return;
             }
@@ -285,7 +275,7 @@ class UpdatePostComponent extends Component {
                 return;
             }
     
-            else if (this.state.createdBy.length === 0) {
+            else if (this.state.selectedWriter === '') {
                 window.alert('Fill the Written By field');
                 return;
             }
@@ -360,7 +350,7 @@ class UpdatePostComponent extends Component {
             console.log("iznad posta=>this.state.createdBy", this.state.createdBy.value)
             let post = {
                 title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-                isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.selectedWriter, images: imagesNames
+                isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.selectedWriter.value, images: imagesNames
             };
             console.log("Ovo su categories", this.state.categories)
     
@@ -389,7 +379,7 @@ class UpdatePostComponent extends Component {
     
                 let post = {
                     title: this.state.title, shortDescription: this.state.shortDescription, mainContent: this.state.mainContent,
-                    isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.createdBy.value
+                    isPublished: this.state.isPublished, postDate: this.state.postDate, categories: selectedCategories, createdBy: this.state.selectedWriter.value
                 };
                 console.log("Ovo su categories", this.state.categories)
         
@@ -739,7 +729,7 @@ class UpdatePostComponent extends Component {
                         // },
                         body: formData,
                     });
-                    if (this.state.title === '' && this.state.createdBy.length === 0 && this.state.selectedOptions.length == 0) {
+                    if (this.state.title === '' && this.state.selectedWriter === '' && this.state.selectedOptions.length == 0) {
                         window.alert('Fill the Title, Written By and Categories filds');
                         return;
                     }

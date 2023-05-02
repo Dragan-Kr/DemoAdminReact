@@ -9,11 +9,9 @@ import IsvgComponent from "../../IsvgComponent";
 
 
 
-
-
 const Header = ({ headers, onSorting }) => {
     const [sortingField, setSortingField] = useState("");
-    const [sortingOrder, setSortingOrder] = useState("asc");
+    const [sortingOrder, setSortingOrder] = useState("");
 
     const onSortingChange = (field) => {
         const order =
@@ -55,45 +53,3 @@ const Header = ({ headers, onSorting }) => {
 
 export default Header;
 
-// const Header = ({ headers, onSorting }) => {
-//     const [sortField, setSortField] = useState("");
-//     const [sortOrder, setSortOrder] = useState("asc");
-
-//     const onSortingChange = (field) => {
-//         const order = field === sortField && sortOrder === "asc" ? "desc" : "asc";
-//         setSortField(field);
-//         setSortOrder(order);
-//         onSorting(setSortField, setSortOrder);
-//     };
-
-//     return (
-//         <thead>
-//             <tr>
-//                 {headers.map(({ name, field, sortable }) => (
-//                     <th
-//                         key={name}
-//                         onClick={() =>
-//                             sortable ? onSortingChange(field) : null
-//                         }
-//                     >
-//                         {name==="Action" ?"Action": <IsvgComponent name={name} image={Arrows}/> }
-                        
-//                         {/* {sortingField && sortingField === field && (
-                            
-//                                     sortingOrder === "asc"
-//                                         ?  <Isvg  src={Arrows}/>
-//                                         :  <Isvg src={Arrows}/>
-                                
-                            
-
-                            
-//                         )}
-//                         <Isvg  src={ArraowUp}/> */}
-//                     </th>
-//                 ))}
-//             </tr>
-//         </thead>
-//     );
-// };
-
-// export default Header;

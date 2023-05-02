@@ -36,7 +36,7 @@ const DataTable = () => {
         { name: "Title", field: "title", sortable: true },
         // { name: "ShortDescription", field: "shortDescription", sortable: true },
         { name: "Date", field: "postDate", sortable: true },
-        { name: "Time", field: "postDate", sortable: true },
+        { name: "Time", field: "time", sortable: true },
         { name: "Action", field: "", sortable: false },
 
     ];
@@ -54,7 +54,7 @@ const DataTable = () => {
     const [searchTerm, setSearchTerm] = useState("");
     // const [sortField, setSortField] = useState("");//STOJALO TITLE
     // const [sortOrder, setSortOrder] = useState('asc');
-    const [sorting, setSorting] = useState({ field: "", order: "" });
+    const [sorting, setSorting] = useState({ field: "index", order: "asc" });
 
     const [pageSize, setPageSize] = useState(options[0].value);
     const[allDataLength,setAllDataLength] = useState(0);
@@ -214,7 +214,6 @@ const DataTable = () => {
                                 <div className="news-list-drop">
                                     <div className="drop-down-left-word">
                                         <label>Show </label>
-
                                     </div>
 
                                     <Select //ranije bilo-BROJ ELEMENATA PO STRANICI
