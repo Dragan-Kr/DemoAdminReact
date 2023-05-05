@@ -92,7 +92,8 @@ import HomePage from "./components/HomePage/HomePage";
 import UpdatePostComponent from "./components/UpdatePostComponent";
 import UpdatePost from "./components/UpdatePost";
 
-import DropDownTestComponent from "./components/DropDownTestComponent"
+import ImageComponent from "./components/ImageComponent";
+import NewUpdatePostComponent from "./components/NewUpdatePostComponent";
 
 function App() {
     return (
@@ -106,7 +107,11 @@ function App() {
             <Route path="/news-list" element={<DataTable/>}/>
             <Route path="/update-news/:id" element={<UpdatePost/>}/>
             <Route path="/add-news/" element={<UpdatePost/>}/>
-            
+
+            {/* testing */}
+            <Route path="/imageComp/" element={<ImageComponent/>}/>
+            <Route path="/new-update/:id" element={<NewUpdatePostComponent/>}/>
+             {/* testing */}
 
         </Route>
         </Routes>

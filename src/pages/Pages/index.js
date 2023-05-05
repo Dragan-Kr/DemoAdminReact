@@ -57,75 +57,55 @@ const DataTable = () => {
     const [sorting, setSorting] = useState({ field: "index", order: "asc" });
 
     const [pageSize, setPageSize] = useState(options[0].value);
-    const[allDataLength,setAllDataLength] = useState(0);
+    const [allDataLength, setAllDataLength] = useState(0);
 
     ////
-   
+
     const [show, setShow] = useState(false);
     const [deletePost, setDeletePost] = useState("");
     const [totalItems, setTotalItems] = useState(0);
 
 
-  
+
 
 
     useEffect(() => {
         let res;
-        if(searchTerm.length !==0){ 
+        if (searchTerm.length !== 0) {
             console.log("USAO U IF U useEffect")
-            
-            const search = debounce(async() => {
-             res = await axios.get(`http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`);
-             setPosts(res.data.data);
-             setTotalItems(res.data.data.length);
-             setTotalPages(res.data.totalPages);
-             setAllDataLength(res.data.allDataLength);
-             setLoading(false);
-          }, 1000);
 
-          search();
+            const search = debounce(async () => {
+                res = await axios.get(`http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`);
+                setPosts(res.data.data);
+                setTotalItems(res.data.data.length);
+                setTotalPages(res.data.totalPages);
+                setAllDataLength(res.data.allDataLength);
+                setLoading(false);
+            }, 1000);
+
+            search();
         }
-        else{ 
-        const fetchData = async () => {
-            setLoading(true);
-            // const res = await axios.get(`http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sortField}&sortOrder=${sortOrder}&searchTerm=${searchTerm}`);
-            res = await axios.get(`http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`);
-            console.log('RES',res)
-            setPosts(res.data.data);
-            setTotalItems(res.data.data.length);
-            setTotalPages(res.data.totalPages);
-            setAllDataLength(res.data.allDataLength);
-            console.log("SORT FIELD",sorting.field)
-            console.log("SORT ORDER",sorting.order)
-            setLoading(false);
-            
-        };
-        fetchData();
-    }
-       
+        else {
+            const fetchData = async () => {
+                setLoading(true);
+                // const res = await axios.get(`http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sortField}&sortOrder=${sortOrder}&searchTerm=${searchTerm}`);
+                res = await axios.get(`http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`);
+                console.log('RES', res)
+                setPosts(res.data.data);
+                setTotalItems(res.data.data.length);
+                setTotalPages(res.data.totalPages);
+                setAllDataLength(res.data.allDataLength);
+                console.log("SORT FIELD", sorting.field)
+                console.log("SORT ORDER", sorting.order)
+                setLoading(false);
+
+            };
+            fetchData();
+        }
+
 
     }, [currentPage, pageSize, sorting.field, sorting.order, searchTerm]);
 
-    // const handlePageChange = (pageNumber) => {
-    //     setCurrentPage(pageNumber);
-    // };
-
-    // const handlePageSizeChange = (event) => {
-    //     setPageSize(parseInt(event.target.value, 10));
-    //     setCurrentPage(1);
-    // };
-
-    // const handleSortChange = (event) => {
-    //     const sort = event.target.value.split(":");
-    //     setSortField(sort[0]);
-    //     setSortOrder(parseInt(sort[1], 10));
-    //     setCurrentPage(1);
-    // };
-
-    // const handleSearchChange = (event) => {
-    //     setSearchTerm(event.target.value);
-    //     setCurrentPage(1);
-    // };
 
     const handleClose = () => {
         setShow(false);
@@ -134,9 +114,9 @@ const DataTable = () => {
         return <div>Loading...</div>;
     }
 
-    if (posts.length === 0) {
-        return <div>No posts found.</div>;
-    }
+    // if (posts.length === 0) {
+    //     return <div>No posts found.</div>;
+    // }
 
 
     const handleDeletePost = () => {
@@ -222,8 +202,8 @@ const DataTable = () => {
                                         defaultValue={pageSize}
                                         value={options.find(option => option.value === pageSize)}
                                         onChange={option => setPageSize(option.value)}
-                                        
-                                    />  
+
+                                    />
                                     <div className="drop-down-right"> <label className="drop-down-right-word">entries</label>
                                     </div>
                                 </div>
@@ -237,10 +217,10 @@ const DataTable = () => {
                                     <Search
                                         onChange={value => {
                                             setSearchTerm(value);
-                                            setCurrentPage(1);   
+                                            setCurrentPage(1);
                                         }}
                                     />
-                                   
+
                                 </div>
                             </div>
                         </div>
@@ -252,12 +232,14 @@ const DataTable = () => {
                                 
                                 onSorting={(setSortField, setSortOrder)}
                             /> */}
-                             <TableHeader
+                            <TableHeader
                                 headers={headers}
                                 onSorting={(field, order) =>
                                     setSorting({ field, order })
                                 }
-                                />
+
+                                setSorting={setSorting}
+                            />
                             <tbody>
                                 {posts.length > 0 ? posts.map((comment) => (
                                     <tr>
@@ -267,7 +249,8 @@ const DataTable = () => {
                                         <td className="title-td">{comment.title}</td>
                                         {/* <td>{comment.shortDescription}</td> */}
                                         <td>{DateFormat(comment.postDate, "mm.dd.yyyy")}</td>
-                                        <td>{DateFormat(comment.postDate, "h:MM")} h</td>
+                                        {/* <td>{DateFormat(comment.postDate, "h:MM")} h</td> */}
+                                        <td >{comment.time} h</td>
                                         <td>
                                             <div className="update-delete-img-div">
                                                 <button onClick={() => editPost(comment._id)}><Isvg className='isvg-pen-update' src={Pen} /></button>
