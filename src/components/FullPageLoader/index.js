@@ -1,5 +1,4 @@
 import React from "react";
-// import Spinner from "resources/images/spinner.gif";
 
 const FullPageLoader = () => {
     return (

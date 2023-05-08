@@ -1,7 +1,7 @@
 function HomePage () {
   return(
 
-<div>dsafsdfsd</div>
+<div></div>
 
 
 
