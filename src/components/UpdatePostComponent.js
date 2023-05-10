@@ -17,6 +17,7 @@ import { IMAGE_API } from "../globalVariables";
 import { WRITER_API } from "../globalVariables";
 import { CATEGORY_API } from "../globalVariables";
 import { API_REST } from "../globalVariables";
+import {NOT_FOUND_IMAGE} from "../globalVariables";
 
 class UpdatePostComponent extends Component {
   constructor(props) {
@@ -50,7 +51,8 @@ class UpdatePostComponent extends Component {
       imagesNames: [],
       imagesFiles: [],
       imageIndex: 0,
-      newCreatedImagesNames: [],
+      preselectedAndNewImagesLoc: [],
+      updatedRecord:[]
     };
 
     this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -110,9 +112,12 @@ class UpdatePostComponent extends Component {
         ...this.state.imagesNames,
         ...newImagesNames,
       ];
-      this.setState({ newCreatedImagesNames: mergedFileNamesArray }, () => {
-        console.log("UPDATED STATE:", this.state.imagesNames);
-      });
+      this.setState(
+        { preselectedAndNewImagesLoc: mergedFileNamesArray },
+        () => {
+          console.log("UPDATED STATE:", this.state.imagesNames);
+        }
+      );
     }
   }
 
@@ -249,7 +254,7 @@ class UpdatePostComponent extends Component {
           postDate: this.state.postDate,
           categories: selectedCategories,
           createdBy: this.state.selectedWriter.value,
-          images: this.state.newCreatedImagesNames,
+          images: this.state.preselectedAndNewImagesLoc,
         };
 
         console.log("OVVVVO JE POST", post);
@@ -363,7 +368,21 @@ class UpdatePostComponent extends Component {
                       (item) => item.value
                     );
 
-                    let post = {
+                    let post=[];
+                    if(this.state.imagesNames.length>0 && this.state.preselectedAndNewImagesLoc.length===0){
+                       post = {
+                        title: this.state.title,
+                        shortDescription: this.state.shortDescription,
+                        mainContent: this.state.mainContent,
+                        isPublished: this.state.isPublished,
+                        postDate: this.state.postDate,
+                        categories: valueArray2,
+                        createdBy: selectedWriterValue[0],
+                        images: this.state.imagesNames,
+                      };
+                    }
+
+                     else post = {
                       title: this.state.title,
                       shortDescription: this.state.shortDescription,
                       mainContent: this.state.mainContent,
@@ -371,7 +390,7 @@ class UpdatePostComponent extends Component {
                       postDate: this.state.postDate,
                       categories: valueArray2,
                       createdBy: selectedWriterValue[0],
-                      images: this.state.newCreatedImagesNames,
+                      images: this.state.preselectedAndNewImagesLoc,
                     };
 
                     fetch(IMAGE_API, {
@@ -460,16 +479,32 @@ class UpdatePostComponent extends Component {
                 let selectedOptionsValue = this.state.selectedOptions.map(
                   (item) => item.value
                 );
-                let post = {
-                  title: this.state.title,
-                  shortDescription: this.state.shortDescription,
-                  mainContent: this.state.mainContent,
-                  isPublished: this.state.isPublished,
-                  postDate: this.state.postDate,
-                  categories: selectedOptionsValue,
-                  createdBy: this.state.selectedWriter.value,
-                  images: this.state.newCreatedImagesNames,
-                };
+
+                let post=[];
+                if(this.state.imagesNames.length >0 && this.state.preselectedAndNewImagesLoc.length===0)
+                {
+                   post = {
+                    title: this.state.title,
+                    shortDescription: this.state.shortDescription,
+                    mainContent: this.state.mainContent,
+                    isPublished: this.state.isPublished,
+                    postDate: this.state.postDate,
+                    categories: selectedOptionsValue,
+                    createdBy: this.state.selectedWriter.value,
+                    images: this.state.imagesNames,
+                  };
+                }else{
+                  post = {
+                    title: this.state.title,
+                    shortDescription: this.state.shortDescription,
+                    mainContent: this.state.mainContent,
+                    isPublished: this.state.isPublished,
+                    postDate: this.state.postDate,
+                    categories: selectedOptionsValue,
+                    createdBy: this.state.selectedWriter.value,
+                    images: this.state.preselectedAndNewImagesLoc,
+                }
+              }
 
                 console.log("POST iz elsa", post);
 
@@ -553,16 +588,34 @@ class UpdatePostComponent extends Component {
 
         if (this.state.selectedWriter !== "") {
           console.log("Izabrane vrijednosti i pisca i kategorije");
-          let post = {
-            title: this.state.title,
-            shortDescription: this.state.shortDescription,
-            mainContent: this.state.mainContent,
-            isPublished: this.state.isPublished,
-            postDate: this.state.postDate,
-            categories: valueArrayOfSelectedCategories,
-            createdBy: this.state.selectedWriter.value,
-            images: this.state.newCreatedImagesNames,
-          };
+
+          let post=[];
+          if(this.state.imagesNames.length >0 && this.state.preselectedAndNewImagesLoc.length===0){
+
+             post = {
+              title: this.state.title,
+              shortDescription: this.state.shortDescription,
+              mainContent: this.state.mainContent,
+              isPublished: this.state.isPublished,
+              postDate: this.state.postDate,
+              categories: valueArrayOfSelectedCategories,
+              createdBy: this.state.selectedWriter.value,
+              images: this.state.imagesNames,
+            };
+          }else{
+            post = {
+              title: this.state.title,
+              shortDescription: this.state.shortDescription,
+              mainContent: this.state.mainContent,
+              isPublished: this.state.isPublished,
+              postDate: this.state.postDate,
+              categories: valueArrayOfSelectedCategories,
+              createdBy: this.state.selectedWriter.value,
+              images: this.state.preselectedAndNewImagesLoc,
+
+          }
+        }
+          
           console.log("ELSE->POST", post);
 
           fetch(IMAGE_API, {
@@ -601,16 +654,32 @@ class UpdatePostComponent extends Component {
           valueArrayOfSelectedCategories = this.state.selectedOptions.map(
             (item) => item.value
           );
-          let post = {
-            title: this.state.title,
-            shortDescription: this.state.shortDescription,
-            mainContent: this.state.mainContent,
-            isPublished: this.state.isPublished,
-            postDate: this.state.postDate,
-            categories: valueArrayOfSelectedCategories,
-            createdBy: this.state.selectedWriter.value,
-            images: this.state.newCreatedImagesNames,
-          };
+          let post=[];
+          if(this.state.imagesNames.length >0 && this.state.preselectedAndNewImagesLoc.length===0){
+             post = {
+              title: this.state.title,
+              shortDescription: this.state.shortDescription,
+              mainContent: this.state.mainContent,
+              isPublished: this.state.isPublished,
+              postDate: this.state.postDate,
+              categories: valueArrayOfSelectedCategories,
+              createdBy: this.state.selectedWriter.value,
+              images: this.state.imagesNames,
+            };
+
+          }else{
+            post = {
+              title: this.state.title,
+              shortDescription: this.state.shortDescription,
+              mainContent: this.state.mainContent,
+              isPublished: this.state.isPublished,
+              postDate: this.state.postDate,
+              categories: valueArrayOfSelectedCategories,
+              createdBy: this.state.selectedWriter.value,
+              images: this.state.preselectedAndNewImagesLoc,
+            };
+          }
+        
 
           fetch(IMAGE_API, {
             method: "POST",
@@ -647,7 +716,12 @@ class UpdatePostComponent extends Component {
   }
 
   changeTitleHandler(event) {
-    this.setState({ title: event.target.value });
+    const newTitle = event.target.value;
+    this.setState({ title: newTitle }, () => {
+      this.setState((prevState) => ({
+        updatedRecord: [...prevState.updatedRecord, {name:"title",value:newTitle}]
+      }));
+    });
   }
 
   changeShortDescriptionHandler(event) {
@@ -687,13 +761,26 @@ class UpdatePostComponent extends Component {
     });
   }
 
+
   handleDrop = (event) => {
     event.preventDefault();
-    const files = Array.from(event.dataTransfer.files);
-    const newImages = files.map((file) => URL.createObjectURL(file));
-    this.setState((prevState) => ({
-      images: [...prevState.images, ...newImages],
-    }));
+    console.log("handleDrop")
+
+    
+    if (event.dataTransfer.files.length > 0) {
+      const files = event.dataTransfer.files;
+      console.log("Usao u handleDrop");
+      console.log("files", files);
+      // const newImages = Array.from(files).map((file) => URL.createObjectURL(file));
+      const filesArray = Array.from(event.dataTransfer.files);
+ 
+       console.log("filesArray", filesArray);
+      this.setState((prevState) => ({
+        imagesFiles: [...prevState.imagesFiles, ...filesArray]
+      }));
+    }else{
+      console.log("No images droped")
+    }
   };
 
   handleDragOver = (event) => {
@@ -715,14 +802,59 @@ class UpdatePostComponent extends Component {
   };
 
   handleImageDelete = (index) => {
-    const imagesNames = [...this.state.imagesNames];
-    imagesNames.splice(index, 1);
-    this.setState({ imagesNames: imagesNames });
-    if (index >= this.state.imagesNames.length - 1) {
+    //1
+    console.log(" Inicijalni index", index);
+    index = index + 1;
+    console.log("Index odmah nakon inicijalnog +1", index);
+    if (
+      this.state.imagesNames.length == 0 &&
+      this.state.preselectedAndNewImagesLoc.length > 0
+    ) {
+      console.log("USAO U IF")
+      let index1 = index - 1;
+
+      const preselectedAndNewImagesLoc = [
+        ...this.state.preselectedAndNewImagesLoc,
+      ];
+
+      preselectedAndNewImagesLoc.splice(index1, 1);
+      this.setState({ preselectedAndNewImagesLoc: preselectedAndNewImagesLoc });
+
       const imagesFilesArray = [...this.state.imagesFiles];
-      imagesFilesArray.splice(index - this.state.imagesNames.length, 1);
+      imagesFilesArray.splice(index1, 1);
       this.setState({ imagesFiles: imagesFilesArray });
     }
+
+    ///////////////
+    else if (this.state.preselectedAndNewImagesLoc.length > 0) {
+      //2
+      
+      console.log("USAOOO U  else IF");
+      console.log("ELSE IF index",index)
+      
+      const preselectedAndNewImagesLoc = [
+        ...this.state.preselectedAndNewImagesLoc,
+      ];
+      preselectedAndNewImagesLoc.splice(index, 1);
+      this.setState({ preselectedAndNewImagesLoc: preselectedAndNewImagesLoc });
+
+      if (index > this.state.imagesNames.length - 1) {
+        const imagesFilesArray = [...this.state.imagesFiles];
+        imagesFilesArray.splice(index - 1, 1);
+        this.setState({ imagesFiles: imagesFilesArray });
+      } else {
+        const imagesNames = [...this.state.imagesNames];
+        imagesNames.splice(index - 1, 1);
+        this.setState({ imagesNames: imagesNames });
+      }
+    } else {
+      console.log("USAOOO U ELSE");
+      const imagesNames = [...this.state.imagesNames];
+      imagesNames.splice(index - 1, 1);
+      this.setState({ imagesNames: imagesNames });
+      
+    }
+
   };
 
   render() {
@@ -861,6 +993,10 @@ class UpdatePostComponent extends Component {
                           id={`pro-img-${index + 1}`}
                           src={`${API_REST}${image}`}
                           alt=""
+                          onError={({ currentTarget }) => {
+                            currentTarget.onerror = null;
+                            currentTarget.src=`${API_REST}${NOT_FOUND_IMAGE}`
+                          }}
                         />
                       </div>
                     </div>

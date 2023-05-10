@@ -9,3 +9,7 @@ export const UPDATE_NEWS='http://localhost:3000/update-news/'
 export const IMAGE_API='http://localhost:8000/api/image';
 export const WRITER_API = 'http://localhost:8000/api/writer';
 export const CATEGORY_API='http://localhost:8000/api/category';
+export const POST_API='http://localhost:8000/api/post';
+
+
+export const NOT_FOUND_IMAGE="/uploads/image-not-found.jpg"

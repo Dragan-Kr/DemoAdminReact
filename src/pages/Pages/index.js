@@ -21,6 +21,7 @@ import debounce from "lodash/debounce";
 import axios from "axios";
 
 import {UPDATE_NEWS} from '../../globalVariables';
+import {POST_API} from '../../globalVariables';
 
 
 const DataTable = () => {
@@ -59,8 +60,11 @@ const DataTable = () => {
       console.log("USAO U IF U useEffect");
 
       const search = debounce(async () => {
+        // res = await axios.get(
+        //   `http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
+        // );
         res = await axios.get(
-          `http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
+          `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
         );
         setPosts(res.data.data);
         setTotalItems(res.data.data.length);
@@ -73,9 +77,11 @@ const DataTable = () => {
     } else {
       const fetchData = async () => {
         setLoading(true);
-        // const res = await axios.get(`http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sortField}&sortOrder=${sortOrder}&searchTerm=${searchTerm}`);
+        // res = await axios.get(
+        //   `http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
+        // );
         res = await axios.get(
-          `http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
+          `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
         );
         console.log("RES", res);
         setPosts(res.data.data);
