@@ -219,15 +219,15 @@ const DataTable = () => {
               />
               <tbody>
                 {posts.length > 0 ? (
-                  posts.map((comment) => (
-                    <tr>
+                  posts.map((comment,index) => (
+                    <tr key={index}>
                       <th scope="row" key={comment._id}>
                         {comment.index}
                       </th>
                       <td className="title-td">{comment.title}</td>
-                      {/* <td>{comment.shortDescription}</td> */}
+                     
                       <td>{DateFormat(comment.postDate, "mm.dd.yyyy")}</td>
-                      {/* <td>{DateFormat(comment.postDate, "h:MM")} h</td> */}
+                     
                       <td>{comment.time} h</td>
                       <td>
                         <div className="update-delete-img-div">
@@ -243,9 +243,7 @@ const DataTable = () => {
                     </tr>
                   ))
                 ) : (
-                  <div>
-                    <h1>NOTHING TO SHOW</h1>
-                  </div>
+                  null
                 )}
               </tbody>
             </table>

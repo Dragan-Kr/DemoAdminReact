@@ -11,7 +11,6 @@ import DataTable from "./pages/Pages/index";
 import MainLayout from "./components/Layout/MainLayout";
 import HomePage from "./components/HomePage/HomePage";
 import UpdatePost from "./components/UpdatePost";
-
 function App() {
   return (
     <BrowserRouter>
