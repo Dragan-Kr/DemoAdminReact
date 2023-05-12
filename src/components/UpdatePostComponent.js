@@ -3,8 +3,11 @@ import axios from "axios";
 import Select from "react-select";
 import PostService from "../services/PostService";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { FormGroup, Label, Input, NavLink } from "reactstrap";
+import { Form } from "react-bootstrap";
+import { FormText} from 'reactstrap'
+import {DatePicker} from 'reactstrap-date-picker'
 
-import { FormGroup, Label, Input, Options, NavLink } from "reactstrap";
 
 import Isvg from "react-inlinesvg";
 import Save from "../images/save.svg";
@@ -18,6 +21,8 @@ import { WRITER_API } from "../globalVariables";
 import { CATEGORY_API } from "../globalVariables";
 import { API_REST } from "../globalVariables";
 import { NOT_FOUND_IMAGE } from "../globalVariables";
+import WriterService from "../services/WriterService";
+
 
 class UpdatePostComponent extends Component {
   constructor(props) {
@@ -71,6 +76,11 @@ class UpdatePostComponent extends Component {
 
   async componentDidMount() {
     if (this.state._id === 0) {
+     let writers = await WriterService.getWriters();
+     console.log("WRITER IN componentDidMount",writers.data.writers[0]._id)
+      this.setState({//u slucaju da korisnik sacuva a da pri tome ne izabere novog writera vec samo ostavi ono stoje vec prikazano
+        selectedWriter:writers.data.writers[0]._id
+      });
       this.getListOfWriters();
       this.getListOfCategories();
     } else {
@@ -133,7 +143,7 @@ class UpdatePostComponent extends Component {
           label: d.name + " " + d.lastName,
         }));
 
-        this.setState({ preselectedWriter: preselectedWriter2 });
+        this.setState({ preselectedWriter: preselectedWriter2 }, () => {});
       })
       .catch(function (error) {
         console.log("Error in fetching market updates");
@@ -188,7 +198,7 @@ class UpdatePostComponent extends Component {
       if (
         this.state.title === "" &&
         this.state.selectedWriter === "" &&
-        this.state.selectedOptions.length == 0
+        this.state.selectedOptions.length === 0
       ) {
         window.alert("Fill the Title, Written By and Categories filds");
         return;
@@ -253,7 +263,7 @@ class UpdatePostComponent extends Component {
           isPublished: this.state.isPublished,
           postDate: this.state.postDate,
           categories: selectedCategories,
-          createdBy: this.state.selectedWriter.value,
+          createdBy: this.state.selectedWriter,
           images: this.state.preselectedAndNewImagesLoc,
         };
 
@@ -403,7 +413,7 @@ class UpdatePostComponent extends Component {
                     if (
                       this.state.title === "" &&
                       this.state.createdBy.length === 0 &&
-                      this.state.selectedOptions.length == 0
+                      this.state.selectedOptions.length === 0
                     ) {
                       window.alert(
                         "Fill the Title, Written By and Categories filds"
@@ -519,7 +529,7 @@ class UpdatePostComponent extends Component {
                 if (
                   this.state.title === "" &&
                   this.state.createdBy.length === 0 &&
-                  this.state.selectedOptions.length == 0
+                  this.state.selectedOptions.length === 0
                 ) {
                   window.alert(
                     "Fill the Title, Written By and Categories filds"
@@ -630,7 +640,7 @@ class UpdatePostComponent extends Component {
           if (
             this.state.title === "" &&
             this.state.selectedWriter === "" &&
-            this.state.selectedOptions.length == 0
+            this.state.selectedOptions.length === 0
           ) {
             window.alert("Fill the Title, Written By and Categories filds");
             return;
@@ -694,7 +704,7 @@ class UpdatePostComponent extends Component {
           if (
             this.state.title === "" &&
             this.state.createdBy.length === 0 &&
-            this.state.selectedOptions.length == 0
+            this.state.selectedOptions.length === 0
           ) {
             window.alert("Fill the Title, Written By and Categories filds");
             return;
@@ -746,7 +756,10 @@ class UpdatePostComponent extends Component {
   }
 
   changePostDateHandler(event) {
-    this.setState({ postDate: event.target.value });
+    console.log("changePostDateHandler->event",event)
+    this.setState({ postDate: event},()=>{
+      console.log("POST DATE",this.state.postDate)
+    });
   }
 
   handleSelect(event) {
@@ -754,8 +767,10 @@ class UpdatePostComponent extends Component {
   }
 
   handleWriterSelect(event) {
-    console.log("EVENT", event);
-
+    // console.log("EVENT", event.target.value);
+    if (this.state.preselectedWriter.length > 0) {
+      console.log("RADI provjera");
+    }
     this.setState({ selectedWriter: event.target.value }, () => {
       console.log(
         "handleWriterSelect=>selectedWriter",
@@ -809,52 +824,50 @@ class UpdatePostComponent extends Component {
   };
 
   handleImageDelete = (index) => {
-    if(this.state.imagesNames.length > 0 && this.state.imagesFiles.length > 0 && this.state.preselectedAndNewImagesLoc.length>0){//predefinisani i novo kreirani
-       console.log("Prvi if")
+    if (
+      this.state.imagesNames.length > 0 &&
+      this.state.imagesFiles.length > 0 &&
+      this.state.preselectedAndNewImagesLoc.length > 0
+    ) {
+      //predefinisani i novo kreirani
+      console.log("Prvi if");
       let newIndex = index + this.state.imagesNames.length;
-      console.log("NewIndex",newIndex)
-        const preselectedAndNewImagesLoc = [
+      console.log("NewIndex", newIndex);
+      const preselectedAndNewImagesLoc = [
         ...this.state.preselectedAndNewImagesLoc,
       ];
       preselectedAndNewImagesLoc.splice(newIndex, 1);
       this.setState({ preselectedAndNewImagesLoc: preselectedAndNewImagesLoc });
-       
+
       const imagesFilesArray = [...this.state.imagesFiles];
       imagesFilesArray.splice(index, 1);
-      this.setState({ imagesFiles: imagesFilesArray })
-      
+      this.setState({ imagesFiles: imagesFilesArray });
+    } else if (this.state.imagesNames.length > 0) {
+      console.log("Onlu predefined images");
+      console.log("Index", index);
+      const imagesNames = [...this.state.imagesNames];
+      imagesNames.splice(index, 1);
+      this.setState({ imagesNames: imagesNames });
 
-
-    }
-     else if(this.state.imagesNames.length >0){
-        console.log("Onlu predefined images")
-        console.log("Index",index)
-        const imagesNames = [...this.state.imagesNames];
-        imagesNames.splice(index , 1);
-        this.setState({ imagesNames: imagesNames });
-
-        if(this.state.preselectedAndNewImagesLoc.length>0){
-          const preselectedAndNewImagesLoc = [
-            ...this.state.preselectedAndNewImagesLoc,
-          ];
-          preselectedAndNewImagesLoc.splice(index, 1);
-          this.setState({ preselectedAndNewImagesLoc: preselectedAndNewImagesLoc });
-        }
-
-    }else {//samo novo kreirane
-      const imagesFilesArray = [...this.state.imagesFiles];
-      imagesFilesArray.splice(index, 1);
-      this.setState({ imagesFiles: imagesFilesArray }
-        ,()=>{
-        if(this.state.imagesFiles.length ===0){
-          this.setState({preselectedAndNewImagesLoc:[]})
-        }
+      if (this.state.preselectedAndNewImagesLoc.length > 0) {
+        const preselectedAndNewImagesLoc = [
+          ...this.state.preselectedAndNewImagesLoc,
+        ];
+        preselectedAndNewImagesLoc.splice(index, 1);
+        this.setState({
+          preselectedAndNewImagesLoc: preselectedAndNewImagesLoc,
+        });
       }
-      );
+    } else {
+      //samo novo kreirane
+      const imagesFilesArray = [...this.state.imagesFiles];
+      imagesFilesArray.splice(index, 1);
+      this.setState({ imagesFiles: imagesFilesArray }, () => {
+        if (this.state.imagesFiles.length === 0) {
+          this.setState({ preselectedAndNewImagesLoc: [] });
+        }
+      });
     }
-
-
-
   };
 
   render() {
@@ -972,7 +985,6 @@ class UpdatePostComponent extends Component {
                 onDrop={this.handleDrop.bind(this)}
                 onDragOver={this.handleDragOver.bind(this)}
               >
-                
                 {/* /// */}
                 {this.state.imagesNames.length > 0 ? ( //kada ne dodajemo nove slike osim predefinisanih
                   this.state.imagesNames.map((image, index) => (
@@ -1008,7 +1020,7 @@ class UpdatePostComponent extends Component {
 
                 {/* ///// */}
 
-                {this.state.imagesFiles.length > 0  ? ( //dodajemo nove slike bez predhodnih
+                {this.state.imagesFiles.length > 0 ? ( //dodajemo nove slike bez predhodnih
                   Array.from(this.state.imagesFiles).map((item, index) => (
                     <div
                       className={`preview-image preview-show-${index + 1}`}
@@ -1058,8 +1070,8 @@ class UpdatePostComponent extends Component {
           </div>
 
           <div className="right-form">
-            {/* <div className="select-content">
-              <label>Written By</label>
+            <div className="select-content">
+              {/* <label>Written By</label>
               <Select
                 options={this.state.writers}
                 value={
@@ -1069,30 +1081,52 @@ class UpdatePostComponent extends Component {
                 }
                 onChange={this.handleWriterSelect}
                 styles={colourStyles}
-              />
-            </div> */}
+              /> */}
 
-            <FormGroup>
-              <Label for="exampleSelect">Select</Label>
-              <Input id="exampleSelect" name="select" type="select" onChange={this.handleWriterSelect}>
-                {this.state.writers.map((option) => (
-                  <option key={option.value} value={ this.state.selectedWriter
-                    ? this.state.selectedWriter
-                    : this.state.preselectedWriter}>
-                    {option.label}
-                  </option>
-                ))}
-              </Input>
-            </FormGroup>
+              <FormGroup>
+                <Label for="exampleSelect">Select</Label>
+                <Input
+                  id="exampleSelect"
+                  name="select"
+                  type="select"
+                  
+                  onChange={this.handleWriterSelect}
+                >
+                  {this.state.writers.map((option) => (
+                    <option
+                      key={option.value}
+                      selected={
+                        option?.value === this.state.preselectedWriterId
+                          ? true
+                          : false
+                      }
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup>
+            </div>
 
             <div className="date-content">
-              <label>Post Date</label>
+              {/* <label>Post Date</label>
               <input
                 className="date-input"
                 type="date"
                 value={defaultDate}
                 onChange={this.changePostDateHandler}
-              />
+              /> */}
+
+              <FormGroup>
+                <Label>My Date Picker</Label>
+                <DatePicker className="date-input"
+                  id="example-datepicker"
+                  value={defaultDate}
+                  onChange={this.changePostDateHandler}
+                />
+                
+              </FormGroup>
             </div>
 
             <div className="categories-content">

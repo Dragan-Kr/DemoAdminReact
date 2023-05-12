@@ -1261,3 +1261,7 @@ display: none;
   }
   }
   
+
+  .right-form .form-select svg {
+    display: none !important;
+  }
