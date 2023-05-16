@@ -1,30 +1,17 @@
-import React, {useState, useEffect} from 'react'
-import {FormGroup, Label, FormText} from 'reactstrap'
-import {DatePicker} from 'reactstrap-date-picker'
+import React, { useState } from "react";
+import { Col, Form } from "react-bootstrap";
 
-const DataPicker = () => {
-  const [value, setValue]= useState(new Date().toISOString())
-  const [fmtValue, setFmtValue]= useState(undefined)
-
-   const handleChange = (value, formattedValue)=> {
-    setValue(value)
-   
-    setFmtValue(formattedValue)
-  }
-
-  useEffect(( )=> {
-    console.log("VALUE is",value)
-    console.log(`Formatted value is ${fmtValue}`)
-  }, [fmtValue])
+export default function Da() {
+  const [field, setField] = useState([]);
 
   return (
-    <FormGroup>
-      <Label>My Date Picker</Label>
-      <DatePicker id      = "example-datepicker" 
-                  value   = {value} 
-                  onChange= {(v,f) => handleChange(v, f)} />
-      <FormText>Help</FormText>
-    </FormGroup>
-  )
+    <Form.Group as={Col} controlId="my_multiselect_field">
+      <Form.Label>My multiselect</Form.Label>
+      <Form.Control as="select" multiple value={field} onChange={e => setField([].slice.call(e.target.selectedOptions).map(item => item.value))}>
+        <option value="field1">Field 1</option>
+        <option value="field2">Field 2</option>
+        <option value="field3">Field 3</option>
+      </Form.Control>
+    </Form.Group>
+  );
 }
-export default DataPicker;

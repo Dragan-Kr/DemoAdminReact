@@ -1,0 +1,14 @@
+.input-group:not(.has-validation)>.dropdown-toggle:nth-last-child(n+3), .input-group:not(.has-validation)>.form-floating:not(:last-child)>.form-control, .input-group:not(.has-validation)>.form-floating:not(:last-child)>.form-select, .input-group:not(.has-validation)>:not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating){
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    height: 50px;
+    font-size: 17px;
+}
+
+
+
+///Writer select
+.form-select {
+background-size: 14px 15px;
+background-image: url("./images/arrow.svg") !important; 
+}

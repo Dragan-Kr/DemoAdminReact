@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import "./index.css";
 import "./list.css";
+import "./DataPicker.scss"
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 
 import DataTable from "./pages/Pages/index";
@@ -11,7 +12,7 @@ import DataTable from "./pages/Pages/index";
 import MainLayout from "./components/Layout/MainLayout";
 import HomePage from "./components/HomePage/HomePage";
 import UpdatePost from "./components/UpdatePost";
-import DataPicker from "./components/DataPicker";
+// import DataPicker from "./components/DataPicker";
 function App() {
   return (
     <BrowserRouter>
@@ -21,7 +22,7 @@ function App() {
           <Route path="/news-list" element={<DataTable />} />
           <Route path="/update-news/:id" element={<UpdatePost />} />
           <Route path="/add-news/" element={<UpdatePost />} />
-          <Route path="/date-picker/" element={<DataPicker />} />
+          {/* <Route path="/date-picker/" element={<DataPicker />} /> */}
 
         </Route>
       </Routes>

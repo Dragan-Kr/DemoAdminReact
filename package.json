@@ -29,11 +29,14 @@
     "inline-svg": "^2.2.3",
     "jquery": "^3.6.4",
     "lodash": "^4.17.21",
+    "multiselect-react-dropdown": "^2.0.25",
+    "node-sass": "^8.0.0",
     "params": "^0.1.1",
     "react": "^18.2.0",
     "react-admin": "^4.8.3",
     "react-alert": "^7.0.3",
     "react-bootstrap": "^2.7.2",
+    "react-bootstrap-multiselect": "^2.4.1",
     "react-dom": "^18.2.0",
     "react-dotenv": "^0.1.3",
     "react-formdata": "^3.0.0",
@@ -88,5 +91,8 @@
     "whitelist": [
       "API_REST"
     ]
+  },
+  "devDependencies": {
+    "sass": "^1.62.1"
   }
 }

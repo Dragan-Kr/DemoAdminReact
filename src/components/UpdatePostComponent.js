@@ -5,14 +5,16 @@ import PostService from "../services/PostService";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FormGroup, Label, Input, NavLink } from "reactstrap";
 import { Form } from "react-bootstrap";
-import { FormText} from 'reactstrap'
-import {DatePicker} from 'reactstrap-date-picker'
-
+import { FormText } from "reactstrap";
+import { DatePicker } from "reactstrap-date-picker";
+import { Multiselect } from "multiselect-react-dropdown";
 
 import Isvg from "react-inlinesvg";
 import Save from "../images/save.svg";
 import Plus from "../images/plus.svg";
 import Cancel from "../images/cancel.svg";
+import Arrow from "../images/arrow.svg";
+
 import FormData from "form-data";
 
 import { NEWS_LIST } from "../globalVariables";
@@ -22,7 +24,6 @@ import { CATEGORY_API } from "../globalVariables";
 import { API_REST } from "../globalVariables";
 import { NOT_FOUND_IMAGE } from "../globalVariables";
 import WriterService from "../services/WriterService";
-
 
 class UpdatePostComponent extends Component {
   constructor(props) {
@@ -58,6 +59,7 @@ class UpdatePostComponent extends Component {
       imageIndex: 0,
       preselectedAndNewImagesLoc: [],
       updatedRecord: [],
+      categoriesValues: [],
     };
 
     this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -72,18 +74,21 @@ class UpdatePostComponent extends Component {
     this.handleWriterSelect = this.handleWriterSelect.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
     this.getWriter = this.getWriter.bind(this);
+    this.onRemove = this.onRemove.bind(this);
   }
 
   async componentDidMount() {
     if (this.state._id === 0) {
-     let writers = await WriterService.getWriters();
-     console.log("WRITER IN componentDidMount",writers.data.writers[0]._id)
-      this.setState({//u slucaju da korisnik sacuva a da pri tome ne izabere novog writera vec samo ostavi ono stoje vec prikazano
-        selectedWriter:writers.data.writers[0]._id
+      let writers = await WriterService.getWriters();
+      console.log("WRITER IN componentDidMount", writers.data.writers[0]._id);
+      this.setState({
+        //u slucaju da korisnik sacuva a da pri tome ne izabere novog writera vec samo ostavi ono stoje vec prikazano
+        selectedWriter: writers.data.writers[0]._id,
       });
       this.getListOfWriters();
       this.getListOfCategories();
     } else {
+      //post update
       await PostService.getPostById(this.state._id).then((res) => {
         this.setState(
           {
@@ -98,6 +103,7 @@ class UpdatePostComponent extends Component {
             index: res.data.post.index,
             preselectedWriterId: res.data.post.createdBy,
             imagesNames: res.data.post.images,
+            // selectedOptions:this.state.preselectedCategoriesArray
           },
           () => {
             this.getListOfPreselectedCategories();
@@ -150,7 +156,7 @@ class UpdatePostComponent extends Component {
       });
   }
 
-  getListOfPreselectedCategories() {
+  async getListOfPreselectedCategories() {
     let preselectedCategoriesArray = [];
     for (let index in this.state.preselectedCategories) {
       if (
@@ -162,7 +168,7 @@ class UpdatePostComponent extends Component {
         return;
       }
 
-      axios
+      await axios
         .get(CATEGORY_API + "/" + this.state.preselectedCategories[index])
         .then((res) => {
           console.log("getListOfPreselectedCategories=>res.data", res.data);
@@ -171,23 +177,31 @@ class UpdatePostComponent extends Component {
             "then=>preselectedCategoriesArray",
             preselectedCategoriesArray
           );
+
           const preselectedCategoriesArray2 = preselectedCategoriesArray.map(
             (d) => ({
               value: d._id,
               label: d.name,
             })
           );
-          console.log(
-            "preselectedCategoriesArray2",
-            preselectedCategoriesArray2
-          );
 
           this.setState({
             preselectedCategoriesArray: preselectedCategoriesArray2,
           });
+
+          const categoriesValues = preselectedCategoriesArray.map((d) => ({
+            value: d.name,
+          }));
+
+          this.setState({ categoriesValues: categoriesValues });
+
+          console.log(
+            "preselectedCategoriesArray2",
+            preselectedCategoriesArray2
+          );
         })
         .catch(function (error) {
-          console.log("Error in fetching market updates");
+          console.log("Error in fetching data");
         });
     }
   }
@@ -198,7 +212,7 @@ class UpdatePostComponent extends Component {
       if (
         this.state.title === "" &&
         this.state.selectedWriter === "" &&
-        this.state.selectedOptions.length === 0
+        this.state.selectedOptions === ""
       ) {
         window.alert("Fill the Title, Written By and Categories filds");
         return;
@@ -309,6 +323,23 @@ class UpdatePostComponent extends Component {
 
     ///UPDATE
     else {
+      if (
+        this.state.title === "" &&
+        this.state.preselectedWriter.length === 0 &&
+        this.state.selectedOptions.length === 0
+      ) {
+        window.alert("Fill the Title, Written By and Categories filds");
+        return;
+      } else if (this.state.title === "") {
+        window.alert("Fill the Title field");
+        return;
+      } else if (this.state.preselectedWriter.length === 0) {
+        window.alert("Fill the Written By field");
+        return;
+      } else if (this.state.selectedOptions.length === 0) {
+        window.alert("Fill the Categories field");
+        return;
+      }
       if (this.state.selectedOptions === "") {
         //categories nepromjenjen
         this.setState(
@@ -559,7 +590,6 @@ class UpdatePostComponent extends Component {
         );
       } else {
         const formData = new FormData();
-
         const imagesForm = [];
         for (let i = 0; i < this.state.imagesFiles.length; i++) {
           formData.append("images2", this.state.imagesFiles[i]);
@@ -595,7 +625,7 @@ class UpdatePostComponent extends Component {
         imagesNames2 = [...this.state.imagesNames, ...imagesNames2];
         this.setState({ imagesNames: imagesNames2 });
 
-        const valueArrayOfSelectedCategories = [];
+        let valueArrayOfSelectedCategories = [];
         valueArrayOfSelectedCategories = this.state.selectedOptions.map(
           (item) => item.value
         );
@@ -756,9 +786,9 @@ class UpdatePostComponent extends Component {
   }
 
   changePostDateHandler(event) {
-    console.log("changePostDateHandler->event",event)
-    this.setState({ postDate: event},()=>{
-      console.log("POST DATE",this.state.postDate)
+    console.log("changePostDateHandler->event", event);
+    this.setState({ postDate: event }, () => {
+      console.log("POST DATE", this.state.postDate);
     });
   }
 
@@ -870,6 +900,13 @@ class UpdatePostComponent extends Component {
     }
   };
 
+  onRemove = (selectedList, removedItem) => {
+    console.log("SelectedList", selectedList);
+    console.log("RemovedItem", removedItem);
+    // const newArray = this.state.selectedOptions.filter(obj => obj.id !== value);
+    this.setState({ selectedOptions: selectedList });
+  };
+
   render() {
     const dropdownIndicatorStyles = (base, state) => {
       let changes = {
@@ -881,7 +918,7 @@ class UpdatePostComponent extends Component {
     const colourStyles = {
       control: (styles) => ({
         ...styles,
-        backgroundColor: " #F4F5FC",
+        backgroundColor: "green",
         borderRadius: 10,
         height: 50,
         border: 0,
@@ -900,7 +937,7 @@ class UpdatePostComponent extends Component {
         return {
           ...styles,
           backgroundColor: "#5561B3",
-          borderRadius: 10,
+          borderRadius: 5,
           height: 40,
         };
       },
@@ -919,7 +956,7 @@ class UpdatePostComponent extends Component {
     const dateObject = new Date(this.state.postDate);
 
     const defaultDate = dateObject.toISOString().slice(0, 10);
-
+    const { preselectedCategoriesArray } = this.state;
     return (
       <form>
         <div className="heading-post">
@@ -1084,12 +1121,11 @@ class UpdatePostComponent extends Component {
               /> */}
 
               <FormGroup>
-                <Label for="exampleSelect">Select</Label>
+                <Label for="exampleSelect">Written By</Label>
                 <Input
                   id="exampleSelect"
                   name="select"
                   type="select"
-                  
                   onChange={this.handleWriterSelect}
                 >
                   {this.state.writers.map((option) => (
@@ -1117,21 +1153,21 @@ class UpdatePostComponent extends Component {
                 value={defaultDate}
                 onChange={this.changePostDateHandler}
               /> */}
-
+              <Label>Post Date</Label>
               <FormGroup>
-                <Label>My Date Picker</Label>
-                <DatePicker className="date-input"
+                <DatePicker
+                  className="date-input"
                   id="example-datepicker"
                   value={defaultDate}
                   onChange={this.changePostDateHandler}
                 />
-                
               </FormGroup>
             </div>
 
             <div className="categories-content">
               <label>Categories</label>
-              <Select
+              <Isvg className="arrow-categories" src={Arrow} />
+              {/* <Select
                 options={this.state.categories}
                 placeholder="Select category"
                 value={
@@ -1143,6 +1179,23 @@ class UpdatePostComponent extends Component {
                 isSearchable={true}
                 isMulti
                 styles={colourStyles}
+              /> */}
+
+              {console.log("niz", this.state.preselectedCategoriesArray)}
+
+              <Multiselect
+                options={this.state.categories || []}
+                displayValue="label"
+                selectedValues={preselectedCategoriesArray || []} //kada ubacim samo values onda ne pravi problem tj.this.state.preselectedCategoriesArray pravi problem tj.aman da se ne poziva na vrijeme
+                value={
+                  //na njihovom primjeru nema value samo selectedValues
+                  this.state.selectedOptions || []
+                }
+                onSelect={this.handleSelect}
+                hidePlaceholder="true"
+                showArrow="false"
+                onRemove={this.onRemove}
+                closeIcon="cancel"
               />
             </div>
 
