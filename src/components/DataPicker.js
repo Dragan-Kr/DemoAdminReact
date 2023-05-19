@@ -1,17 +1,63 @@
-import React, { useState } from "react";
-import { Col, Form } from "react-bootstrap";
+// @flow
 
-export default function Da() {
-  const [field, setField] = useState([]);
+import React from "react";
 
+import Select from "react-select";
+
+const CustomClearText = () => "clear all";
+const ClearIndicator = props => {
+  const {
+    children = <CustomClearText />,
+    getStyles,
+    innerProps: { ref, ...restInnerProps }
+  } = props;
   return (
-    <Form.Group as={Col} controlId="my_multiselect_field">
-      <Form.Label>My multiselect</Form.Label>
-      <Form.Control as="select" multiple value={field} onChange={e => setField([].slice.call(e.target.selectedOptions).map(item => item.value))}>
-        <option value="field1">Field 1</option>
-        <option value="field2">Field 2</option>
-        <option value="field3">Field 3</option>
-      </Form.Control>
-    </Form.Group>
+    <div
+      {...restInnerProps}
+      ref={ref}
+      style={getStyles("clearIndicator", props)}
+    >
+      <div style={{ padding: "0px 5px" }}>
+        <button
+          onClick={() => {
+            console.log("hi");
+          }}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const colourOptions = [
+  { value: 'ocean', label: 'Ocean', color: '#00B8D9', isFixed: true },
+  { value: 'blue', label: 'Blue', color: '#0052CC', disabled: true },
+  { value: 'purple', label: 'Purple', color: '#5243AA' },
+  { value: 'red', label: 'Red', color: '#FF5630', isFixed: true },
+  { value: 'orange', label: 'Orange', color: '#FF8B00' },
+  { value: 'yellow', label: 'Yellow', color: '#FFC400' },
+  { value: 'green', label: 'Green', color: '#36B37E' },
+  { value: 'forest', label: 'Forest', color: '#00875A' },
+  { value: 'slate', label: 'Slate', color: '#253858' },
+  { value: 'silver', label: 'Silver', color: '#666666' },
+];
+
+const ClearIndicatorStyles = (base, state) => ({
+  ...base,
+  cursor: "pointer",
+  color: state.isFocused ? "blue" : "black"
+});
+
+export default function DataPicker() {
+  return (
+    <Select
+      components={{ ClearIndicator }}
+      styles={{ clearIndicator: ClearIndicatorStyles }}
+      defaultValue={[colourOptions[4], colourOptions[5]]}
+      isMulti
+      options={colourOptions}
+      isSearchable={true}
+    />
   );
 }

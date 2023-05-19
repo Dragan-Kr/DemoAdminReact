@@ -6,6 +6,7 @@ import PostService from "../../services/PostService";
 
 import DateFormat from "dateformat";
 import Isvg from "react-inlinesvg";
+import { useHistory, useNavigate } from 'react-router-dom';
 
 import Select from "react-select";
 import Pen from "../../images/pen.svg";
@@ -13,16 +14,14 @@ import Trash from "../../images/trash.svg";
 import SortArrowUp from "../../images/sortArrowUp.svg";
 import Magnifying from "../../images/magnifying.svg";
 
-
 ///Modal////
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import debounce from "lodash/debounce";
 import axios from "axios";
 
-import {UPDATE_NEWS} from '../../globalVariables';
-import {POST_API} from '../../globalVariables';
-
+import { UPDATE_NEWS } from "../../globalVariables";
+import { POST_API } from "../../globalVariables";
 
 const DataTable = () => {
   const headers = [
@@ -53,16 +52,16 @@ const DataTable = () => {
   const [show, setShow] = useState(false);
   const [deletePost, setDeletePost] = useState("");
   const [totalItems, setTotalItems] = useState(0);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     let res;
+    const queryParams = new URLSearchParams();
     if (searchTerm.length !== 0) {
       console.log("USAO U IF U useEffect");
 
       const search = debounce(async () => {
-        // res = await axios.get(
-        //   `http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
-        // );
         res = await axios.get(
           `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
         );
@@ -74,12 +73,18 @@ const DataTable = () => {
       }, 1000);
 
       search();
+
+      queryParams.append('page', currentPage);
+      queryParams.append('limit', pageSize);
+      queryParams.append('sortField', sorting.field);
+      queryParams.append('sortOrder', sorting.order);
+      queryParams.append('searchTerm',searchTerm);
+      const url = `/news-list?${queryParams.toString()}`;
+      navigate(url);
+  
     } else {
       const fetchData = async () => {
         setLoading(true);
-        // res = await axios.get(
-        //   `http://localhost:8000/api/post?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
-        // );
         res = await axios.get(
           `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
         );
@@ -91,6 +96,13 @@ const DataTable = () => {
         setLoading(false);
       };
       fetchData();
+      queryParams.append('page', currentPage);
+      queryParams.append('limit', pageSize);
+      queryParams.append('sortField', sorting.field);
+      queryParams.append('sortOrder', sorting.order);
+      queryParams.append('searchTerm',searchTerm);
+      const url = `/news-list?${queryParams.toString()}`;
+      navigate(url);
     }
   }, [currentPage, pageSize, sorting.field, sorting.order, searchTerm]);
 
@@ -218,33 +230,31 @@ const DataTable = () => {
                 setSorting={setSorting}
               />
               <tbody>
-                {posts.length > 0 ? (
-                  posts.map((comment,index) => (
-                    <tr key={index}>
-                      <th scope="row" key={comment._id}>
-                        {comment.index}
-                      </th>
-                      <td className="title-td">{comment.title}</td>
-                     
-                      <td>{DateFormat(comment.postDate, "mm.dd.yyyy")}</td>
-                     
-                      <td>{comment.time} h</td>
-                      <td>
-                        <div className="update-delete-img-div">
-                          <button onClick={() => editPost(comment._id)}>
-                            <Isvg className="isvg-pen-update" src={Pen} />
-                          </button>
+                {posts.length > 0
+                  ? posts.map((comment, index) => (
+                      <tr key={index}>
+                        <th scope="row" key={comment._id}>
+                          {comment.index}
+                        </th>
+                        <td className="title-td">{comment.title}</td>
 
-                          <button onClick={() => handleClickDelete(comment)}>
-                            <Isvg className="isvg-pen-delete" src={Trash} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  null
-                )}
+                        <td>{DateFormat(comment.postDate, "mm.dd.yyyy")}</td>
+
+                        <td>{comment.time} h</td>
+                        <td>
+                          <div className="update-delete-img-div">
+                            <button onClick={() => editPost(comment._id)}>
+                              <Isvg className="isvg-pen-update" src={Pen} />
+                            </button>
+
+                            <button onClick={() => handleClickDelete(comment)}>
+                              <Isvg className="isvg-pen-delete" src={Trash} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  : null}
               </tbody>
             </table>
           </div>

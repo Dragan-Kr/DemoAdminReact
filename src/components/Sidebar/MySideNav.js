@@ -46,6 +46,8 @@ function MySideNav({ setElementClass }) {
         <ul className="ul-links">
           <li>
             <a href={NEWS_LIST}>News List</a>
+            {/* <a href={"http://localhost:3000/news-list?page=1&limit=5&sortField=index&sortOrder=asc&searchTerm="}>News List</a> */}
+
           </li>
           <li>
             <a href={ADD_NEWS}>Add News</a>

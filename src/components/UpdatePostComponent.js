@@ -8,6 +8,7 @@ import { Form } from "react-bootstrap";
 import { FormText } from "reactstrap";
 import { DatePicker } from "reactstrap-date-picker";
 import { Multiselect } from "multiselect-react-dropdown";
+// import { MultiSelect } from "primereact/multiselect";
 
 import Isvg from "react-inlinesvg";
 import Save from "../images/save.svg";
@@ -46,7 +47,7 @@ class UpdatePostComponent extends Component {
       preselectedWriterId: "",
       writerName: "",
       preselectedCategories: [],
-      preselectedCategoriesArray: [],
+      preselectedCategoriesArray: [], //props.preselectedCategoriesArray
       preselectedWriter: [],
       selectedWriter: "",
       valueArray: [],
@@ -60,6 +61,7 @@ class UpdatePostComponent extends Component {
       preselectedAndNewImagesLoc: [],
       updatedRecord: [],
       categoriesValues: [],
+      emptyPreselectedCategoryList: { value: "1", label: "-" },
     };
 
     this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -81,14 +83,18 @@ class UpdatePostComponent extends Component {
     if (this.state._id === 0) {
       let writers = await WriterService.getWriters();
       console.log("WRITER IN componentDidMount", writers.data.writers[0]._id);
-      this.setState({
-        //u slucaju da korisnik sacuva a da pri tome ne izabere novog writera vec samo ostavi ono stoje vec prikazano
-        selectedWriter: writers.data.writers[0]._id,
-      });
+      // this.setState({
+      //   //u slucaju da korisnik sacuva a da pri tome ne izabere novog writera vec samo ostavi ono stoje vec prikazano
+      //   selectedWriter: writers.data.writers[0]._id,
+      // });
       this.getListOfWriters();
       this.getListOfCategories();
     } else {
       //post update
+      console.log(
+        "Props.preselectedCategoriesArray",
+        this.state.preselectedCategoriesArray
+      );
       await PostService.getPostById(this.state._id).then((res) => {
         this.setState(
           {
@@ -115,7 +121,6 @@ class UpdatePostComponent extends Component {
       });
     }
   }
-
   componentDidUpdate(prevProps, prevState) {
     if (
       this.state.imagesFiles !== prevState.imagesFiles &&
@@ -136,7 +141,6 @@ class UpdatePostComponent extends Component {
       );
     }
   }
-
   getPreselectedWriter() {
     let preselectedWriter = [];
     axios
@@ -156,7 +160,8 @@ class UpdatePostComponent extends Component {
       });
   }
 
-  async getListOfPreselectedCategories() {
+  getListOfPreselectedCategories() {
+    console.log("USAO U getListOfPreselectedCategories");
     let preselectedCategoriesArray = [];
     for (let index in this.state.preselectedCategories) {
       if (
@@ -168,7 +173,7 @@ class UpdatePostComponent extends Component {
         return;
       }
 
-      await axios
+      axios
         .get(CATEGORY_API + "/" + this.state.preselectedCategories[index])
         .then((res) => {
           console.log("getListOfPreselectedCategories=>res.data", res.data);
@@ -405,6 +410,10 @@ class UpdatePostComponent extends Component {
                 this.setState(
                   { selectedWriter: this.state.preselectedWriter },
                   () => {
+                    console.log(
+                      "selectedWriter odmah ispod1",
+                      this.state.selectedWriter
+                    );
                     let selectedWriterValue = this.state.selectedWriter.map(
                       (item) => item.value
                     );
@@ -535,7 +544,7 @@ class UpdatePostComponent extends Component {
                     isPublished: this.state.isPublished,
                     postDate: this.state.postDate,
                     categories: selectedOptionsValue,
-                    createdBy: this.state.selectedWriter.value,
+                    createdBy: this.state.selectedWriter,
                     images: this.state.imagesNames,
                   };
                 } else {
@@ -546,7 +555,7 @@ class UpdatePostComponent extends Component {
                     isPublished: this.state.isPublished,
                     postDate: this.state.postDate,
                     categories: selectedOptionsValue,
-                    createdBy: this.state.selectedWriter.value,
+                    createdBy: this.state.selectedWriter,
                     images: this.state.preselectedAndNewImagesLoc,
                   };
                 }
@@ -645,7 +654,7 @@ class UpdatePostComponent extends Component {
               isPublished: this.state.isPublished,
               postDate: this.state.postDate,
               categories: valueArrayOfSelectedCategories,
-              createdBy: this.state.selectedWriter.value,
+              createdBy: this.state.selectedWriter,
               images: this.state.imagesNames,
             };
           } else {
@@ -656,7 +665,7 @@ class UpdatePostComponent extends Component {
               isPublished: this.state.isPublished,
               postDate: this.state.postDate,
               categories: valueArrayOfSelectedCategories,
-              createdBy: this.state.selectedWriter.value,
+              createdBy: this.state.selectedWriter,
               images: this.state.preselectedAndNewImagesLoc,
             };
           }
@@ -687,7 +696,7 @@ class UpdatePostComponent extends Component {
 
           PostService.updatePost(post, this.state._id)
             .then((res) => {
-              window.location.replace(NEWS_LIST);
+              // window.location.replace(NEWS_LIST);
             })
             .catch((error) => {
               console.log(error.message);
@@ -711,7 +720,7 @@ class UpdatePostComponent extends Component {
               isPublished: this.state.isPublished,
               postDate: this.state.postDate,
               categories: valueArrayOfSelectedCategories,
-              createdBy: this.state.selectedWriter.value,
+              createdBy: this.state.preselectedWriterId,
               images: this.state.imagesNames,
             };
           } else {
@@ -722,7 +731,7 @@ class UpdatePostComponent extends Component {
               isPublished: this.state.isPublished,
               postDate: this.state.postDate,
               categories: valueArrayOfSelectedCategories,
-              createdBy: this.state.selectedWriter.value,
+              createdBy: this.state.preselectedWriterId,
               images: this.state.preselectedAndNewImagesLoc,
             };
           }
@@ -751,7 +760,7 @@ class UpdatePostComponent extends Component {
 
           PostService.updatePost(post, this.state._id)
             .then((res) => {
-              window.location.replace(NEWS_LIST);
+              // window.location.replace(NEWS_LIST);
             })
             .catch((error) => {
               console.log(error.message);
@@ -797,11 +806,12 @@ class UpdatePostComponent extends Component {
   }
 
   handleWriterSelect(event) {
-    // console.log("EVENT", event.target.value);
+    console.log("handleWriterSelect->EVENT", event);
     if (this.state.preselectedWriter.length > 0) {
       console.log("RADI provjera");
     }
-    this.setState({ selectedWriter: event.target.value }, () => {
+    this.setState({ selectedWriter: event }, () => {
+      console.log("SELECTED WRITER", event.target);
       console.log(
         "handleWriterSelect=>selectedWriter",
         this.state.selectedWriter
@@ -956,7 +966,7 @@ class UpdatePostComponent extends Component {
     const dateObject = new Date(this.state.postDate);
 
     const defaultDate = dateObject.toISOString().slice(0, 10);
-    const { preselectedCategoriesArray } = this.state;
+    // const { preselectedCategoriesArray } = this.state;
     return (
       <form>
         <div className="heading-post">
@@ -1120,7 +1130,7 @@ class UpdatePostComponent extends Component {
                 styles={colourStyles}
               /> */}
 
-              <FormGroup>
+              {/* <FormGroup>
                 <Label for="exampleSelect">Written By</Label>
                 <Input
                   id="exampleSelect"
@@ -1136,13 +1146,38 @@ class UpdatePostComponent extends Component {
                           ? true
                           : false
                       }
-                      value={option.value}
+                      // value={option.value}
                     >
                       {option.label}
                     </option>
                   ))}
                 </Input>
-              </FormGroup>
+              </FormGroup> */}
+
+<FormGroup>
+  <Label for="exampleSelect">Written By</Label>
+  <Input
+    id="exampleSelect"
+    name="select"
+    type="select"
+    onChange={(event) => this.handleWriterSelect(event.target.value)}
+  >
+    <option value="" disabled selected hidden>
+      Select a writer
+    </option> {/* Placeholder option */}
+    {this.state.writers.map((option) => (
+      <option
+        key={option.value}
+        selected={
+          option?.value === this.state.preselectedWriterId ? true : false
+        }
+        value={option.value}
+      >
+        {option.label}
+      </option>
+    ))}
+  </Input>
+</FormGroup>
             </div>
 
             <div className="date-content">
@@ -1166,8 +1201,8 @@ class UpdatePostComponent extends Component {
 
             <div className="categories-content">
               <label>Categories</label>
-              <Isvg className="arrow-categories" src={Arrow} />
-              {/* <Select
+              {/* <Isvg className="arrow-categories" src={Arrow} /> */}
+              <Select
                 options={this.state.categories}
                 placeholder="Select category"
                 value={
@@ -1179,24 +1214,61 @@ class UpdatePostComponent extends Component {
                 isSearchable={true}
                 isMulti
                 styles={colourStyles}
-              /> */}
+                autoFocus={true}
+              />
 
               {console.log("niz", this.state.preselectedCategoriesArray)}
 
-              <Multiselect
+              {/* {() => {
+                this.getListOfPreselectedCategories();
+                {console.log("niz2", this.state.preselectedCategoriesArray)}
+                return (
+                  <Multiselect
+                    options={this.state.categories || []}
+                    displayValue="label"
+                    selectedValues={
+                      this.state.selectedOptions
+                        ? this.state.selectedOptions
+                        : this.state.preselectedCategoriesArray
+                    }
+                    onSelect={this.handleSelect}
+                    hidePlaceholder="true"
+                    showArrow="false"
+                    onRemove={this.onRemove}
+                    closeIcon="cancel"
+                  />
+                );
+              }} */}
+
+              {/* <Multiselect
                 options={this.state.categories || []}
                 displayValue="label"
-                selectedValues={preselectedCategoriesArray || []} //kada ubacim samo values onda ne pravi problem tj.this.state.preselectedCategoriesArray pravi problem tj.aman da se ne poziva na vrijeme
-                value={
-                  //na njihovom primjeru nema value samo selectedValues
-                  this.state.selectedOptions || []
-                }
+                
+                selectedValues={
+                  this.state.selectedOptions
+                  ? this.state.selectedOptions
+                  : this.state.preselectedCategoriesArray
+                } //kada ubacim samo values onda ne pravi problem tj.this.state.preselectedCategoriesArray pravi problem tj.aman da se ne poziva na vrijeme
+                // value={
+                //   //na njihovom primjeru nema value samo selectedValues
+                //   this.state.selectedOptions || []
+                // }
                 onSelect={this.handleSelect}
                 hidePlaceholder="true"
                 showArrow="false"
                 onRemove={this.onRemove}
                 closeIcon="cancel"
-              />
+              /> */}
+              {/* <Multiselect //poslednje novo
+                value={
+                  this.state.selectedOptions
+                    ? this.state.selectedOptions
+                    : this.state.preselectedCategoriesArray
+                }
+                onChange={this.handleSelect}
+                options={this.state.categories || []}
+                optionLabel="label"
+              /> */}
             </div>
 
             <div className="published-content">
