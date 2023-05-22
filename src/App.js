@@ -12,8 +12,8 @@ import DataTable from "./pages/Pages/index";
 import MainLayout from "./components/Layout/MainLayout";
 import HomePage from "./components/HomePage/HomePage";
 import UpdatePost from "./components/UpdatePost";
-import DataPicker from "./components/DataPicker";
-
+// import DataPicker from "./components/DataPicker";
+import LoginComponent from "./components/LoginComponent";
 function App() {
   return (
     <BrowserRouter>
@@ -25,10 +25,10 @@ function App() {
 
           <Route path="/update-news/:id" element={<UpdatePost />} />
           <Route path="/add-news/" element={<UpdatePost />} />
+          <Route path="/login/" element={<LoginComponent />} />
 
 
-
-          <Route path="/date-picker/" element={<DataPicker />} />
+          {/* <Route path="/date-picker/" element={<DataPicker />} /> */}
 
         </Route>
       </Routes>

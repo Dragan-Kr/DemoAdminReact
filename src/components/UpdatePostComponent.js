@@ -112,10 +112,10 @@ class UpdatePostComponent extends Component {
             // selectedOptions:this.state.preselectedCategoriesArray
           },
           () => {
-            this.getListOfPreselectedCategories();
             this.getPreselectedWriter();
             this.getListOfWriters();
             this.getListOfCategories();
+            this.getListOfPreselectedCategories();
           }
         );
       });
@@ -1154,30 +1154,35 @@ class UpdatePostComponent extends Component {
                 </Input>
               </FormGroup> */}
 
-<FormGroup>
-  <Label for="exampleSelect">Written By</Label>
-  <Input
-    id="exampleSelect"
-    name="select"
-    type="select"
-    onChange={(event) => this.handleWriterSelect(event.target.value)}
-  >
-    <option value="" disabled selected hidden>
-      Select a writer
-    </option> {/* Placeholder option */}
-    {this.state.writers.map((option) => (
-      <option
-        key={option.value}
-        selected={
-          option?.value === this.state.preselectedWriterId ? true : false
-        }
-        value={option.value}
-      >
-        {option.label}
-      </option>
-    ))}
-  </Input>
-</FormGroup>
+              <FormGroup>
+                <Label for="exampleSelect">Written By</Label>
+                <Input
+                  id="exampleSelect"
+                  name="select"
+                  type="select"
+                  onChange={(event) =>
+                    this.handleWriterSelect(event.target.value)
+                  }
+                >
+                  <option value="" disabled selected hidden>
+                    Select a writer
+                  </option>{" "}
+                  {/* Placeholder option */}
+                  {this.state.writers.map((option) => (
+                    <option
+                      key={option.value}
+                      selected={
+                        option?.value === this.state.preselectedWriterId
+                          ? true
+                          : false
+                      }
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup>
             </div>
 
             <div className="date-content">
@@ -1201,8 +1206,8 @@ class UpdatePostComponent extends Component {
 
             <div className="categories-content">
               <label>Categories</label>
-              {/* <Isvg className="arrow-categories" src={Arrow} /> */}
-              <Select
+              <Isvg className="arrow-categories" src={Arrow} />
+              {/* <Select
                 options={this.state.categories}
                 placeholder="Select category"
                 value={
@@ -1215,7 +1220,7 @@ class UpdatePostComponent extends Component {
                 isMulti
                 styles={colourStyles}
                 autoFocus={true}
-              />
+              /> */}
 
               {console.log("niz", this.state.preselectedCategoriesArray)}
 
@@ -1240,14 +1245,13 @@ class UpdatePostComponent extends Component {
                 );
               }} */}
 
-              {/* <Multiselect
+              <Multiselect
                 options={this.state.categories || []}
                 displayValue="label"
-                
                 selectedValues={
                   this.state.selectedOptions
-                  ? this.state.selectedOptions
-                  : this.state.preselectedCategoriesArray
+                    ? this.state.selectedOptions
+                    : this.state.preselectedCategoriesArray
                 } //kada ubacim samo values onda ne pravi problem tj.this.state.preselectedCategoriesArray pravi problem tj.aman da se ne poziva na vrijeme
                 // value={
                 //   //na njihovom primjeru nema value samo selectedValues
@@ -1258,7 +1262,8 @@ class UpdatePostComponent extends Component {
                 showArrow="false"
                 onRemove={this.onRemove}
                 closeIcon="cancel"
-              /> */}
+                placeholder="Select categories"
+              />
               {/* <Multiselect //poslednje novo
                 value={
                   this.state.selectedOptions
