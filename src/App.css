@@ -1399,3 +1399,11 @@ background-image: url("./images/arrow.svg") !important;
     border: none;
     margin-top: 8px;
 }
+
+
+.errorAlert .alert-info {
+  height: 60px;
+  width: 400px;
+  background-color: red;
+    color: white;
+}
