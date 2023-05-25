@@ -1407,3 +1407,35 @@ background-image: url("./images/arrow.svg") !important;
   background-color: red;
     color: white;
 }
+
+
+
+.row .col-md-6.mb-4 .userName-prop .form-outline {
+
+  width: 425px;
+  right: 14px;
+
+}
+
+
+.login-form{
+    width: 500px;
+    align-self: center;
+    margin-left: 30%;
+    margin-top: 6%;
+    background-color: white;
+}
+
+.register-div-alert{
+  padding-bottom: 15px;
+}
+
+
+.register-alert{
+  background-color: red;
+    width: 400px;
+    font-size: 16px;
+    color: white;
+    height: 50px;
+    border-radius: 5px;
+}
