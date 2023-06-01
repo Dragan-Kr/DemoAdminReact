@@ -29,6 +29,7 @@
     "format": "^0.2.2",
     "inline-svg": "^2.2.3",
     "jquery": "^3.6.4",
+    "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "multiselect-react-dropdown": "^2.0.25",
     "node-sass": "^8.0.0",
@@ -59,6 +60,7 @@
     "reactstrap-date-picker": "^1.0.9",
     "routes": "^2.1.0",
     "svg-inline-react": "^3.2.1",
+    "universal-cookie": "^4.0.4",
     "usescript-hook": "^1.0.5",
     "web-vitals": "^2.1.4"
   },

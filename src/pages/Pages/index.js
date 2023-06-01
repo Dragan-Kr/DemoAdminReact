@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useContext  } from "react";
 
 import { TableHeader, Pagination, Search } from "../.././components/DataTable";
 
@@ -22,6 +22,10 @@ import axios from "axios";
 
 import { UPDATE_NEWS } from "../../globalVariables";
 import { POST_API } from "../../globalVariables";
+import {LOGOUT_API} from "../../globalVariables"
+import {LOGIN} from "../../globalVariables";
+import AppContext from "../../context/AppContext";
+
 
 const DataTable = () => {
   const headers = [
@@ -55,15 +59,25 @@ const DataTable = () => {
   const navigate = useNavigate();
 
 
+  const { roles, username,accessToken } = useContext(AppContext);
+  // const context = useContext(AppContext);
+console.log("accessToken",accessToken)
   useEffect(() => {
     let res;
     const queryParams = new URLSearchParams();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+    console.log("DataTable->AccessToken",config)
+
+    // console.log("DataTable->useContext",context)
     if (searchTerm.length !== 0) {
       console.log("USAO U IF U useEffect");
-
       const search = debounce(async () => {
         res = await axios.get(
-          `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
+          `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`,config
         );
         setPosts(res.data.data);
         setTotalItems(res.data.data.length);
@@ -86,7 +100,7 @@ const DataTable = () => {
       const fetchData = async () => {
         setLoading(true);
         res = await axios.get(
-          `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`
+          `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`,config
         );
         console.log("RES", res);
         setPosts(res.data.data);
@@ -104,7 +118,7 @@ const DataTable = () => {
       const url = `/news-list?${queryParams.toString()}`;
       navigate(url);
     }
-  }, [currentPage, pageSize, sorting.field, sorting.order, searchTerm]);
+  }, [currentPage, pageSize, sorting.field, sorting.order, searchTerm,accessToken]);
 
   const handleClose = () => {
     setShow(false);
@@ -165,6 +179,16 @@ const DataTable = () => {
     return Object.assign(base, changes);
   };
 
+
+  const handleLogOut =()=>{
+    axios.get(LOGOUT_API).then((res)=>{
+      console.log("RES", res);
+      window.location.replace(LOGIN);
+    }).catch((error)=>{
+      console.log("ERRROOR", error.response.data.message);
+    })
+  }
+
   return (
     <>
       <div className="row w-100">
@@ -194,6 +218,7 @@ const DataTable = () => {
               <div className="news-list-drop-down">
                 <div className="news-list-drop">
                   <div className="drop-down-left-word">
+                    <button onClick={() =>handleLogOut()}>Logout</button>
                     <label>Show </label>
                   </div>
 

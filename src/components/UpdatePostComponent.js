@@ -25,6 +25,9 @@ import { CATEGORY_API } from "../globalVariables";
 import { API_REST } from "../globalVariables";
 import { NOT_FOUND_IMAGE } from "../globalVariables";
 import WriterService from "../services/WriterService";
+import AppContext from "../context/AppContext";
+
+
 
 class UpdatePostComponent extends Component {
   constructor(props) {
@@ -62,6 +65,7 @@ class UpdatePostComponent extends Component {
       updatedRecord: [],
       categoriesValues: [],
       emptyPreselectedCategoryList: { value: "1", label: "-" },
+      
     };
 
     this.changeTitleHandler = this.changeTitleHandler.bind(this);
@@ -78,6 +82,7 @@ class UpdatePostComponent extends Component {
     this.getWriter = this.getWriter.bind(this);
     this.onRemove = this.onRemove.bind(this);
   }
+  static contextType = AppContext;
 
   async componentDidMount() {
     if (this.state._id === 0) {
