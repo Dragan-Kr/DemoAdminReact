@@ -1463,3 +1463,12 @@ cursor: pointer;
  
   color: white;
 }
+
+/* .empty-field-login{
+  margin-top: -40px;
+} */
+
+
+.empty-field-login .warning-paragraph{
+  color: red;
+}

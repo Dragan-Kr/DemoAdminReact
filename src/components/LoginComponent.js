@@ -152,39 +152,10 @@ class LoginComponent extends Component {
       <div>
        <div className="errorAlert">
          
-          <div className="register-div-alert">
-            {this.state.errorMessage.email !== "" && (
-              <div>
-                {this.state.showAlertEmail && (
-                         <p
-                         id={emailDivId}
-                        //  className="register-alert"
-                         onClick={this.handleValidation}
-                         readOnly={true}
-                       >
-                         {this.state.errorMessage.email ? this.state.errorMessage.email : skippedEmailField}
-                       </p>
-               
-                )}
-              </div>
-            )}
-          </div>
+         
 
           <div className="register-div-alert">
-            {this.state.errorMessage.password !== "" && (
-              <div>
-                {this.state.showAlertPassword && (
-                  <input
-                    type="text"
-                    id={passwordDivId}
-                    className="register-alert"
-                    onClick={this.handleValidation}
-                    value={this.state.errorMessage.password ?this.state.errorMessage.password :skippedPasswordField}
-                    readOnly={true}
-                  />
-                )}
-              </div>
-            )}
+           
           </div>
 
 
@@ -209,6 +180,21 @@ class LoginComponent extends Component {
               Email address
             </label>
           </div>
+            {this.state.errorMessage.email !== "" && (
+              <div className="empty-field-login">
+                {this.state.showAlertEmail && (
+                         <p className="warning-paragraph"
+                         id={emailDivId}
+                        //  className="register-alert"
+                         onClick={this.handleValidation}
+                         readOnly={true}
+                       >
+                         {this.state.errorMessage.email ? this.state.errorMessage.email : skippedEmailField}
+                       </p>
+               
+                )}
+              </div>
+            )}
 
           <div className="form-outline mb-4">
             <input
@@ -226,6 +212,20 @@ class LoginComponent extends Component {
               Password
             </label>
           </div>
+
+          {this.state.errorMessage.password !== "" && (
+              <div className="empty-field-login">
+                {this.state.showAlertPassword && (
+                <p
+                id={passwordDivId}
+                className="warning-paragraph"
+                onClick={this.handleValidation}
+              >
+                {this.state.errorMessage.password || skippedPasswordField}
+              </p>
+                )}
+              </div>
+            )}
 
           <div className="row mb-4">
             <div className="col d-flex justify-content-center">

@@ -5,7 +5,6 @@ import { Alert } from "reactstrap";
 import { REGISTRATION_API } from "../globalVariables";
 import { LOGIN } from "../globalVariables";
 
-
 //SVAKI PUT KADA MI IZBACI UPOZORENJE I NAKON STO POPUNIM TO POLJE UPOZORENJE TREBA DA SE UGASI
 class RegistrationComponent extends Component {
   constructor(props) {
@@ -15,9 +14,9 @@ class RegistrationComponent extends Component {
       email: "",
       password: "",
       showAlert: false,
-      showAlertUserName:false,
-      showAlertEmail:false,
-      showAlertPassword:false,
+      showAlertUserName: false,
+      showAlertEmail: false,
+      showAlertPassword: false,
       errorMessage: {}, // ako salje vise ->[]
     };
     this.dismissTimer = null;
@@ -38,28 +37,27 @@ class RegistrationComponent extends Component {
       this.showAlertWithTimeout(this.state.errorMessage, 63000);
     }
 
-    if(prevState.userName !== this.state.userName){
-      this.setState({showAlertUserName:false})
+    if (prevState.userName !== this.state.userName) {
+      this.setState({ showAlertUserName: false });
     }
-    if(prevState.email !== this.state.email){
-      this.setState({showAlertEmail:false})
+    if (prevState.email !== this.state.email) {
+      this.setState({ showAlertEmail: false });
     }
-    if(prevState.password !== this.state.password){
-      this.setState({showAlertPassword:false})
+    if (prevState.password !== this.state.password) {
+      this.setState({ showAlertPassword: false });
     }
   }
+  
   componentDidMount() {
     // this.inputUserNameRef.current.focus(); // Focus the userName input field when the component mounts
   }
-
-
 
   showAlertWithTimeout(message, duration) {
     this.setState({
       // showAlert: true,
       showAlertUserName: true,
-      showAlertEmail:true,
-      showAlertPassword:true,
+      showAlertEmail: true,
+      showAlertPassword: true,
       errorMessage: message,
     });
 
@@ -77,7 +75,7 @@ class RegistrationComponent extends Component {
         "Content-Type": "application/json", // Specify the media type here
       },
     };
-   axios
+    axios
       .post(
         REGISTRATION_API,
         {
@@ -104,10 +102,6 @@ class RegistrationComponent extends Component {
     this.setState({ showAlert: false });
   }
 
-
-
-
-
   handleChange = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
@@ -126,70 +120,37 @@ class RegistrationComponent extends Component {
     }
   };
 
-
-  handleInputBlur = (e) => { //ovo je ako preskocimo neko polje--treba dorada
-    console.log("Blur->e",e.target.name)
-    if (e.target.name === "userName" && this.state.userName.trim() === '') {
+  handleInputBlur = (e) => {
+    //ovo je ako preskocimo neko polje--treba dorada
+    console.log("Blur->e", e.target.name);
+    if (e.target.name === "userName" && this.state.userName.trim() === "") {
       this.setState({ showAlertUserName: true });
-    } 
-     if(e.target.name ==="email" && this.state.email.trim()===''){
-      this.setState({showAlertEmail:true})
     }
-    if(e.target.name ==="password" && this.state.password.trim()===''){
-      this.setState({showAlertPassword:true})
+    if (e.target.name === "email" && this.state.email.trim() === "") {
+      this.setState({ showAlertEmail: true });
     }
-
+    if (e.target.name === "password" && this.state.password.trim() === "") {
+      this.setState({ showAlertPassword: true });
+    }
   };
 
   render() {
     const userNameDivId = "userName";
     const emailDivId = "email";
     const passwordDivId = "password";
-    
 
-    const skippedUserNameField= "Fill the user name field";
+    const skippedUserNameField = "Fill the user name field";
     const skippedEmailField = "Fill the email field";
     const skippedPasswordField = "Fill the password field";
 
-    
     return (
       <div>
         <div className="errorAlert">
-          <div className="register-div-alert">
-            {this.state.errorMessage.userName !== "" && (
-              <div>
-                {this.state.showAlertUserName && (
-                  <input
-                    type="text"
-                    id={userNameDivId}
-                    className="register-alert"
-                    onClick={this.handleValidation}
-                    value={this.state.errorMessage.userName ? this.state.errorMessage.userName : skippedUserNameField}
-                    readOnly={true}
-                  />
-                )}
-              </div>
-            )}
-          </div>
-          <div className="register-div-alert">
-            {this.state.errorMessage.email !== "" && (
-              <div>
-                {this.state.showAlertEmail && (
-                  <input
-                    type="text"
-                    id={emailDivId}
-                    className="register-alert"
-                    onClick={this.handleValidation}
-                    value={this.state.errorMessage.email ? this.state.errorMessage.email : skippedEmailField}
-                    readOnly={true}
-                  />
-                )}
-              </div>
-            )}
-          </div>
+          <div className="register-div-alert"></div>
+          <div className="register-div-alert"></div>
 
           <div className="register-div-alert">
-            {this.state.errorMessage.password !== "" && (
+            {/* {this.state.errorMessage.password !== "" && (
               <div>
                 {this.state.showAlertPassword && (
                   <input
@@ -197,16 +158,17 @@ class RegistrationComponent extends Component {
                     id={passwordDivId}
                     className="register-alert"
                     onClick={this.handleValidation}
-                    value={this.state.errorMessage.password ?this.state.errorMessage.password :skippedPasswordField}
+                    value={
+                      this.state.errorMessage.password
+                        ? this.state.errorMessage.password
+                        : skippedPasswordField
+                    }
                     readOnly={true}
                   />
                 )}
               </div>
-            )}
+            )} */}
           </div>
-
-
-
         </div>
         <section className="">
           <div
@@ -238,6 +200,20 @@ class RegistrationComponent extends Component {
                                 >
                                   userName
                                 </label>
+                                {this.state.errorMessage.userName !== "" && (
+                                  <div className="empty-field-login">
+                                    {this.state.showAlertUserName && (
+                                      <p
+                                        id={userNameDivId}
+                                        className="warning-paragraph"
+                                        onClick={this.handleValidation}
+                                      >
+                                        {this.state.errorMessage.userName ||
+                                          skippedUserNameField}
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -252,12 +228,26 @@ class RegistrationComponent extends Component {
                             name="email"
                             ref={this.inputEmailRef}
                             onBlur={this.handleInputBlur}
-                            
                           />
                           <label className="form-label" htmlFor="form3Example3">
                             Email address
                           </label>
                         </div>
+
+                        {this.state.errorMessage.email !== "" && (
+                          <div className="empty-field-login">
+                            {this.state.showAlertEmail && (
+                              <p
+                                id={emailDivId}
+                                className="warning-paragraph"
+                                onClick={this.handleValidation}
+                              >
+                                {this.state.errorMessage.email ||
+                                  skippedEmailField}
+                              </p>
+                            )}
+                          </div>
+                        )}
 
                         <div className="form-outline mb-4">
                           <input
@@ -273,6 +263,20 @@ class RegistrationComponent extends Component {
                           <label className="form-label" htmlFor="form3Example4">
                             Password
                           </label>
+
+                          {this.state.errorMessage.password !== "" && (
+                             <div className="empty-field-login">
+                              {this.state.showAlertPassword && (
+                               <p
+                               id={passwordDivId}
+                               className="warning-paragraph"
+                               onClick={this.handleValidation}
+                             >
+                               {this.state.errorMessage.password || skippedPasswordField}
+                             </p>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <button
                           type="submit"

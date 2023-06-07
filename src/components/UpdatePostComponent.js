@@ -65,6 +65,12 @@ class UpdatePostComponent extends Component {
       updatedRecord: [],
       categoriesValues: [],
       emptyPreselectedCategoryList: { value: "1", label: "-" },
+
+
+      showAlertTitle:false,
+      showAlertWriter:false,
+      showAlertCategory:false,
+      errorMessage: {}
       
     };
 
@@ -95,7 +101,8 @@ class UpdatePostComponent extends Component {
     const config = {
       headers: {
         Authorization: `Bearer ${contextValue.accessToken}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+         Accept: 'application/json',
       },
     };
 
@@ -145,9 +152,35 @@ class UpdatePostComponent extends Component {
 
 
 
+  handleInputBlur = (e) => {
+    //ovo je ako preskocimo neko polje--treba dorada
+    console.log("Blur->e", e.target);
+    if (e.target.name === "title" && this.state.title.trim() === "") {
+      
+      this.setState({ showAlertTitle: true });
+    }
+    if(e.target.name==="writer" && this.state.selectedWriter === ""){
+      console.log("handleInputBlur->writer")
+      this.setState({ showAlertWriter: true });
+    }
+
+    if(e.target.name ==="category_input" && this.state.selectedOptions === ""){
+      console.log("handleInputBlur->category")
+
+      this.setState({showAlertCategory:true})
+    }
+ 
+  };
 
 
   componentDidUpdate(prevProps, prevState) {
+    if (prevState.errorMessage !== this.state.errorMessage) {
+      // Clear the previous timer if it exists
+      clearTimeout(this.dismissTimer);
+
+      // Show the alert for 3 seconds (3000 milliseconds)
+      this.showAlertWithTimeout(this.state.errorMessage, 63000);
+    }
     if (
       this.state.imagesFiles !== prevState.imagesFiles &&
       this.state.imagesFiles.length > 0
@@ -166,21 +199,33 @@ class UpdatePostComponent extends Component {
         }
       );
     }
-    // const { accessToken } = this.context;
+    if (prevState.title !== this.state.title) {
+      this.setState({ showAlertTitle: false });
+    }
 
-    // if (accessToken !== '' && accessToken !== prevState.config.headers.Authorization) {
-    //   const config = {
-    //     headers: {
-    //       Authorization: `Bearer ${accessToken}`,
-    //     },
-    //   };
+    if(prevState.selectedWriter !== this.state.selectedWriter){
+      this.setState({showAlertWriter:false})
+    }
+    if(prevState.selectedOptions !== this.state.selectedOptions){
+      this.setState({showAlertCategory:false})
+    }
 
-    //   // Update the state with the new config
-    //   this.setState({ config })
+   
+}
 
 
-    
-  // }
+showAlertWithTimeout(message, duration) {
+  this.setState({
+    // showAlert: true,
+    showAlertTitle: true,
+    showAlertWriter:true,
+    showAlertCategory:true,
+    errorMessage: message,
+  });
+
+  this.dismissTimer = setTimeout(() => {
+    this.setState({ showAlert: false });
+  }, duration);
 }
  async getPreselectedWriter(config) {
   console.log("USAO U getPreselectedWriter->config",config);
@@ -259,35 +304,18 @@ class UpdatePostComponent extends Component {
     const config = {
       headers: {
         Authorization: `Bearer ${contextValue.accessToken}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     };
-
-
     console.log("UpdatePost method->config",config)
-    if (this.state._id === 0) {
-      if (
-        this.state.title === "" &&
-        this.state.selectedWriter === "" &&
-        this.state.selectedOptions === ""
-      ) {
-        window.alert("Fill the Title, Written By and Categories filds");
-        return;
-      } else if (this.state.title === "") {
-        window.alert("Fill the Title field");
-        return;
-      } else if (this.state.selectedWriter === "") {
-        window.alert("Fill the Written By field");
-        return;
-      } else if (this.state.selectedOptions.length === 0) {
-        window.alert("Fill the Categories field");
-        return;
-      }
 
-      const selectedCategories = this.state.selectedOptions.map(
+
+    if (this.state._id === 0) {                         ///OVDE TREBA isNewPostAdd
+      console.log("Create new post")
+      const selectedCategories = this.state.selectedOptions.length>0 ?this.state.selectedOptions.map(
         (item) => item.value
-      );
-
+      ) : [];
       console.log("this.state.selectedOptions", this.state.selectedOptions);
       const formData = new FormData();
 
@@ -297,10 +325,8 @@ class UpdatePostComponent extends Component {
           formData.append("images2", this.state.imagesFiles[i]);
           imagesForm.push(formData);
         }
-
         //Array of files converting to array of objects
         const filesArray = [];
-
         // Loop through the array of files
         for (let i = 0; i < this.state.imagesFiles.length; i++) {
           const file = this.state.imagesFiles[i];
@@ -346,13 +372,29 @@ class UpdatePostComponent extends Component {
           body: formData,
         });
 
-        PostService.createPost(post,this.state.config)
+        console.log("Create post ->cofing",config)
+        PostService.createPost(post,config)
           .then((res) => {
             // window.location.replace(NEWS_LIST);
           })
           .catch((error) => {
-            // window.alert('Post failed');
-            console.log(error.message);
+            if (
+              error.response &&
+              error.response.data &&
+              error.response.data.message
+            ) {
+              this.setState(
+                { errorMessage: error.response.data.message, showAlert: true },
+                () => {
+                  console.log("errorMessage", this.state.errorMessage);
+                }
+              );
+            } else {
+              this.setState({
+                errorMessage: "Registration failed.",
+                showAlert: true,
+              });
+            }
           });
       } else {
         let post = {
@@ -367,36 +409,35 @@ class UpdatePostComponent extends Component {
 
         console.log("FORM DATA", formData);
 
-        PostService.createPost(post,this.state.config)
+        PostService.createPost(post,config)
           .then((res) => {
             // window.location.replace(NEWS_LIST);
           })
           .catch((error) => {
             // window.alert('Post failed');
-            console.log(error.message);
+            if (
+              error.response &&
+              error.response.data &&
+              error.response.data.message
+            ) {
+              this.setState(
+                { errorMessage: error.response.data.message, showAlert: true },
+                () => {
+                  console.log("errorMessage", this.state.errorMessage);
+                }
+              );
+            } else {
+              this.setState({
+                errorMessage: "Post failed.",
+                showAlert: true,
+              });
+            }
           });
       }
     }
 
     ///UPDATE
     else {
-      if (
-        this.state.title === "" &&
-        this.state.preselectedWriter.length === 0 &&
-        this.state.selectedOptions.length === 0
-      ) {
-        window.alert("Fill the Title, Written By and Categories filds");
-        return;
-      } else if (this.state.title === "") {
-        window.alert("Fill the Title field");
-        return;
-      } else if (this.state.preselectedWriter.length === 0) {
-        window.alert("Fill the Written By field");
-        return;
-      } else if (this.state.selectedOptions.length === 0) {
-        window.alert("Fill the Categories field");
-        return;
-      }
       if (this.state.selectedOptions === "") {
         //categories nepromjenjen
         this.setState(
@@ -502,31 +543,16 @@ class UpdatePostComponent extends Component {
                       body: formData,
                     });
 
-                    if (
-                      this.state.title === "" &&
-                      this.state.createdBy.length === 0 &&
-                      this.state.selectedOptions.length === 0
-                    ) {
-                      window.alert(
-                        "Fill the Title, Written By and Categories filds"
-                      );
-                      return;
-                    } else if (this.state.title === "") {
-                      window.alert("Fill the Title field");
-                      return;
-                    } else if (this.state.createdBy.length === 0) {
-                      window.alert("Fill the Written By field");
-                      return;
-                    } else if (this.state.selectedOptions.length === 0) {
-                      window.alert("Fill the Categories field");
-                      return;
-                    }
+                    
                     PostService.updatePost(post, this.state._id,config)
                       .then((res) => {
                         // window.location.replace(NEWS_LIST);
                       })
                       .catch((error) => {
-                        console.log(error.message);
+                        console.log("ERRROOR", error.response.data.message);//TREBA I NA OSTALIM MJESTIMA!!!!!!!
+                        this.setState({ errorMessage: error.response.data.message }, () => {
+                        console.log("errorMessage", this.state.errorMessage);
+                    });
                       });
                     console.log(
                       "valueArray izvan setState",
@@ -618,32 +644,17 @@ class UpdatePostComponent extends Component {
                   method: "POST",
                   body: formData,
                 });
-                if (
-                  this.state.title === "" &&
-                  this.state.createdBy.length === 0 &&
-                  this.state.selectedOptions.length === 0
-                ) {
-                  window.alert(
-                    "Fill the Title, Written By and Categories filds"
-                  );
-                  return;
-                } else if (this.state.title === "") {
-                  window.alert("Fill the Title field");
-                  return;
-                } else if (this.state.createdBy.length === 0) {
-                  window.alert("Fill the Written By field");
-                  return;
-                } else if (this.state.selectedOptions.length === 0) {
-                  window.alert("Fill the Categories field");
-                  return;
-                }
+              
 
                 PostService.updatePost(post, this.state._id,config)
                   .then((res) => {
                     // window.location.replace(NEWS_LIST);
                   })
                   .catch((error) => {
-                    console.log(error.message);
+                    console.log("ERRROOR", error.response.data.message);//TREBA I NA OSTALIM MJESTIMA!!!!!!!
+                    this.setState({ errorMessage: error.response.data.message }, () => {
+                    console.log("errorMessage", this.state.errorMessage);
+                });
                   });
               }
             });
@@ -728,30 +739,16 @@ class UpdatePostComponent extends Component {
             method: "POST",
             body: formData,
           });
-          if (
-            this.state.title === "" &&
-            this.state.selectedWriter === "" &&
-            this.state.selectedOptions.length === 0
-          ) {
-            window.alert("Fill the Title, Written By and Categories filds");
-            return;
-          } else if (this.state.title === "") {
-            window.alert("Fill the Title field");
-            return;
-          } else if (this.state.createdBy.length === 0) {
-            window.alert("Fill the Written By field");
-            return;
-          } else if (this.state.selectedOptions.length === 0) {
-            window.alert("Fill the Categories field");
-            return;
-          }
-
+         
           PostService.updatePost(post, this.state._id,config)
             .then((res) => {
               // window.location.replace(NEWS_LIST);
             })
             .catch((error) => {
-              console.log(error.message);
+              console.log("ERRROOR", error.response.data.message);//TREBA I NA OSTALIM MJESTIMA!!!!!!!
+              this.setState({ errorMessage: error.response.data.message }, () => {
+              console.log("errorMessage", this.state.errorMessage);
+          });
             });
         } else {
           //pisac ostao nepromjenjen
@@ -792,30 +789,17 @@ class UpdatePostComponent extends Component {
             method: "POST",
             body: formData,
           });
-          if (
-            this.state.title === "" &&
-            this.state.createdBy.length === 0 &&
-            this.state.selectedOptions.length === 0
-          ) {
-            window.alert("Fill the Title, Written By and Categories filds");
-            return;
-          } else if (this.state.title === "") {
-            window.alert("Fill the Title field");
-            return;
-          } else if (this.state.createdBy.length === 0) {
-            window.alert("Fill the Written By field");
-            return;
-          } else if (this.state.selectedOptions.length === 0) {
-            window.alert("Fill the Categories field");
-            return;
-          }
+          
 
           PostService.updatePost(post, this.state._id,config)
             .then((res) => {
               // window.location.replace(NEWS_LIST);
             })
             .catch((error) => {
-              console.log(error.message);
+              console.log("ERRROOR", error.response.data.message);//TREBA I NA OSTALIM MJESTIMA!!!!!!!
+            this.setState({ errorMessage: error.response.data.message }, () => {
+            console.log("errorMessage", this.state.errorMessage);
+        });
             });
         }
       }
@@ -977,13 +961,13 @@ class UpdatePostComponent extends Component {
   };
 
   render() {
-    // const dropdownIndicatorStyles = (base, state) => {
-    //   let changes = {
-    //     backgroundColor: "green",
-    //   };
-    //   return Object.assign(base, changes);
-    // };
+  const skippedTitleField = "Fill the title field";
+  const skippedWriterField="Choose a writer";
+  const skippedCategoryField="Choose a category";
 
+  const titleDivId = "title";
+  const writerDivId = "writer";
+  const categoryDivId ="category";
 
     const dateObject = new Date(this.state.postDate);
     const defaultDate = dateObject.toISOString().slice(0, 10);
@@ -992,7 +976,6 @@ class UpdatePostComponent extends Component {
     
     {console.log("ContextValueeeeee",this.context)}
 
-// if(preselectedCategoriesArray.length > 0 && typeof preselectedCategoriesArray !== 'undefined' || selectedOptions.length > 0 && typeof selectedOptions !=='undefined' ){ 
    return (
       <form>
         <div className="heading-post">
@@ -1013,7 +996,21 @@ class UpdatePostComponent extends Component {
               type="text"
               value={this.state.title}
               onChange={this.handleChange}
+              onBlur={this.handleInputBlur}
             />
+             {this.state.errorMessage.title !== "" && (
+                          <div className="empty-field-login">
+                            {this.state.showAlertTitle && (
+                              <p
+                                id={titleDivId}
+                                className="warning-paragraph"
+                              >
+                                {this.state.errorMessage.title ||
+                                  skippedTitleField}
+                              </p>
+                            )}
+                          </div>
+                        )}
             <h2>Content</h2>
             <div className="textarea-content">
               <label>Short description</label>
@@ -1186,11 +1183,13 @@ class UpdatePostComponent extends Component {
                 <Label for="exampleSelect">Written By</Label>
                 <Input
                   id="exampleSelect"
-                  name="select"
+                  // name="select"
+                  name="writer"
                   type="select"
                   onChange={(event) =>
                     this.handleWriterSelect(event.target.value)
                   }
+                  onBlur={this.handleInputBlur}
                 >
                   <option value="" disabled selected hidden>
                     Select a writer
@@ -1212,6 +1211,19 @@ class UpdatePostComponent extends Component {
                 </Input>
               </FormGroup>
             </div>
+            {this.state.errorMessage.title !== "" && (
+                          <div className="empty-field-login">
+                            {this.state.showAlertWriter && (
+                              <p
+                                id={writerDivId}
+                                className="warning-paragraph"
+                              >
+                                {this.state.errorMessage.writer ? this.state.errorMessage.writer:
+                                  skippedWriterField}
+                              </p>
+                            )}
+                          </div>
+                        )}
 
             <div className="date-content">
               {/* <label>Post Date</label>
@@ -1272,9 +1284,11 @@ class UpdatePostComponent extends Component {
                 );
               }} */}
   
+              <div  name="category" onBlur={this.handleInputBlur}> 
               <Multiselect
                 options={this.state.categories || []}
                 displayValue="label"
+                name="category"
                 selectedValues={
                   this.state.selectedOptions
                     ? this.state.selectedOptions
@@ -1303,8 +1317,23 @@ class UpdatePostComponent extends Component {
                 optionLabel="label"
               /> */}
 
-              
+</div>
             </div>
+
+            {this.state.errorMessage.category !== "" && (
+                          <div className="empty-field-login">
+                            {this.state.showAlertCategory && (
+                              <p
+                                id={categoryDivId}
+                                className="warning-paragraph"
+                              >
+                                {this.state.errorMessage.category ||
+                                  skippedCategoryField}
+                              </p>
+                            )}
+                          </div>
+                        )}
+
 
             <div className="published-content">
               <label>Published</label>
