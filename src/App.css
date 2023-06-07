@@ -1439,3 +1439,27 @@ background-image: url("./images/arrow.svg") !important;
     height: 50px;
     border-radius: 5px;
 }
+
+.dropDown-logout{
+  background-color: wheat;
+  color: black;
+  display: flex;
+  align-self: center;
+  /* justify-content: center; */
+  width: auto;
+  bottom: -40px;
+  position: absolute;
+  right: 0px;
+  z-index: 6;
+}
+
+
+.logout {
+  list-style-type: none;
+right: 10px;
+cursor: pointer;
+}
+.logout:hover {
+ 
+  color: white;
+}

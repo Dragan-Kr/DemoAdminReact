@@ -23,8 +23,6 @@ class LoginComponent extends Component {
     this.inputEmailRef = React.createRef();
     this.inputPasswordRef = React.createRef();
     this.cookies = new Cookies();
-
-
     this.handleLogin = this.handleLogin.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -64,7 +62,7 @@ class LoginComponent extends Component {
 
   
 
-  handleLogin(e) {
+ async handleLogin(e) {
     e.preventDefault();
       let logObject = {
         email: this.state.email,
@@ -77,12 +75,11 @@ class LoginComponent extends Component {
         }
       };
       
-      axios.post(LOGIN_API, logObject,config) //nauci zasto ide post a ne get
+    await axios.post(LOGIN_API, logObject,config) //nauci zasto ide post a ne get
         .then((res) => {
           console.log("Login->Res",res.data.accessToken);
-          this.cookies.set("accessToken",res.data.accessToken)
+          this.cookies.set("jwt",res.data.accessToken)
           window.location.replace(NEWS_LIST);
-          console.log(this.cookies.get('accessToken'));
           
         })
         .catch((error) => {
@@ -159,14 +156,15 @@ class LoginComponent extends Component {
             {this.state.errorMessage.email !== "" && (
               <div>
                 {this.state.showAlertEmail && (
-                  <input
-                    type="text"
-                    id={emailDivId}
-                    className="register-alert"
-                    onClick={this.handleValidation}
-                    value={this.state.errorMessage.email ? this.state.errorMessage.email : skippedEmailField}
-                    readOnly={true}
-                  />
+                         <p
+                         id={emailDivId}
+                        //  className="register-alert"
+                         onClick={this.handleValidation}
+                         readOnly={true}
+                       >
+                         {this.state.errorMessage.email ? this.state.errorMessage.email : skippedEmailField}
+                       </p>
+               
                 )}
               </div>
             )}

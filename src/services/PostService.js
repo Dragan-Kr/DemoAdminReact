@@ -8,12 +8,12 @@ class PostService{
         return axios.get(Post_API_Base_URL);
     }
 
-    getPostById(postId){
-        return axios.get(Post_API_Base_URL + '/'+postId);
+    getPostById(postId,config){
+        return axios.get(Post_API_Base_URL + '/'+postId,config);
     }
 
-    createPost(post){
-        return axios.post(Post_API_Base_URL, post);
+    createPost(post,config){
+        return axios.post(Post_API_Base_URL, post,config);
     }
 
     deletePost(postId){
@@ -24,8 +24,8 @@ class PostService{
     //     return axios.delete(Post_API_Base_URL,post._id);
     // }
 
-    updatePost(post,postId){
-        return axios.patch(Post_API_Base_URL + '/' + postId,post);
+    updatePost(post,postId,config){
+        return axios.patch(Post_API_Base_URL + '/' + postId,post,config);
     }
     createPostWithUpload(formData) {
         axios({

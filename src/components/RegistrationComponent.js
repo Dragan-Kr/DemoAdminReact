@@ -3,7 +3,7 @@ import axios from "axios";
 import { Alert } from "reactstrap";
 
 import { REGISTRATION_API } from "../globalVariables";
-import { LOGIN_API } from "../globalVariables";
+import { LOGIN } from "../globalVariables";
 
 
 //SVAKI PUT KADA MI IZBACI UPOZORENJE I NAKON STO POPUNIM TO POLJE UPOZORENJE TREBA DA SE UGASI
@@ -88,7 +88,7 @@ class RegistrationComponent extends Component {
         config
       )
       .then((res) => {
-        // window.location.replace(LOGIN_API);
+        window.location.replace(LOGIN);
 
         console.log("RES", res);
       })

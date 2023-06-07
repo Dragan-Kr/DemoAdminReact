@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import axios from "axios";
-import Select from "react-select";
+// import Select from "react-select";
 import PostService from "../services/PostService";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FormGroup, Label, Input, NavLink } from "reactstrap";
-import { Form } from "react-bootstrap";
-import { FormText } from "reactstrap";
+// import { Form } from "react-bootstrap";
+// import { FormText } from "reactstrap";
 import { DatePicker } from "reactstrap-date-picker";
 import { Multiselect } from "multiselect-react-dropdown";
 // import { MultiSelect } from "primereact/multiselect";
@@ -18,7 +18,6 @@ import Arrow from "../images/arrow.svg";
 
 import FormData from "form-data";
 
-import { NEWS_LIST } from "../globalVariables";
 import { IMAGE_API } from "../globalVariables";
 import { WRITER_API } from "../globalVariables";
 import { CATEGORY_API } from "../globalVariables";
@@ -35,6 +34,7 @@ class UpdatePostComponent extends Component {
 
     this.state = {
       _id: props._id,
+      isNewPostAdd:props.isNewPostAdd,
       title: "",
       shortDescription: "",
       mainContent: "",
@@ -71,7 +71,7 @@ class UpdatePostComponent extends Component {
     this.changeTitleHandler = this.changeTitleHandler.bind(this);
     this.changeTitleHandler = this.changeTitleHandler.bind(this);
     this.changeShortDescriptionHandler =
-      this.changeShortDescriptionHandler.bind(this);
+    this.changeShortDescriptionHandler.bind(this);
     this.changeMainContentHandler = this.changeMainContentHandler.bind(this);
     this.changeIsPublishedHandler = this.changeIsPublishedHandler.bind(this);
     this.changePostDateHandler = this.changePostDateHandler.bind(this);
@@ -81,51 +81,72 @@ class UpdatePostComponent extends Component {
     this.handleDrop = this.handleDrop.bind(this);
     this.getWriter = this.getWriter.bind(this);
     this.onRemove = this.onRemove.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
+ 
   static contextType = AppContext;
 
-  async componentDidMount() {
-    if (this.state._id === 0) {
-      let writers = await WriterService.getWriters();
-      console.log("WRITER IN componentDidMount", writers.data.writers[0]._id);
-      // this.setState({
-      //   //u slucaju da korisnik sacuva a da pri tome ne izabere novog writera vec samo ostavi ono stoje vec prikazano
-      //   selectedWriter: writers.data.writers[0]._id,
-      // });
-      this.getListOfWriters();
-      this.getListOfCategories();
-    } else {
-      //post update
-      console.log(
-        "Props.preselectedCategoriesArray",
-        this.state.preselectedCategoriesArray
-      );
-      await PostService.getPostById(this.state._id).then((res) => {
-        this.setState(
-          {
-            title: res.data.post.title,
-            shortDescription: res.data.post.shortDescription,
-            mainContent: res.data.post.mainContent,
-            isPublished: res.data.post.isPublished,
-            postDate: res.data.post.postDate,
-            createdBy: res.data.post.createdBy,
-            categories: res.data.post.categories,
-            preselectedCategories: res.data.post.categories,
-            index: res.data.post.index,
-            preselectedWriterId: res.data.post.createdBy,
-            imagesNames: res.data.post.images,
-            // selectedOptions:this.state.preselectedCategoriesArray
-          },
-          () => {
-            this.getPreselectedWriter();
-            this.getListOfWriters();
-            this.getListOfCategories();
-            this.getListOfPreselectedCategories();
-          }
-        );
-      });
-    }
+
+  async componentDidMount() {//pokrece se isklucivo jednom,odmah nakon refresovanja
+    console.log("componentDidMount1")
+    const contextValue = this.context;
+    console.log("ComponentDidMount->contextValue",contextValue)
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${contextValue.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+    };
+
+    console.log("ComponentDidMount->config",config)
+
+    if(contextValue.accessToken.length>0){ 
+      console.log("UpdatePostComponent->componentDidMount->usao u if",contextValue.accessToken)
+
+
+        if (this.state.isNewPostAdd === true) {
+          this.getListOfWriters(config);
+          this.getListOfCategories(config);
+        } else {
+          //post update
+            console.log("UpdatePost-id",this.state._id)
+         await PostService.getPostById(this.state._id,config).then((res) => {
+            this.setState(
+              {
+                title: res.data.post.title,
+                shortDescription: res.data.post.shortDescription,
+                mainContent: res.data.post.mainContent,
+                isPublished: res.data.post.isPublished,
+                postDate: res.data.post.postDate,
+                createdBy: res.data.post.createdBy,
+                categories: res.data.post.categories,
+                preselectedCategories: res.data.post.categories,
+                index: res.data.post.index,
+                preselectedWriterId: res.data.post.createdBy,
+                imagesNames: res.data.post.images,
+                // selectedOptions:this.state.preselectedCategoriesArray
+              },
+              () => {
+                
+                this.getPreselectedWriter(config);
+                this.getListOfWriters(config);
+                this.getListOfCategories(config);
+                this.getListOfPreselectedCategories(config);
+              }
+            );
+          });
+        }   
   }
+  }
+
+
+
+
+
+
+
+
   componentDidUpdate(prevProps, prevState) {
     if (
       this.state.imagesFiles !== prevState.imagesFiles &&
@@ -145,11 +166,28 @@ class UpdatePostComponent extends Component {
         }
       );
     }
-  }
-  getPreselectedWriter() {
+    // const { accessToken } = this.context;
+
+    // if (accessToken !== '' && accessToken !== prevState.config.headers.Authorization) {
+    //   const config = {
+    //     headers: {
+    //       Authorization: `Bearer ${accessToken}`,
+    //     },
+    //   };
+
+    //   // Update the state with the new config
+    //   this.setState({ config })
+
+
+    
+  // }
+}
+ async getPreselectedWriter(config) {
+  console.log("USAO U getPreselectedWriter->config",config);
+
     let preselectedWriter = [];
-    axios
-      .get(WRITER_API + "/" + this.state.createdBy)
+   await axios
+      .get(WRITER_API + "/" + this.state.createdBy,config)
       .then((res) => {
         preselectedWriter.push(res.data.writer);
 
@@ -158,15 +196,15 @@ class UpdatePostComponent extends Component {
           label: d.name + " " + d.lastName,
         }));
 
-        this.setState({ preselectedWriter: preselectedWriter2 }, () => {});
+        this.setState({ preselectedWriter: preselectedWriter2 });
       })
       .catch(function (error) {
         console.log("Error in fetching market updates");
       });
   }
 
-  getListOfPreselectedCategories() {
-    console.log("USAO U getListOfPreselectedCategories");
+  async getListOfPreselectedCategories(config) {
+    console.log("USAO U getListOfPreselectedCategories->config",config);
     let preselectedCategoriesArray = [];
     for (let index in this.state.preselectedCategories) {
       if (
@@ -178,8 +216,8 @@ class UpdatePostComponent extends Component {
         return;
       }
 
-      axios
-        .get(CATEGORY_API + "/" + this.state.preselectedCategories[index])
+    await axios
+        .get(CATEGORY_API + "/" + this.state.preselectedCategories[index],config)
         .then((res) => {
           console.log("getListOfPreselectedCategories=>res.data", res.data);
           preselectedCategoriesArray.push(res.data.category);
@@ -196,19 +234,18 @@ class UpdatePostComponent extends Component {
           );
 
           this.setState({
-            preselectedCategoriesArray: preselectedCategoriesArray2,
-          });
-
-          const categoriesValues = preselectedCategoriesArray.map((d) => ({
-            value: d.name,
-          }));
-
-          this.setState({ categoriesValues: categoriesValues });
-
-          console.log(
-            "preselectedCategoriesArray2",
-            preselectedCategoriesArray2
-          );
+            preselectedCategoriesArray: preselectedCategoriesArray2,},()=>{
+              const categoriesValues = preselectedCategoriesArray.map((d) => ({
+                value: d.name,
+              }));
+    
+              this.setState({ categoriesValues: categoriesValues });
+    
+              console.log(
+                "preselectedCategoriesArray2",
+                preselectedCategoriesArray2
+              );
+            });       
         })
         .catch(function (error) {
           console.log("Error in fetching data");
@@ -218,6 +255,16 @@ class UpdatePostComponent extends Component {
 
   updatePost(e) {
     e.preventDefault();
+    const contextValue = this.context;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${contextValue.accessToken}`,
+        'Content-Type': 'application/json'
+      },
+    };
+
+
+    console.log("UpdatePost method->config",config)
     if (this.state._id === 0) {
       if (
         this.state.title === "" &&
@@ -299,7 +346,7 @@ class UpdatePostComponent extends Component {
           body: formData,
         });
 
-        PostService.createPost(post)
+        PostService.createPost(post,this.state.config)
           .then((res) => {
             // window.location.replace(NEWS_LIST);
           })
@@ -320,7 +367,7 @@ class UpdatePostComponent extends Component {
 
         console.log("FORM DATA", formData);
 
-        PostService.createPost(post)
+        PostService.createPost(post,this.state.config)
           .then((res) => {
             // window.location.replace(NEWS_LIST);
           })
@@ -474,7 +521,7 @@ class UpdatePostComponent extends Component {
                       window.alert("Fill the Categories field");
                       return;
                     }
-                    PostService.updatePost(post, this.state._id)
+                    PostService.updatePost(post, this.state._id,config)
                       .then((res) => {
                         // window.location.replace(NEWS_LIST);
                       })
@@ -591,7 +638,7 @@ class UpdatePostComponent extends Component {
                   return;
                 }
 
-                PostService.updatePost(post, this.state._id)
+                PostService.updatePost(post, this.state._id,config)
                   .then((res) => {
                     // window.location.replace(NEWS_LIST);
                   })
@@ -699,7 +746,7 @@ class UpdatePostComponent extends Component {
             return;
           }
 
-          PostService.updatePost(post, this.state._id)
+          PostService.updatePost(post, this.state._id,config)
             .then((res) => {
               // window.location.replace(NEWS_LIST);
             })
@@ -763,7 +810,7 @@ class UpdatePostComponent extends Component {
             return;
           }
 
-          PostService.updatePost(post, this.state._id)
+          PostService.updatePost(post, this.state._id,config)
             .then((res) => {
               // window.location.replace(NEWS_LIST);
             })
@@ -809,6 +856,13 @@ class UpdatePostComponent extends Component {
   handleSelect(event) {
     this.setState({ selectedOptions: event });
   }
+
+  handleChange = (event) => {
+    console.log("handleChange->event",event)
+    this.setState({
+      [event.target.name]: event.target.value,
+    });
+  };
 
   handleWriterSelect(event) {
     console.log("handleWriterSelect->EVENT", event);
@@ -923,59 +977,26 @@ class UpdatePostComponent extends Component {
   };
 
   render() {
-    const dropdownIndicatorStyles = (base, state) => {
-      let changes = {
-        backgroundColor: "green",
-      };
-      return Object.assign(base, changes);
-    };
+    // const dropdownIndicatorStyles = (base, state) => {
+    //   let changes = {
+    //     backgroundColor: "green",
+    //   };
+    //   return Object.assign(base, changes);
+    // };
 
-    const colourStyles = {
-      control: (styles) => ({
-        ...styles,
-        backgroundColor: "green",
-        borderRadius: 10,
-        height: 50,
-        border: 0,
-        color: "white",
-        dropdownIndicator: { dropdownIndicatorStyles },
-      }),
-      option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-        return {
-          ...styles,
-
-          height: 50,
-          dropdownIndicator: { dropdownIndicatorStyles },
-        };
-      },
-      multiValue: (styles, { data }) => {
-        return {
-          ...styles,
-          backgroundColor: "#5561B3",
-          borderRadius: 5,
-          height: 40,
-        };
-      },
-      multiValueLabel: (styles, { data }) => {
-        return {
-          ...styles,
-          color: "#FFFFFF",
-          fontSize: 16,
-          fontWeight: 500,
-          fontFamily: "'Poppins', sans-serif",
-          aliginSelf: "center",
-        };
-      },
-    };
 
     const dateObject = new Date(this.state.postDate);
-
     const defaultDate = dateObject.toISOString().slice(0, 10);
-    // const { preselectedCategoriesArray } = this.state;
-    return (
+
+    // const getListOfPreselectedCategories = this.getListOfPreselectedCategories();
+    
+    {console.log("ContextValueeeeee",this.context)}
+
+// if(preselectedCategoriesArray.length > 0 && typeof preselectedCategoriesArray !== 'undefined' || selectedOptions.length > 0 && typeof selectedOptions !=='undefined' ){ 
+   return (
       <form>
         <div className="heading-post">
-          {this.state._id === 0 ? <h1>Add Post</h1> : <h1>Update Post</h1>}
+          {this.state.isNewPostAdd === true ? <h1>Add Post</h1> : <h1>Update Post</h1>}
           <div className="top-btns">
             <button className="save-button" onClick={this.updatePost}>
               <Isvg src={Save} />
@@ -991,7 +1012,7 @@ class UpdatePostComponent extends Component {
               placeholder="Title"
               type="text"
               value={this.state.title}
-              onChange={this.changeTitleHandler}
+              onChange={this.handleChange}
             />
             <h2>Content</h2>
             <div className="textarea-content">
@@ -999,20 +1020,22 @@ class UpdatePostComponent extends Component {
               <textarea
                 rows="5"
                 cols="50"
+                name="shortDescription"
                 placeholder="Short content of the editor..."
                 value={this.state.shortDescription}
-                onChange={this.changeShortDescriptionHandler}
+                onChange={this.handleChange}
               ></textarea>
             </div>
 
             <div className="textarea-content">
               <label>Main content</label>
               <textarea
+              name="mainContent"
                 rows="20"
                 cols="50"
                 placeholder="Content of the editor..."
                 value={this.state.mainContent}
-                onChange={this.changeMainContentHandler}
+                onChange={this.handleChange}
               ></textarea>
             </div>
 
@@ -1227,8 +1250,7 @@ class UpdatePostComponent extends Component {
                 autoFocus={true}
               /> */}
 
-              {console.log("niz", this.state.preselectedCategoriesArray)}
-
+            
               {/* {() => {
                 this.getListOfPreselectedCategories();
                 {console.log("niz2", this.state.preselectedCategoriesArray)}
@@ -1249,7 +1271,7 @@ class UpdatePostComponent extends Component {
                   />
                 );
               }} */}
-
+  
               <Multiselect
                 options={this.state.categories || []}
                 displayValue="label"
@@ -1269,6 +1291,7 @@ class UpdatePostComponent extends Component {
                 closeIcon="cancel"
                 placeholder="Select categories"
               />
+              
               {/* <Multiselect //poslednje novo
                 value={
                   this.state.selectedOptions
@@ -1279,6 +1302,8 @@ class UpdatePostComponent extends Component {
                 options={this.state.categories || []}
                 optionLabel="label"
               /> */}
+
+              
             </div>
 
             <div className="published-content">
@@ -1298,26 +1323,32 @@ class UpdatePostComponent extends Component {
         <div></div>
       </form>
     );
+  // }
   }
 
-  async getListOfWriters() {
-    const res = await axios.get(WRITER_API);
-    console.log("res", res);
+  async getListOfWriters(config) {
+    const res = await axios.get(WRITER_API,config);
+    console.log("getListOfWriters->res", res);
     const writers = res.data.writers.map((d) => ({
       value: d._id,
       label: d.name + " " + d.lastName,
     }));
-    this.setState({ writers: writers });
-    console.log("writers su:" + JSON.stringify(writers));
+    this.setState({ writers: writers },()=>{
+      console.log("writers su:" + JSON.stringify(writers));
+    });
+    
   }
 
   handleWriterChange(e) {
-    this.setState({ createdBy: e.value, name: e.label });
-    console.log("Ovo je createdBy iz handleWriterChange", this.state.createdBy);
+    this.setState({ createdBy: e.value, name: e.label },()=>{
+      console.log("Ovo je createdBy iz handleWriterChange", this.state.createdBy);
+    });
+   
   }
 
-  async getListOfCategories() {
-    const res = await axios.get(CATEGORY_API);
+  async getListOfCategories(config) {
+    console.log("getListOfCategories->config",config)
+    const res = await axios.get(CATEGORY_API,config);
     const categories = res.data.categories.map((d) => ({
       value: d._id,
       label: d.name,

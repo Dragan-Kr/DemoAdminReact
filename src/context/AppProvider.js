@@ -1,7 +1,7 @@
-import React, { Component,useState } from "react";
+import React, { Component } from "react";
 import AppContext from "./AppContext";
 import jwt_decode from 'jwt-decode';
-import { Outlet } from "react-router-dom";
+// import { Outlet } from "react-router-dom";
 import Cookies from 'universal-cookie';
 
 
@@ -13,14 +13,16 @@ class AppProvider extends Component {
         accessToken: "",
         roles: [],
         username: "",
+        email:""
       };
       this.cookies = new Cookies();
       this.setToken = this.setToken.bind(this);
     }
 
     async componentDidMount(){
-      console.log("AppProvider->componentDidMount->accessToken",this.cookies.get('accessToken'));
-      const coockieToken = await this.cookies.get('accessToken')
+      
+      const coockieToken = await this.cookies.get('jwt')
+      // console.log("AppProvider->componentDidMount->jwt",coockieToken);
       if (typeof coockieToken !== 'undefined'){
         this.setToken(coockieToken)
       }
@@ -31,7 +33,7 @@ class AppProvider extends Component {
     setToken = (token) => {
       this.setState({ accessToken: token },()=>{
         console.log("AppProvider->accessToken",this.state.accessToken)
-      });
+    
        
       // Extract roles and username from the access token
       if (token) {
@@ -44,63 +46,34 @@ class AppProvider extends Component {
           this.setState({
             roles: userInfo.roles,
             username: userInfo.username,
+            email:userInfo.email
           });
         }
       }
+    });
     };
   
     render() {
-      const { accessToken, roles, username } = this.state;
+      const { accessToken, roles, username,email } = this.state;
   
       const contextValues = {
         accessToken,
         roles,
         username,
+        email
       };
-      {{console.log("contextValues",contextValues)}} 
-      return (
+      // {console.log("AppProvider-?this.props.children",this.props.children)}
       
-        <AppContext.Provider value={contextValues}>
+      return (     
+        accessToken  &&
+          <AppContext.Provider value={contextValues}>
          {this.props.children}
         </AppContext.Provider>
+      
       );
     }
   }
 
   export default AppProvider;
-
-// const AppProvider = (props) => {
-//   const [accessToken, setAccessToken] = useState(null);
-//   const [roles, setRoles] = useState([]);
-//   const [username, setUsername] = useState("");
-
-//   const setToken = (token) => {
-//     setAccessToken(token);
-
-//     // Extract roles and username from the access token
-//     if (token) {
-//       const decodedToken = jwt.decode(token);
-//       const userInfo = decodedToken?.UserInfo;
-
-//       if (userInfo) {
-//         setRoles(userInfo.roles);
-//         setUsername(userInfo.username);
-//       }
-//     }
-//   };
-
-//   const contextValues = {
-//     accessToken,
-//     roles,
-//     username,
-//     setToken,
-//   };
-
-//   return (
-//     <AppContext.Provider value={contextValues}>
-//       <Outlet />
-//     </AppContext.Provider>
-//   );
-// };
 
   

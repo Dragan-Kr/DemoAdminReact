@@ -6,7 +6,7 @@ import PostService from "../../services/PostService";
 
 import DateFormat from "dateformat";
 import Isvg from "react-inlinesvg";
-import { useHistory, useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 
 import Select from "react-select";
 import Pen from "../../images/pen.svg";
@@ -22,8 +22,7 @@ import axios from "axios";
 
 import { UPDATE_NEWS } from "../../globalVariables";
 import { POST_API } from "../../globalVariables";
-import {LOGOUT_API} from "../../globalVariables"
-import {LOGIN} from "../../globalVariables";
+
 import AppContext from "../../context/AppContext";
 
 
@@ -59,20 +58,24 @@ const DataTable = () => {
   const navigate = useNavigate();
 
 
-  const { roles, username,accessToken } = useContext(AppContext);
+  const {accessToken,email } = useContext(AppContext);
   // const context = useContext(AppContext);
 console.log("accessToken",accessToken)
+
+const config = {
+  headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+};
+
+
   useEffect(() => {
     let res;
     const queryParams = new URLSearchParams();
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
+    
     console.log("DataTable->AccessToken",config)
 
-    // console.log("DataTable->useContext",context)
+    if(accessToken !== "") { 
     if (searchTerm.length !== 0) {
       console.log("USAO U IF U useEffect");
       const search = debounce(async () => {
@@ -118,6 +121,7 @@ console.log("accessToken",accessToken)
       const url = `/news-list?${queryParams.toString()}`;
       navigate(url);
     }
+  }
   }, [currentPage, pageSize, sorting.field, sorting.order, searchTerm,accessToken]);
 
   const handleClose = () => {
@@ -180,14 +184,6 @@ console.log("accessToken",accessToken)
   };
 
 
-  const handleLogOut =()=>{
-    axios.get(LOGOUT_API).then((res)=>{
-      console.log("RES", res);
-      window.location.replace(LOGIN);
-    }).catch((error)=>{
-      console.log("ERRROOR", error.response.data.message);
-    })
-  }
 
   return (
     <>
@@ -218,7 +214,6 @@ console.log("accessToken",accessToken)
               <div className="news-list-drop-down">
                 <div className="news-list-drop">
                   <div className="drop-down-left-word">
-                    <button onClick={() =>handleLogOut()}>Logout</button>
                     <label>Show </label>
                   </div>
 

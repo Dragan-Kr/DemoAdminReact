@@ -1,20 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import UpdatePostComponent from "./UpdatePostComponent";
-import axios from "axios";
-import { POST_API } from "../globalVariables";
 
-import PostService from "../services/PostService";
-
-import { CATEGORY_API } from "../globalVariables";
 
 const UpdatePost = (props) => {
   let { id } = useParams();
 
-  let [preselectedCategories, setPreselectedCategories] = useState([]);
-  let [preselectedCategoriesArray, setPreselectedCategoriesArray] = useState(
-    []
-  );
+  // let [isNewPostAdd,setIsNewPostAdd] = useState(true)
+  // let [preselectedCategories, setPreselectedCategories] = useState([]);
+  // let [preselectedCategoriesArray, setPreselectedCategoriesArray] = useState(
+  //   []
+  // );
 
   // useEffect(()=>{
   // let res=[];
@@ -66,62 +62,60 @@ const UpdatePost = (props) => {
   //   }
   // },[]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let res = await axios.get(`${POST_API}/${id}`);
-        setPreselectedCategories(res.data.post.categories);
-        console.log(
-          "UpdatePost -> setPreselectedCategories",
-          preselectedCategories
-        );
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       if(id){ 
+  //         console.log("UpdatePost->ima id",id)
+  //       let res = await axios.get(`${POST_API}/${id}`);
+  //       setPreselectedCategories(res.data.post.categories);
+  //       console.log(
+  //         "UpdatePost -> setPreselectedCategories",
+  //         preselectedCategories
+  //       );
 
-        const promises = preselectedCategories.map((categoryId) =>
-          axios
-            .get(`${CATEGORY_API}/${categoryId}`)
-            .then((res) => res.data.category)
-        );
+  //       const promises = preselectedCategories.map((categoryId) =>
+  //         axios
+  //           .get(`${CATEGORY_API}/${categoryId}`)
+  //           .then((res) => res.data.category)
+  //       );
 
-        const categoriesData = await Promise.all(promises);
-        const preselectedCategoriesArray = categoriesData.map((category) => ({
-          value: category._id,
-          label: category.name,
-        }));
+  //       const categoriesData = await Promise.all(promises);
+  //       const preselectedCategoriesArray = categoriesData.map((category) => ({
+  //         value: category._id,
+  //         label: category.name,
+  //       }));
 
-        setPreselectedCategoriesArray(preselectedCategoriesArray);
-        console.log(
-          "UpdatePost -> setPreselectedCategoriesArray",
-          preselectedCategoriesArray
-        );
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  //       setPreselectedCategoriesArray(preselectedCategoriesArray);
+  //       console.log(
+  //         "UpdatePost -> setPreselectedCategoriesArray",
+  //         preselectedCategoriesArray
+  //       );
+  //     }
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   // fetchData();
+  // }, []);
 
   if (id !== undefined) {
     console.log("ima id");
     return (
       <div>
-        {console.log(
-          "UpdatePost->preselectedCategoriesArray",
-          preselectedCategoriesArray
-        )}
-
         <UpdatePostComponent
           _id={id}
-          preselectedCategoriesArray={preselectedCategoriesArray}
+     
         />
       </div>
     );
   } else {
-    console.log("id je 0", id);
+    console.log("nema id", id);
 
     return (
       <div>
-        <UpdatePostComponent _id={0} />
+        <UpdatePostComponent _id={0} isNewPostAdd={true} />
       </div>
     );
   }
