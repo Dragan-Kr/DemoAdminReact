@@ -16,8 +16,8 @@ class PostService{
         return axios.post(Post_API_Base_URL, post,config);
     }
 
-    deletePost(postId){
-        return axios.delete(Post_API_Base_URL + '/' + postId);
+    deletePost(postId,config){
+        return axios.delete(Post_API_Base_URL + '/' + postId,config);
     }
 
     // deletePost(post){

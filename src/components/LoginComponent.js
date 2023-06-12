@@ -71,6 +71,7 @@ class LoginComponent extends Component {
       const config = {
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
  // Specify the media type here
         }
       };

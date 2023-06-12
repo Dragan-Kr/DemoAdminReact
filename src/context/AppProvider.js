@@ -43,6 +43,7 @@ class AppProvider extends Component {
         const userInfo = decodedToken?.UserInfo;
   
         if (userInfo) {
+          console.log("UserInfo",userInfo)
           this.setState({
             roles: userInfo.roles,
             username: userInfo.username,

@@ -25,16 +25,14 @@ import { API_REST } from "../globalVariables";
 import { NOT_FOUND_IMAGE } from "../globalVariables";
 import WriterService from "../services/WriterService";
 import AppContext from "../context/AppContext";
-
-
-
+import { NEWS_LIST } from "../globalVariables";
 class UpdatePostComponent extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       _id: props._id,
-      isNewPostAdd:props.isNewPostAdd,
+      isNewPostAdd: props.isNewPostAdd,
       title: "",
       shortDescription: "",
       mainContent: "",
@@ -66,18 +64,17 @@ class UpdatePostComponent extends Component {
       categoriesValues: [],
       emptyPreselectedCategoryList: { value: "1", label: "-" },
 
-
-      showAlertTitle:false,
-      showAlertWriter:false,
-      showAlertCategory:false,
-      errorMessage: {}
-      
+      showAlert: false,
+      showAlertTitle: false,
+      showAlertWriter: false,
+      showAlertCategory: false,
+      errorMessage: {},
     };
 
     this.changeTitleHandler = this.changeTitleHandler.bind(this);
     this.changeTitleHandler = this.changeTitleHandler.bind(this);
     this.changeShortDescriptionHandler =
-    this.changeShortDescriptionHandler.bind(this);
+      this.changeShortDescriptionHandler.bind(this);
     this.changeMainContentHandler = this.changeMainContentHandler.bind(this);
     this.changeIsPublishedHandler = this.changeIsPublishedHandler.bind(this);
     this.changePostDateHandler = this.changePostDateHandler.bind(this);
@@ -89,89 +86,97 @@ class UpdatePostComponent extends Component {
     this.onRemove = this.onRemove.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
- 
+
   static contextType = AppContext;
 
-
-  async componentDidMount() {//pokrece se isklucivo jednom,odmah nakon refresovanja
-    console.log("componentDidMount1")
+  async componentDidMount() {
+    //pokrece se isklucivo jednom,odmah nakon refresovanja
+    console.log("componentDidMount1");
     const contextValue = this.context;
-    console.log("ComponentDidMount->contextValue",contextValue)
+    console.log("ComponentDidMount->contextValue", contextValue);
 
     const config = {
       headers: {
         Authorization: `Bearer ${contextValue.accessToken}`,
-        'Content-Type': 'application/json',
-         Accept: 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
     };
 
-    console.log("ComponentDidMount->config",config)
+    console.log("ComponentDidMount->config", config);
 
-    if(contextValue.accessToken.length>0){ 
-      console.log("UpdatePostComponent->componentDidMount->usao u if",contextValue.accessToken)
+    if (contextValue.accessToken.length > 0) {
+      console.log(
+        "UpdatePostComponent->componentDidMount->usao u if",
+        contextValue.accessToken
+      );
 
-
-        if (this.state.isNewPostAdd === true) {
-          this.getListOfWriters(config);
-          this.getListOfCategories(config);
-        } else {
-          //post update
-            console.log("UpdatePost-id",this.state._id)
-         await PostService.getPostById(this.state._id,config).then((res) => {
-            this.setState(
-              {
-                title: res.data.post.title,
-                shortDescription: res.data.post.shortDescription,
-                mainContent: res.data.post.mainContent,
-                isPublished: res.data.post.isPublished,
-                postDate: res.data.post.postDate,
-                createdBy: res.data.post.createdBy,
-                categories: res.data.post.categories,
-                preselectedCategories: res.data.post.categories,
-                index: res.data.post.index,
-                preselectedWriterId: res.data.post.createdBy,
-                imagesNames: res.data.post.images,
-                // selectedOptions:this.state.preselectedCategoriesArray
-              },
-              () => {
-                
-                this.getPreselectedWriter(config);
-                this.getListOfWriters(config);
-                this.getListOfCategories(config);
-                this.getListOfPreselectedCategories(config);
-              }
-            );
-          });
-        }   
+      if (this.state.isNewPostAdd === true) {
+        this.getListOfWriters(config);
+        this.getListOfCategories(config);
+      } else {
+        this.setState({isNewPostAdd:false})
+        console.log("UpdatePost-id", this.state._id);
+        await PostService.getPostById(this.state._id, config).then((res) => {
+          this.setState(
+            {
+              title: res.data.post.title,
+              shortDescription: res.data.post.shortDescription,
+              mainContent: res.data.post.mainContent,
+              isPublished: res.data.post.isPublished,
+              postDate: res.data.post.postDate,
+              createdBy: res.data.post.createdBy,
+              categories: res.data.post.categories,
+              preselectedCategories: res.data.post.categories,
+              index: res.data.post.index,
+              preselectedWriterId: res.data.post.createdBy,
+              imagesNames: res.data.post.images,
+              // selectedOptions:this.state.preselectedCategoriesArray
+            },
+            () => {
+              this.getPreselectedWriter(config);
+              this.getListOfWriters(config);
+              this.getListOfCategories(config);
+              this.getListOfPreselectedCategories(config);
+            }
+          );
+        });
+      }
+    }
   }
-  }
-
-
-
-
-
 
   handleInputBlur = (e) => {
     //ovo je ako preskocimo neko polje--treba dorada
     console.log("Blur->e", e.target);
     if (e.target.name === "title" && this.state.title.trim() === "") {
-      
       this.setState({ showAlertTitle: true });
     }
-    if(e.target.name==="writer" && this.state.selectedWriter === ""){
-      console.log("handleInputBlur->writer")
-      this.setState({ showAlertWriter: true });
+    if (e.target.name === "writer" && this.state.selectedWriter === "") {
+     
+      if (this.state.preselectedWriterId !== "") {
+        this.setState({ showAlertWriter: false });
+      } else {
+        this.setState({ showAlertWriter: true });
+      }
     }
 
-    if(e.target.name ==="category_input" && this.state.selectedOptions === ""){
-      console.log("handleInputBlur->category")
+    if ((e.target.name === "category_input" && this.state.selectedOptions === "") || (e.target.name === "category_input" && this.state.selectedOptions.length === 0)) {
+      console.log("handleInputBlur->category");
 
-      this.setState({showAlertCategory:true})
+      if (this.state.preselectedCategories.length > 0) {
+        if(this.state.isNewPostAdd === false){
+          console.log("USO SAM BRE")
+
+          this.setState({ showAlertCategory: true });
+        }else {
+          this.setState({ showAlertCategory: false });
+
+        }
+      } else {
+        this.setState({ showAlertCategory: true });
+      }
     }
- 
   };
-
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.errorMessage !== this.state.errorMessage) {
@@ -203,36 +208,34 @@ class UpdatePostComponent extends Component {
       this.setState({ showAlertTitle: false });
     }
 
-    if(prevState.selectedWriter !== this.state.selectedWriter){
-      this.setState({showAlertWriter:false})
+    if (prevState.selectedWriter !== this.state.selectedWriter) {
+      this.setState({ showAlertWriter: false });
     }
-    if(prevState.selectedOptions !== this.state.selectedOptions){
-      this.setState({showAlertCategory:false})
+    if (prevState.selectedOptions !== this.state.selectedOptions) {
+      this.setState({ showAlertCategory: false });
     }
+  }
 
-   
-}
+  showAlertWithTimeout(message, duration) {
+    this.setState({
+      showAlert: true,
+      showAlertTitle: true,
+      showAlertWriter: true,
+      showAlertCategory: true,
+      errorMessage: message,
+    });
 
+    this.dismissTimer = setTimeout(() => {
+      this.setState({ showAlert: false });
+    }, duration);
+  }
 
-showAlertWithTimeout(message, duration) {
-  this.setState({
-    // showAlert: true,
-    showAlertTitle: true,
-    showAlertWriter:true,
-    showAlertCategory:true,
-    errorMessage: message,
-  });
-
-  this.dismissTimer = setTimeout(() => {
-    this.setState({ showAlert: false });
-  }, duration);
-}
- async getPreselectedWriter(config) {
-  console.log("USAO U getPreselectedWriter->config",config);
+  async getPreselectedWriter(config) {
+    console.log("USAO U getPreselectedWriter->config", config);
 
     let preselectedWriter = [];
-   await axios
-      .get(WRITER_API + "/" + this.state.createdBy,config)
+    await axios
+      .get(WRITER_API + "/" + this.state.createdBy, config)
       .then((res) => {
         preselectedWriter.push(res.data.writer);
 
@@ -249,7 +252,7 @@ showAlertWithTimeout(message, duration) {
   }
 
   async getListOfPreselectedCategories(config) {
-    console.log("USAO U getListOfPreselectedCategories->config",config);
+    console.log("USAO U getListOfPreselectedCategories->config", config);
     let preselectedCategoriesArray = [];
     for (let index in this.state.preselectedCategories) {
       if (
@@ -261,8 +264,11 @@ showAlertWithTimeout(message, duration) {
         return;
       }
 
-    await axios
-        .get(CATEGORY_API + "/" + this.state.preselectedCategories[index],config)
+      await axios
+        .get(
+          CATEGORY_API + "/" + this.state.preselectedCategories[index],
+          config
+        )
         .then((res) => {
           console.log("getListOfPreselectedCategories=>res.data", res.data);
           preselectedCategoriesArray.push(res.data.category);
@@ -278,19 +284,23 @@ showAlertWithTimeout(message, duration) {
             })
           );
 
-          this.setState({
-            preselectedCategoriesArray: preselectedCategoriesArray2,},()=>{
+          this.setState(
+            {
+              preselectedCategoriesArray: preselectedCategoriesArray2,
+            },
+            () => {
               const categoriesValues = preselectedCategoriesArray.map((d) => ({
                 value: d.name,
               }));
-    
+
               this.setState({ categoriesValues: categoriesValues });
-    
+
               console.log(
                 "preselectedCategoriesArray2",
                 preselectedCategoriesArray2
               );
-            });       
+            }
+          );
         })
         .catch(function (error) {
           console.log("Error in fetching data");
@@ -304,18 +314,18 @@ showAlertWithTimeout(message, duration) {
     const config = {
       headers: {
         Authorization: `Bearer ${contextValue.accessToken}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
     };
-    console.log("UpdatePost method->config",config)
 
-
-    if (this.state._id === 0) {                         ///OVDE TREBA isNewPostAdd
-      console.log("Create new post")
-      const selectedCategories = this.state.selectedOptions.length>0 ?this.state.selectedOptions.map(
-        (item) => item.value
-      ) : [];
+    if (this.state.isNewPostAdd === true) {
+      ///OVDE TREBA isNewPostAdd
+      console.log("Create new post");
+      const selectedCategories =
+        this.state.selectedOptions.length > 0
+          ? this.state.selectedOptions.map((item) => item.value)
+          : [];
       console.log("this.state.selectedOptions", this.state.selectedOptions);
       const formData = new FormData();
 
@@ -364,18 +374,24 @@ showAlertWithTimeout(message, duration) {
           images: this.state.preselectedAndNewImagesLoc,
         };
 
-        console.log("OVVVVO JE POST", post);
+        console.log(" CREATED  POST", post);
 
         console.log("FORM DATA", formData);
         fetch(IMAGE_API, {
           method: "POST",
           body: formData,
+          headers: {
+            Authorization: `Bearer ${contextValue.accessToken}`,
+           
+            // Add other headers as needed
+          },
         });
 
-        console.log("Create post ->cofing",config)
-        PostService.createPost(post,config)
+        console.log("Create post ->cofing", config);
+        PostService.createPost(post, config)
           .then((res) => {
-            // window.location.replace(NEWS_LIST);
+            console.log("This is response from createing post", res);
+            window.location.replace(NEWS_LIST);
           })
           .catch((error) => {
             if (
@@ -396,7 +412,7 @@ showAlertWithTimeout(message, duration) {
               });
             }
           });
-      } else {
+      } else {///KREIRANJE POSTA BEZ SLIKA
         let post = {
           title: this.state.title,
           shortDescription: this.state.shortDescription,
@@ -404,14 +420,16 @@ showAlertWithTimeout(message, duration) {
           isPublished: this.state.isPublished,
           postDate: this.state.postDate,
           categories: selectedCategories,
-          createdBy: this.state.selectedWriter.value,
+          createdBy: this.state.selectedWriter,
         };
+        console.log("Postovanje bez slika->post", post);
 
         console.log("FORM DATA", formData);
 
-        PostService.createPost(post,config)
+        PostService.createPost(post, config)
           .then((res) => {
-            // window.location.replace(NEWS_LIST);
+            console.log("Postovanje bez slika->res", res);
+            window.location.replace(NEWS_LIST);
           })
           .catch((error) => {
             // window.alert('Post failed');
@@ -420,8 +438,7 @@ showAlertWithTimeout(message, duration) {
               error.response.data &&
               error.response.data.message
             ) {
-              this.setState(
-                { errorMessage: error.response.data.message, showAlert: true },
+              this.setState({ errorMessage: error.response.data.message, showAlert: true },
                 () => {
                   console.log("errorMessage", this.state.errorMessage);
                 }
@@ -438,7 +455,8 @@ showAlertWithTimeout(message, duration) {
 
     ///UPDATE
     else {
-      if (this.state.selectedOptions === "") {
+     
+      if (this.state.selectedOptions === "") {//////NISU DODAVANE NOVE KATEGORIJE
         //categories nepromjenjen
         this.setState(
           { selectedOptions: this.state.preselectedCategoriesArray },
@@ -541,18 +559,35 @@ showAlertWithTimeout(message, duration) {
                     fetch(IMAGE_API, {
                       method: "POST",
                       body: formData,
+                      headers: {
+                        Authorization: `Bearer ${contextValue.accessToken}`,
+                        
+                        // Add other headers as needed
+                      },
                     });
 
-                    
-                    PostService.updatePost(post, this.state._id,config)
+                    PostService.updatePost(post, this.state._id, config)
                       .then((res) => {
                         // window.location.replace(NEWS_LIST);
                       })
                       .catch((error) => {
-                        console.log("ERRROOR", error.response.data.message);//TREBA I NA OSTALIM MJESTIMA!!!!!!!
-                        this.setState({ errorMessage: error.response.data.message }, () => {
-                        console.log("errorMessage", this.state.errorMessage);
-                    });
+                        if (
+                          error.response &&
+                          error.response.data &&
+                          error.response.data.message
+                        ) {
+                          this.setState(
+                            { errorMessage: error.response.data.message, showAlert: true },
+                            () => {
+                              console.log("errorMessage", this.state.errorMessage);
+                            }
+                          );
+                        } else {
+                          this.setState({
+                            errorMessage: "Post failed.",
+                            showAlert: true,
+                          });
+                        }
                       });
                     console.log(
                       "valueArray izvan setState",
@@ -643,24 +678,41 @@ showAlertWithTimeout(message, duration) {
                 fetch(IMAGE_API, {
                   method: "POST",
                   body: formData,
+                  headers: {
+                    Authorization: `Bearer ${contextValue.accessToken}`,
+                    
+                    // Add other headers as needed
+                  },
                 });
-              
 
-                PostService.updatePost(post, this.state._id,config)
+                PostService.updatePost(post, this.state._id, config)
                   .then((res) => {
                     // window.location.replace(NEWS_LIST);
                   })
                   .catch((error) => {
-                    console.log("ERRROOR", error.response.data.message);//TREBA I NA OSTALIM MJESTIMA!!!!!!!
-                    this.setState({ errorMessage: error.response.data.message }, () => {
-                    console.log("errorMessage", this.state.errorMessage);
-                });
+                    if (
+                      error.response &&
+                      error.response.data &&
+                      error.response.data.message
+                    ) {
+                      this.setState(
+                        { errorMessage: error.response.data.message, showAlert: true },
+                        () => {
+                          console.log("errorMessage", this.state.errorMessage);
+                        }
+                      );
+                    } else {
+                      this.setState({
+                        errorMessage: "Post failed.",
+                        showAlert: true,
+                      });
+                    }
                   });
               }
             });
           }
         );
-      } else {
+      } else {////////// MJENJANA SELECTED OPTIONS
         const formData = new FormData();
         const imagesForm = [];
         for (let i = 0; i < this.state.imagesFiles.length; i++) {
@@ -738,17 +790,36 @@ showAlertWithTimeout(message, duration) {
           fetch(IMAGE_API, {
             method: "POST",
             body: formData,
+            headers: {
+              Authorization: `Bearer ${contextValue.accessToken}`,
+           
+              // Add other headers as needed
+            },
           });
-         
-          PostService.updatePost(post, this.state._id,config)
+
+          PostService.updatePost(post, this.state._id, config)
             .then((res) => {
               // window.location.replace(NEWS_LIST);
             })
             .catch((error) => {
-              console.log("ERRROOR", error.response.data.message);//TREBA I NA OSTALIM MJESTIMA!!!!!!!
-              this.setState({ errorMessage: error.response.data.message }, () => {
-              console.log("errorMessage", this.state.errorMessage);
-          });
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.message
+              ) {
+                this.setState(
+                  { errorMessage: error.response.data.message, showAlert: true },
+                  () => {
+                    console.log("errorMessage", this.state.errorMessage);
+                  }
+                );
+              } else {
+                this.setState({
+                  errorMessage: "Post failed.",
+                  showAlert: true,
+                });
+              }
+            
             });
         } else {
           //pisac ostao nepromjenjen
@@ -788,18 +859,34 @@ showAlertWithTimeout(message, duration) {
           fetch(IMAGE_API, {
             method: "POST",
             body: formData,
+            headers: {
+              Authorization: `Bearer ${contextValue.accessToken}`,
+              
+            },
           });
-          
 
-          PostService.updatePost(post, this.state._id,config)
+          PostService.updatePost(post, this.state._id, config)
             .then((res) => {
               // window.location.replace(NEWS_LIST);
             })
             .catch((error) => {
-              console.log("ERRROOR", error.response.data.message);//TREBA I NA OSTALIM MJESTIMA!!!!!!!
-            this.setState({ errorMessage: error.response.data.message }, () => {
-            console.log("errorMessage", this.state.errorMessage);
-        });
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.message
+              ) {
+                this.setState(
+                  { errorMessage: error.response.data.message, showAlert: true },
+                  () => {
+                    console.log("errorMessage", this.state.errorMessage);
+                  }
+                );
+              } else {
+                this.setState({
+                  errorMessage: "Post failed.",
+                  showAlert: true,
+                });
+              }
             });
         }
       }
@@ -842,7 +929,7 @@ showAlertWithTimeout(message, duration) {
   }
 
   handleChange = (event) => {
-    console.log("handleChange->event",event)
+    console.log("handleChange->event", event);
     this.setState({
       [event.target.name]: event.target.value,
     });
@@ -961,25 +1048,31 @@ showAlertWithTimeout(message, duration) {
   };
 
   render() {
-  const skippedTitleField = "Fill the title field";
-  const skippedWriterField="Choose a writer";
-  const skippedCategoryField="Choose a category";
+    const skippedTitleField = "Please provide title";
+    const skippedWriterField = "Choose a writer";
+    const skippedCategoryField = "Choose a category";
 
-  const titleDivId = "title";
-  const writerDivId = "writer";
-  const categoryDivId ="category";
+    const titleDivId = "title";
+    const writerDivId = "writer";
+    const categoryDivId = "category";
 
     const dateObject = new Date(this.state.postDate);
     const defaultDate = dateObject.toISOString().slice(0, 10);
 
     // const getListOfPreselectedCategories = this.getListOfPreselectedCategories();
-    
-    {console.log("ContextValueeeeee",this.context)}
 
-   return (
+    {
+      console.log("ContextValueeeeee", this.context);
+    }
+
+    return (
       <form>
         <div className="heading-post">
-          {this.state.isNewPostAdd === true ? <h1>Add Post</h1> : <h1>Update Post</h1>}
+          {this.state.isNewPostAdd === true ? (
+            <h1>Add Post</h1>
+          ) : (
+            <h1>Update Post</h1>
+          )}
           <div className="top-btns">
             <button className="save-button" onClick={this.updatePost}>
               <Isvg src={Save} />
@@ -998,7 +1091,7 @@ showAlertWithTimeout(message, duration) {
               onChange={this.handleChange}
               onBlur={this.handleInputBlur}
             />
-             {this.state.errorMessage.title !== "" && (
+            {/* {this.state.errorMessage.title !== "" && (
                           <div className="empty-field-login">
                             {this.state.showAlertTitle && (
                               <p
@@ -1010,7 +1103,27 @@ showAlertWithTimeout(message, duration) {
                               </p>
                             )}
                           </div>
-                        )}
+              )} */}
+            {/* /////////////////////////// */}
+
+            { this.state.errorMessage.title  ? (
+              <div className="empty-field-login">
+                <p className="warning-paragraph">
+                  {console.log("this.state.errorMessage.title",this.state.errorMessage.title)}
+                  {this.state.errorMessage.title}
+                </p>
+              </div>
+            ) : (
+              this.state.showAlertTitle && (
+                <div className="empty-field-login">
+                  <p id={titleDivId} className="warning-paragraph">
+                    {skippedTitleField}
+                  </p>
+                </div>
+              )
+            )}
+
+            {/* ////////////////////// */}
             <h2>Content</h2>
             <div className="textarea-content">
               <label>Short description</label>
@@ -1027,7 +1140,7 @@ showAlertWithTimeout(message, duration) {
             <div className="textarea-content">
               <label>Main content</label>
               <textarea
-              name="mainContent"
+                name="mainContent"
                 rows="20"
                 cols="50"
                 placeholder="Content of the editor..."
@@ -1211,19 +1324,19 @@ showAlertWithTimeout(message, duration) {
                 </Input>
               </FormGroup>
             </div>
-            {this.state.errorMessage.title !== "" && (
-                          <div className="empty-field-login">
-                            {this.state.showAlertWriter && (
-                              <p
-                                id={writerDivId}
-                                className="warning-paragraph"
-                              >
-                                {this.state.errorMessage.writer ? this.state.errorMessage.writer:
-                                  skippedWriterField}
-                              </p>
-                            )}
-                          </div>
-                        )}
+            {this.state.errorMessage.writer && (
+              <div className="empty-field-login">
+                {this.state.showAlertWriter && (
+                  <p id={writerDivId} className="warning-paragraph">
+                  {console.log("this.state.errorMessage.writer",this.state.errorMessage.writer)}
+
+                    {this.state.errorMessage.writer
+                      ? this.state.errorMessage.writer
+                      : skippedWriterField}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="date-content">
               {/* <label>Post Date</label>
@@ -1262,7 +1375,6 @@ showAlertWithTimeout(message, duration) {
                 autoFocus={true}
               /> */}
 
-            
               {/* {() => {
                 this.getListOfPreselectedCategories();
                 {console.log("niz2", this.state.preselectedCategoriesArray)}
@@ -1283,30 +1395,30 @@ showAlertWithTimeout(message, duration) {
                   />
                 );
               }} */}
-  
-              <div  name="category" onBlur={this.handleInputBlur}> 
-              <Multiselect
-                options={this.state.categories || []}
-                displayValue="label"
-                name="category"
-                selectedValues={
-                  this.state.selectedOptions
-                    ? this.state.selectedOptions
-                    : this.state.preselectedCategoriesArray
-                } //kada ubacim samo values onda ne pravi problem tj.this.state.preselectedCategoriesArray pravi problem tj.aman da se ne poziva na vrijeme
-                // value={
-                //   //na njihovom primjeru nema value samo selectedValues
-                //   this.state.selectedOptions || []
-                // }
-                onSelect={this.handleSelect}
-                hidePlaceholder="true"
-                showArrow="false"
-                onRemove={this.onRemove}
-                closeIcon="cancel"
-                placeholder="Select categories"
-              />
-              
-              {/* <Multiselect //poslednje novo
+
+              <div name="category" onBlur={this.handleInputBlur}>
+                <Multiselect
+                  options={this.state.categories || []}
+                  displayValue="label"
+                  name="category"
+                  selectedValues={
+                    this.state.selectedOptions
+                      ? this.state.selectedOptions
+                      : this.state.preselectedCategoriesArray
+                  } //kada ubacim samo values onda ne pravi problem tj.this.state.preselectedCategoriesArray pravi problem tj.aman da se ne poziva na vrijeme
+                  // value={
+                  //   //na njihovom primjeru nema value samo selectedValues
+                  //   this.state.selectedOptions || []
+                  // }
+                  onSelect={this.handleSelect}
+                  hidePlaceholder="true"
+                  showArrow="false"
+                  onRemove={this.onRemove}
+                  closeIcon="cancel"
+                  placeholder="Select categories"
+                />
+
+                {/* <Multiselect //poslednje novo
                 value={
                   this.state.selectedOptions
                     ? this.state.selectedOptions
@@ -1316,24 +1428,20 @@ showAlertWithTimeout(message, duration) {
                 options={this.state.categories || []}
                 optionLabel="label"
               /> */}
-
-</div>
+              </div>
             </div>
 
-            {this.state.errorMessage.category !== "" && (
-                          <div className="empty-field-login">
-                            {this.state.showAlertCategory && (
-                              <p
-                                id={categoryDivId}
-                                className="warning-paragraph"
-                              >
-                                {this.state.errorMessage.category ||
-                                  skippedCategoryField}
-                              </p>
-                            )}
-                          </div>
-                        )}
-
+            {this.state.errorMessage.category  && (
+              <div className="empty-field-login">
+                {this.state.showAlertCategory && (
+                  <p id={categoryDivId} className="warning-paragraph">
+                    {this.state.errorMessage.category
+                      ? this.state.errorMessage.category
+                      : skippedCategoryField}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="published-content">
               <label>Published</label>
@@ -1352,32 +1460,33 @@ showAlertWithTimeout(message, duration) {
         <div></div>
       </form>
     );
-  // }
+    // }
   }
 
   async getListOfWriters(config) {
-    const res = await axios.get(WRITER_API,config);
+    const res = await axios.get(WRITER_API, config);
     console.log("getListOfWriters->res", res);
     const writers = res.data.writers.map((d) => ({
       value: d._id,
       label: d.name + " " + d.lastName,
     }));
-    this.setState({ writers: writers },()=>{
+    this.setState({ writers: writers }, () => {
       console.log("writers su:" + JSON.stringify(writers));
     });
-    
   }
 
   handleWriterChange(e) {
-    this.setState({ createdBy: e.value, name: e.label },()=>{
-      console.log("Ovo je createdBy iz handleWriterChange", this.state.createdBy);
+    this.setState({ createdBy: e.value, name: e.label }, () => {
+      console.log(
+        "Ovo je createdBy iz handleWriterChange",
+        this.state.createdBy
+      );
     });
-   
   }
 
   async getListOfCategories(config) {
-    console.log("getListOfCategories->config",config)
-    const res = await axios.get(CATEGORY_API,config);
+    console.log("getListOfCategories->config", config);
+    const res = await axios.get(CATEGORY_API, config);
     const categories = res.data.categories.map((d) => ({
       value: d._id,
       label: d.name,

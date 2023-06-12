@@ -17,3 +17,7 @@ export const REGISTRATION_API = "http://localhost:8000/api/auth/register"
 export const LOGOUT_API="http://localhost:8000/api/auth/logout";
 
 export const NOT_FOUND_IMAGE="/uploads/image-not-found.jpg"
+
+
+export const ADMIN_ROLE = 'Admin';
+export const EDITOR_ROLE = 'Editor';

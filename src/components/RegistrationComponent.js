@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Alert } from "reactstrap";
+import { NavLink } from "react-router-dom";
 
 import { REGISTRATION_API } from "../globalVariables";
 import { LOGIN } from "../globalVariables";
@@ -73,6 +73,7 @@ class RegistrationComponent extends Component {
     const config = {
       headers: {
         "Content-Type": "application/json", // Specify the media type here
+        'Accept': 'application/json',
       },
     };
     axios
@@ -284,7 +285,9 @@ class RegistrationComponent extends Component {
                           onClick={(e) => this.handleRegistration(e)}
                         >
                           Sign up
-                        </button>
+                        </button> 
+                       <NavLink to="/login" >Login</NavLink>
+                        
                       </form>
                     </div>
                   </div>

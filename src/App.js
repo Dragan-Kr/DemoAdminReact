@@ -17,6 +17,7 @@ import LoginComponent from "./components/LoginComponent";
 import RegistrationComponent from "./components/RegistrationComponent";
 import AppProvider from "./context/AppProvider";
 import PrivateRoute from "./privateRoute/PrivateRoute";
+import { ADMIN_ROLE,EDITOR_ROLE } from "./globalVariables";
 
 
 function App() {
@@ -36,13 +37,42 @@ function App() {
         >
           <Route path="/news-list" element={<DataTable />} />
           <Route path="/update-news/:id" element={<UpdatePost />} />
-          <Route path="/add-news/" element={<UpdatePost />} />
+          {/* <Route path="/add-news/" element={<UpdatePost />} /> */}
+               <Route path="/add-news/" element={<PrivateRoute allowedRoles={ADMIN_ROLE}><UpdatePost/></PrivateRoute>} />
           <Route path="/date-picker/" element={<DataPicker />} />
         </Route>
       </Routes>
     </BrowserRouter>
   );
 }
+
+
+
+// function App() {
+//   return (
+//     <BrowserRouter>
+//       <Routes>
+//         <Route path="/" element={<LoginComponent />} />
+//         <Route path="/login" element={<LoginComponent />} />
+//         <Route path="/register" element={<RegistrationComponent />} />
+
+//         <Route
+//           element={
+//             <AppProvider>
+//               <MainLayout />
+//             </AppProvider>
+//           }
+//         >
+//           <Route path="/news-list" element={<DataTable />} />
+//           {/* <PrivateRoute path="/news-list"lement={<DataTable />} /> */}
+//           <Route path="/update-news/:id" element={<UpdatePost />} />
+//           <Route path="/add-news/" element={<UpdatePost />} />
+//           <Route path="/date-picker/" element={<DataPicker />} />
+//         </Route>
+//       </Routes>
+//     </BrowserRouter>
+//   );
+// }
 
 
 // //staro sa gita

@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useContext  } from "react";
+import React, { useEffect, useState,useContext,useMemo   } from "react";
 
 import { TableHeader, Pagination, Search } from "../.././components/DataTable";
 
@@ -49,7 +49,7 @@ const DataTable = () => {
   const [sorting, setSorting] = useState({ field: "index", order: "asc" });
   const [pageSize, setPageSize] = useState(options[0].value);
   const [allDataLength, setAllDataLength] = useState(0);
-
+  const [allDataResTotal,setAllDataResTotal]=useState(0);
   ////
 
   const [show, setShow] = useState(false);
@@ -67,10 +67,20 @@ const config = {
     Authorization: `Bearer ${accessToken}`,
   },
 };
-
+// useMemo(async () => {
+//   let allDataRes;
+//   let allDataResTotal=0;
+//   allDataRes = await axios.get(POST_API,config)
+  
+//   allDataResTotal = allDataRes.data.allDataLength;
+//   setAllDataResTotal(allDataResTotal);
+//   console.log("allDataRes",allDataRes)
+//   console.log("allDataResTotal",allDataResTotal)
+// }, [allDataResTotal]);
 
   useEffect(() => {
     let res;
+   
     const queryParams = new URLSearchParams();
     
     console.log("DataTable->AccessToken",config)
@@ -101,18 +111,27 @@ const config = {
   
     } else {
       const fetchData = async () => {
+      
+
         setLoading(true);
+
+
         res = await axios.get(
           `${POST_API}?page=${currentPage}&limit=${pageSize}&sortField=${sorting.field}&sortOrder=${sorting.order}&searchTerm=${searchTerm}`,config
         );
-        console.log("RES", res);
+        
         setPosts(res.data.data);
         setTotalItems(res.data.data.length);
         setTotalPages(res.data.totalPages);
         setAllDataLength(res.data.allDataLength);
+        console.log("All data length",allDataLength)
         setLoading(false);
       };
+
+    
       fetchData();
+     
+      console.log("Total items",totalItems)
       queryParams.append('page', currentPage);
       queryParams.append('limit', pageSize);
       queryParams.append('sortField', sorting.field);
@@ -122,11 +141,16 @@ const config = {
       navigate(url);
     }
   }
-  }, [currentPage, pageSize, sorting.field, sorting.order, searchTerm,accessToken]);
+  
+  console.log("allDataLength na samom kraju",allDataLength)//nakon brisanja elementa ne ispisuje se
+  console.log("Total pages na samom kraju",totalPages)
+  }, [currentPage, pageSize, sorting.field, sorting.order, searchTerm,accessToken,allDataLength]);
+  
 
   const handleClose = () => {
     setShow(false);
   };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -135,10 +159,22 @@ const config = {
   //     return <div>No posts found.</div>;
   // }
 
-  const handleDeletePost = () => {
-    PostService.deletePost(deletePost._id).then((res) => {
+   const handleDeletePost = async () => {
+    PostService.deletePost(deletePost._id,config).then((res) => {
+      
       setPosts(posts.filter((comment) => comment._id !== deletePost._id));
+     
     });
+    
+    let allDataRes;
+    let allDataResTotal=0;
+    allDataRes = await axios.get(POST_API,config)
+    
+    allDataResTotal = allDataRes.data.allDataLength;
+    setAllDataLength(allDataResTotal);
+    console.log("allDataRes",allDataRes)
+    console.log("allDataResTotal",allDataResTotal)
+    
     setShow(false);
   };
 
